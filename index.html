@@ -251,6 +251,22 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 .sw .win-body{overflow-y:auto;padding:24px}
 .sw .win-body::-webkit-scrollbar{width:4px}
 .sw .win-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+/* 3D section: browser-style tab bar */
+.sw-tabs{display:flex;align-items:stretch;height:34px;background:rgba(0,0,0,.3);border-bottom:.5px solid rgba(255,255,255,.08);flex-shrink:0;overflow-x:auto;overflow-y:hidden}
+.sw-tabs::-webkit-scrollbar{height:0}
+.sw-tab{display:flex;align-items:center;gap:5px;padding:0 12px;font-family:var(--sans);font-size:10px;letter-spacing:.05em;color:rgba(255,255,255,.4);cursor:pointer;white-space:nowrap;flex-shrink:0;user-select:none;border-right:.5px solid rgba(255,255,255,.06)}
+.sw-tab.active{background:rgba(255,255,255,.1);color:#fff}
+.sw-tab-name{pointer-events:none}
+.sw-tab-x{background:none;border:none;color:rgba(255,255,255,.35);cursor:pointer;font-size:13px;line-height:1;padding:0 0 0 3px;transition:color .1s;flex-shrink:0}
+.sw-tab-x:hover{color:#ff5f57}
+/* 3D project tab content */
+.td3-hero-wrap{width:100%;aspect-ratio:16/9;overflow:hidden;position:relative;background:rgba(255,255,255,.04)}
+.td3-hero-wrap video,.td3-hero-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.td3-tab-info{padding:16px 24px 24px}
+.td3-tab-title{font-family:var(--serif);font-size:24px;color:#f0f0f0;margin-bottom:4px}
+.td3-tab-client{font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.12em}
+/* Dimmed pill button (section minimised to pill) */
+.pbtn.dim{opacity:.4}
 
 .cgrid{display:grid;gap:12px}
 .c4{grid-template-columns:repeat(4,1fr)}.c3{grid-template-columns:repeat(3,1fr)}
@@ -1027,10 +1043,14 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 <!-- 3D section -->
 <div class="sw" id="sw-3d">
   <div class="win-bar"><div class="dots"><div class="dot r" data-role="sc" data-id="sw-3d"></div><div class="dot y" data-role="sy" data-id="sw-3d"></div><div class="dot g" data-role="sg" data-id="sw-3d"></div></div><div class="win-label">3D Design</div></div>
-  <div class="sw-sub">3D Design</div>
-  <div class="win-body">
-    <!-- Mixed-orientation video grid rendered by JS from PROJECTS['3d'] -->
-    <div class="threed-grid" id="threed-grid"></div>
+  <div class="sw-tabs" id="td3-tabs">
+    <div class="sw-tab active" data-tab="all">All Projects</div>
+  </div>
+  <div class="win-body" id="td3-body" style="padding:0;overflow-y:auto">
+    <div id="td3-grid-wrap" style="padding:24px">
+      <!-- Mixed-orientation video grid rendered by JS from PROJECTS['3d'] -->
+      <div class="threed-grid" id="threed-grid"></div>
+    </div>
   </div>
 </div>
 
@@ -1881,6 +1901,7 @@ function restoreWin(cat){
 
 function restoreSW(cat, swId){
   removeThumb(cat);
+  undimPillBtn(cat);
   openSection(cat);
 }
 
@@ -1905,16 +1926,49 @@ function removeThumb(cat){
 
 // ── Section windows ──
 const SW_MAX={};
+const sectionEls={};  // cat → sw element while open
+
+function bringFront(sw){ sw.style.zIndex=++Z; }
+
+// Fix 3: dim/restore teaser windows based on how many sections are open.
+function dimTeasers(){
+  document.querySelectorAll('.win[data-cat]').forEach(el=>{
+    el.style.transition='opacity 0.3s';
+    el.style.opacity='0.35';
+  });
+}
+function checkRestoreTeasers(){
+  if(Object.keys(sectionEls).length===0){
+    document.querySelectorAll('.win[data-cat]').forEach(el=>{
+      el.style.transition='opacity 0.3s';
+      el.style.opacity='1';
+    });
+  }
+}
+// Fix 6: dim/undim individual pill buttons.
+function dimPillBtn(cat){
+  const b=document.querySelector(`.pbtn[data-sec="${cat}"]`);
+  if(b) b.classList.add('dim');
+}
+function undimPillBtn(cat){
+  const b=document.querySelector(`.pbtn[data-sec="${cat}"]`);
+  if(b) b.classList.remove('dim');
+}
 
 function openSection(cat){
-  document.querySelectorAll('.sw').forEach(s=>{ s.classList.remove('open'); });
+  // Fix 1: if this category's window is already open, just raise it.
+  if(sectionEls[cat]){
+    if(sectionEls[cat].classList.contains('open')){ bringFront(sectionEls[cat]); return; }
+    delete sectionEls[cat];
+  }
   const sw=document.getElementById('sw-'+cat); if(!sw) return;
   sw.classList.add('open'); sw.style.zIndex=++Z;
-  sw.style.cssText += ';left:50%;top:20px;transform:translateX(-50%);width:90vw;height:;border-radius:10px';
   sw.style.left='50%'; sw.style.top='20px'; sw.style.transform='translateX(-50%)';
   sw.style.width='90vw'; sw.style.height=''; sw.style.borderRadius='10px';
   SW_MAX[sw.id]=false;
+  sectionEls[cat]=sw;
   initSwDrag(sw);
+  dimTeasers();  // Fix 3
 }
 
 function initSwDrag(sw){
@@ -1943,15 +1997,16 @@ document.querySelectorAll('.sw .dot[data-role]').forEach(dot=>{
     e.stopPropagation();
     const role=dot.dataset.role, id=dot.dataset.id;
     const sw=document.getElementById(id);
-    // Red — close the section, return to the teaser desktop.
+    const cat=id.replace('sw-','');
+    // Red — minimise to pill (Fix 6: same as teaser minimise).
     if(role==='sc'){
-      sw.classList.remove('open');
-      SW_MAX[id]=false;
-      // Reset size so the next reopen starts at 90vw default.
+      sw.classList.remove('open'); SW_MAX[id]=false;
       sw.style.width='90vw'; sw.style.height='';
       sw.style.top='20px'; sw.style.left='50%'; sw.style.transform='translateX(-50%)'; sw.style.borderRadius='10px';
+      addThumb(cat, true, id); dimPillBtn(cat);
+      delete sectionEls[cat]; checkRestoreTeasers();
     }
-    // Green — maximise / restore toggle.
+    // Green — maximise / restore toggle (unchanged).
     else if(role==='sg'){
       if(SW_MAX[id]){
         sw.style.width='90vw'; sw.style.height='';
@@ -1963,11 +2018,12 @@ document.querySelectorAll('.sw .dot[data-role]').forEach(dot=>{
         SW_MAX[id]=true;
       }
     }
-    // Yellow — minimise to the dock pill.
+    // Yellow — collapse back to teaser position (Fix 6: was minimise-to-pill).
     else if(role==='sy'){
-      const cat=id.replace('sw-','');
       sw.classList.remove('open'); SW_MAX[id]=false;
-      addThumb(cat, true, id);
+      // If the teaser for this category was itself minimised, restore it now.
+      if(MINNED[cat]) restoreWin(cat);
+      delete sectionEls[cat]; checkRestoreTeasers();
     }
   });
 });
@@ -2080,9 +2136,7 @@ function openDetail(cat,idx){
   ${heroHTML}
   <div class="d-info">
     <div class="d-cat">${p.cat}</div>
-    <!-- Project title is the sole headline. Italic-gray subtitle removed. -->
     <div class="d-client">${p.title}</div>
-    <div class="d-desc">Project description placeholder. A brief overview of the creative process, tools used, and direction behind this work.</div>
   </div>
   ${extrasHTML}`;
   }
@@ -2151,11 +2205,21 @@ document.querySelectorAll('.win[data-cat]').forEach(win=>{
 
 // ── Pill buttons ──
 document.querySelectorAll('.pbtn[data-sec]').forEach(btn=>{
-  btn.addEventListener('click',()=>openSection(btn.dataset.sec));
+  btn.addEventListener('click',()=>{
+    const cat=btn.dataset.sec;
+    // If the pill is dim the section was minimised — clear the thumb too.
+    if(btn.classList.contains('dim')){ removeThumb(cat); undimPillBtn(cat); }
+    openSection(cat);
+  });
 });
 document.getElementById('pill-home').addEventListener('click',()=>{
-  document.querySelectorAll('.sw').forEach(s=>{ s.classList.remove('open'); SW_MAX[s.id]=false; });
+  document.querySelectorAll('.sw').forEach(s=>{
+    if(s.classList.contains('open')){ s.classList.remove('open'); SW_MAX[s.id]=false; }
+  });
   document.querySelectorAll('.dw').forEach(d=>d.remove());
+  Object.keys(sectionEls).forEach(k=>delete sectionEls[k]);
+  document.querySelectorAll('.pbtn.dim').forEach(b=>b.classList.remove('dim'));
+  checkRestoreTeasers();
 });
 
 // ── Project cards ──
@@ -2275,17 +2339,82 @@ function openMotionPlayer(videoSrc){
 
     card.addEventListener('click', e => {
       if(e.target.closest('[data-mute]')) return;
-      // Vertical videos → fullscreen player. Everything else → detail window.
+      // Vertical videos → fullscreen player. Everything else → tab in section window.
       if(p.orientation === 'vertical' && p.video){
         openMotionPlayer(p.video);
       } else {
-        openDetail('3d', i);
+        open3DTab(i);
       }
     });
 
     grid.appendChild(card);
   });
 })();
+
+// ── 3D section: browser-style tab management ──
+const td3State={tabs:[],active:'all'};
+
+document.getElementById('td3-tabs').querySelector('[data-tab="all"]')
+  .addEventListener('click',()=>setActive3DTab('all'));
+
+function open3DTab(idx){
+  // If tab already open, just activate it.
+  const existing=td3State.tabs.find(t=>t.idx===idx);
+  if(existing){ setActive3DTab(idx); return; }
+  // Make sure the 3D section window is open first.
+  openSection('3d');
+  const p=PROJECTS['3d'][idx];
+  const tabBar=document.getElementById('td3-tabs');
+  const body=document.getElementById('td3-body');
+  // Tab button
+  const tabEl=document.createElement('div');
+  tabEl.className='sw-tab';
+  tabEl.dataset.tabIdx=String(idx);
+  tabEl.innerHTML=`<span class="sw-tab-name">${p.title}</span><button class="sw-tab-x" aria-label="Close">&#215;</button>`;
+  tabBar.appendChild(tabEl);
+  // Content area
+  const contentEl=document.createElement('div');
+  contentEl.style.display='none';
+  const mediaHtml=p.video
+    ?`<div class="td3-hero-wrap"><video src="${p.video}" autoplay muted loop playsinline preload="metadata"></video></div>`
+    :`<div class="td3-hero-wrap"><img src="${p.img}" alt=""></div>`;
+  contentEl.innerHTML=mediaHtml+
+    `<div class="td3-tab-info"><div class="td3-tab-title">${p.title}</div>`+
+    (p.client?`<div class="td3-tab-client">${p.client}</div>`:'')+`</div>`;
+  body.appendChild(contentEl);
+  tabEl.querySelector('.sw-tab-name').addEventListener('click',()=>setActive3DTab(idx));
+  tabEl.querySelector('.sw-tab-x').addEventListener('click',e=>{e.stopPropagation();close3DTab(idx);});
+  td3State.tabs.push({idx,el:tabEl,contentEl});
+  setActive3DTab(idx);
+}
+
+function setActive3DTab(idx){
+  td3State.active=idx;
+  const tabBar=document.getElementById('td3-tabs');
+  const gridWrap=document.getElementById('td3-grid-wrap');
+  tabBar.querySelectorAll('.sw-tab').forEach(t=>t.classList.remove('active'));
+  if(idx==='all'){
+    tabBar.querySelector('[data-tab="all"]').classList.add('active');
+    gridWrap.style.display='';
+    td3State.tabs.forEach(t=>{t.contentEl.style.display='none';});
+  } else {
+    const d=td3State.tabs.find(t=>t.idx===idx);
+    if(!d) return;
+    d.el.classList.add('active');
+    gridWrap.style.display='none';
+    td3State.tabs.forEach(t=>{t.contentEl.style.display=(t.idx===idx)?'':'none';});
+  }
+}
+
+function close3DTab(idx){
+  const i=td3State.tabs.findIndex(t=>t.idx===idx);
+  if(i===-1) return;
+  const d=td3State.tabs[i];
+  const wasActive=(td3State.active===idx);
+  d.el.remove(); d.contentEl.remove();
+  td3State.tabs.splice(i,1);
+  if(wasActive) setActive3DTab(i>0?td3State.tabs[i-1].idx:'all');
+}
 
 // ── Wire the 3D teaser's mute button ──
 (function wireBITeaserMute(){
@@ -2334,7 +2463,7 @@ function openMotionPlayer(videoSrc){
     mSec.tracks.innerHTML = MUSIC.tracks.map((t,i) =>
       `<div class="mtrack">` +
         `<span class="tn">${String(i+1).padStart(2,'0')}</span>` +
-        `<div class="ti"><div class="nm">${t.n}</div><div class="gn">${t.g}</div></div>` +
+        `<div class="ti"><div class="nm">${t.n}</div></div>` +
         `<span class="td">${t.d}</span>` +
       `</div>`
     ).join('');
@@ -2747,7 +2876,7 @@ const AIRPLANE_SRC = 'assets/airplane.gif';
   list.innerHTML = MUSIC.tracks.map((t,i) => (
     `<div class="mtrack">` +
       `<span class="tn">${String(i+1).padStart(2,'0')}</span>` +
-      `<div class="ti"><div class="nm">${t.n}</div><div class="gn">${t.g}</div></div>` +
+      `<div class="ti"><div class="nm">${t.n}</div></div>` +
       `<span class="td">${t.d || ''}</span>` +
     `</div>`
   )).join('');
