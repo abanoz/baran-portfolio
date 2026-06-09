@@ -1,0 +1,2587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baran — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --sans:'DM Sans',sans-serif;
+  --serif:'DM Serif Display',serif;
+  --text:#f0f0f0;
+  --win-bg:rgba(16,16,16,.96);
+  --win-border:rgba(255,255,255,.08);
+  --bar-h:32px;
+}
+html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:var(--text);background:#0a0a0a}
+
+/* Background */
+#bg{position:fixed;inset:0;z-index:0;background:url('assets/background.png') center/cover no-repeat}
+#bg::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,.42)}
+
+#desktop{position:fixed;inset:0;z-index:1}
+
+/* Airplane flyby — the 1920×1080 GIF already animates the plane right→left
+   over its own 8-second runtime, so we don't add any CSS transform. We just
+   show the GIF in place for 8s, then hide. Positioned higher than the music
+   window so the plane reads "in the sky" above all the content. Sits at
+   z-index 0 so every window (z ≥ 1) is in front of it. */
+#airplane{
+  position:absolute;
+  top:-30vh;                          /* lifted high above the viewport — plane reads as a distant flyover */
+  left:0;
+  width:100%;
+  height:auto;
+  pointer-events:none;
+  user-select:none;
+  z-index:0;                          /* behind every window */
+  display:none;                       /* hidden between flights */
+}
+#airplane.flying{ display:block }
+
+/* ── Windows ── */
+.win{
+  position:absolute;min-width:160px;min-height:120px;
+  border-radius:10px;border:.5px solid var(--win-border);
+  background:var(--win-bg);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  box-shadow:0 20px 60px rgba(0,0,0,.55),0 0 0 .5px rgba(255,255,255,.04);
+  display:flex;flex-direction:column;overflow:hidden;user-select:none;
+  transition:box-shadow .2s ease;
+}
+.win.focused{box-shadow:0 28px 80px rgba(0,0,0,.72),0 0 0 .5px rgba(255,255,255,.09)}
+
+.win-bar{
+  height:var(--bar-h);flex-shrink:0;
+  display:flex;align-items:center;padding:0 10px;gap:6px;
+  cursor:grab;border-radius:10px 10px 0 0;
+}
+.win-bar:active{cursor:grabbing}
+.dots{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.dot{width:12px;height:12px;border-radius:50%;cursor:pointer;transition:filter .15s}
+.dot:hover{filter:brightness(1.25)}
+.dot.r{background:#ff5f57}.dot.y{background:#ffbd2e}.dot.g{background:#28c941}
+.win-label{flex:1;text-align:center;font-size:11px;font-weight:400;color:rgba(255,255,255,.35);letter-spacing:.05em;pointer-events:none}
+.win-body{flex:1;overflow:hidden;position:relative}
+.grip{position:absolute;right:0;bottom:0;width:16px;height:16px;cursor:se-resize;z-index:10}
+.grip::after{content:'';position:absolute;right:3px;bottom:3px;width:8px;height:8px;border-right:1.5px solid rgba(255,255,255,.18);border-bottom:1.5px solid rgba(255,255,255,.18)}
+
+/* ── Teaser content ── */
+.motion-card{height:100%;position:relative;overflow:hidden;background:#000}
+.motion-card img, .motion-card video{width:100%;height:100%;object-fit:cover;display:block}
+.motion-card .ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.72) 0%,transparent 55%);display:flex;flex-direction:column;justify-content:flex-end;padding:12px;pointer-events:none}
+.motion-card .ov small{font-size:9px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em}
+.motion-card .ov h3{font-family:var(--serif);font-size:18px;color:#fff;margin-top:3px}
+/* Instagram-stories progress bars
+   The top scrim adds a soft dark gradient behind the bars so they read against
+   bright video frames as well as dark ones. */
+.story-bars{
+  position:absolute;top:8px;left:10px;right:10px;
+  display:flex;gap:4px;z-index:4;pointer-events:none;
+}
+#story-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:48px;
+  background:linear-gradient(to bottom,rgba(0,0,0,.45) 0%,rgba(0,0,0,0) 100%);
+  z-index:3;pointer-events:none;
+}
+.sb{
+  flex:1;height:3px;
+  background:rgba(255,255,255,.32);
+  border-radius:3px;overflow:hidden;
+  box-shadow:0 0 0 .5px rgba(0,0,0,.3),0 1px 2px rgba(0,0,0,.4);
+}
+.sb-fill{height:100%;width:0;background:#fff;border-radius:3px}
+.story-tap{position:absolute;top:0;bottom:0;width:50%;cursor:pointer;z-index:2}
+.story-tap.left{left:0}
+.story-tap.right{right:0}
+/* Autoplay-blocked play button overlay */
+#story-play-btn{display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,.5);align-items:center;justify-content:center;cursor:pointer;z-index:5;border:none;padding:0}
+#story-play-btn.visible{display:flex}
+#story-play-btn svg{width:18px;height:18px;fill:#fff;margin-left:3px}
+
+/* ── Portfolio sticker (decorative element, NOT a window) ──
+   Flat (no rotation), no chrome, no resize handle — just a draggable image
+   element that lives above the windows and behind the pill nav. */
+.logo-sticker{
+  position:absolute;
+  transform-origin:center;
+  pointer-events:auto;
+  user-select:none;
+  cursor:grab;
+}
+.logo-sticker:active{ cursor:grabbing }
+.logo-sticker img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+  filter:drop-shadow(0 6px 18px rgba(0,0,0,.35));
+  pointer-events:none;
+}
+/* On viewports under 1200px, scale up to 20vw so the sticker stays readable. */
+@media (max-width:1199px){
+  .logo-sticker{ width:20vw !important; height:14vh !important; }
+}
+.win.bare{cursor:grab}
+.win.bare:active{cursor:grabbing}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;height:100%;gap:1px;background:rgba(255,255,255,.05)}
+.g2 .cell{overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center}
+.g2 .cell img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.g2 .cell span{font-size:9px;color:rgba(255,255,255,.15);letter-spacing:.05em;position:relative;z-index:1}
+
+/* ── Music project showcase ── */
+.music-teaser{height:100%;display:flex;flex-direction:column;padding:12px;gap:8px;overflow:hidden}
+.music-cover{width:100%;aspect-ratio:1/1;flex:0 1 auto;min-height:0;
+  border-radius:6px;overflow:hidden;background:rgba(255,255,255,.05);position:relative}
+.music-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.music-cover .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,.18);letter-spacing:.05em}
+.music-name{font-family:var(--serif);font-size:18px;line-height:1.1;flex:0 0 auto}
+.music-tag{font-size:10px;color:rgba(255,255,255,.5);line-height:1.45;flex:0 0 auto}
+.mtracks h3{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-bottom:12px;font-weight:500}
+.mtrack{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:.5px solid rgba(255,255,255,.05)}
+.mtrack .tn{font-size:11px;color:rgba(255,255,255,.25);width:18px;text-align:right;flex-shrink:0}
+.mtrack .ti{flex:1;min-width:0}
+.mtrack .nm{font-size:13px;color:#f0f0f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mtrack .gn{font-size:10px;color:rgba(255,255,255,.35);margin-top:1px}
+.mtrack .td{font-size:11px;color:rgba(255,255,255,.3);flex-shrink:0}
+.spotify-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:#1db954;color:#fff;
+  border-radius:100px;padding:5px 11px;font-size:10px;font-weight:500;
+  text-decoration:none;cursor:pointer;align-self:flex-start;
+  transition:filter .15s,transform .15s;flex:0 0 auto;letter-spacing:.02em;
+}
+.spotify-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.spotify-btn svg{width:13px;height:13px;flex-shrink:0}
+
+/* Music section showcase */
+.mshow{display:grid;grid-template-columns:1fr 1.2fr;gap:32px;align-items:start;margin-bottom:36px}
+.mshow-cover{aspect-ratio:1/1;border-radius:10px;overflow:hidden;background:rgba(255,255,255,.04);position:relative}
+.mshow-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.mshow-cover .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:rgba(255,255,255,.18)}
+.mshow-info h1{font-family:var(--serif);font-size:48px;line-height:1.05;margin-bottom:8px}
+.mshow-info .tag{font-size:13px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.12em;margin-bottom:18px}
+.mshow-info p{font-size:14px;line-height:1.75;color:rgba(255,255,255,.55);margin-bottom:24px}
+.spotify-btn-lg{
+  display:inline-flex;align-items:center;gap:8px;
+  background:#1db954;color:#fff;
+  border-radius:100px;padding:10px 18px;font-size:13px;font-weight:500;
+  text-decoration:none;cursor:pointer;
+  transition:filter .15s,transform .15s;
+}
+.spotify-btn-lg:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.spotify-btn-lg svg{width:18px;height:18px}
+
+.mgallery{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:36px}
+.mgallery-item{aspect-ratio:4/3;border-radius:6px;overflow:hidden;position:relative;background:rgba(255,255,255,.04)}
+.mgallery-item img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.mgallery-item .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,.18)}
+
+.mtracks{border-top:.5px solid rgba(255,255,255,.08);padding-top:20px}
+
+@media(max-width:900px){
+  .mshow{grid-template-columns:1fr}
+  .mgallery{grid-template-columns:repeat(2,1fr)}
+}
+
+.abteaser{padding:14px;height:100%;overflow:hidden;display:flex;flex-direction:column;gap:10px}
+/* Hide all file-path placeholder labels (".phl") site-wide. They were debug
+   overlays showing things like "assets/motion/02" on every card and detail
+   hero — not useful in the final UI. */
+.phl{display:none !important}
+.abn{font-family:var(--serif);font-size:24px;line-height:1.05}
+.abl{font-size:10px;color:rgba(255,255,255,.38);text-transform:uppercase;letter-spacing:.09em}
+.abs{display:inline-flex;align-items:center;gap:5px;font-size:9px;color:rgba(255,255,255,.6);background:rgba(40,201,65,.1);border:.5px solid rgba(40,201,65,.28);border-radius:100px;padding:3px 9px;width:fit-content}
+.abs::before{content:'';width:5px;height:5px;border-radius:50%;background:#28c941}
+.abb{font-size:10px;line-height:1.65;color:rgba(255,255,255,.48)}
+
+/* ── Pill nav ── */
+#pill{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  z-index:2000;display:flex;align-items:center;
+  height:52px;padding:0 14px;gap:4px;
+  background:rgba(42,42,42,.92);
+  backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);
+  border-radius:100px;border:.5px solid rgba(255,255,255,.13);
+  box-shadow:0 8px 32px rgba(0,0,0,.45);white-space:nowrap;
+}
+.psep{width:.5px;height:28px;background:rgba(255,255,255,.13);margin:0 6px;flex-shrink:0}
+.pbtn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,1);transition:background .15s,color .15s;flex-shrink:0;position:relative}
+.pbtn:hover{background:rgba(255,255,255,.09);color:#fff}
+.pbtn svg{width:17.34px;height:17.34px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.pbtn[data-tip]::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:rgba(18,18,18,.92);color:rgba(255,255,255,.82);font-size:10px;padding:4px 9px;border-radius:6px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;letter-spacing:.03em}
+.pbtn[data-tip]:hover::after{opacity:1}
+
+#thumbs{display:flex;align-items:center}
+.pthumb{
+  width:36px;height:36px;border-radius:8px;overflow:hidden;cursor:pointer;
+  border:.5px solid rgba(255,255,255,.18);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:8px;color:rgba(255,255,255,.45);letter-spacing:.05em;text-transform:uppercase;
+  margin-left:4px;
+  transition:width .28s cubic-bezier(.34,1.4,.64,1),
+             margin-left .28s cubic-bezier(.34,1.4,.64,1),
+             opacity .22s ease,
+             transform .15s,box-shadow .15s;
+}
+#thumbs > .pthumb:first-child{margin-left:0}
+.pthumb img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.pthumb:hover{transform:scale(1.12) translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.5)}
+
+/* ── Section windows ── */
+.sw{
+  position:fixed;width:90vw;top:20px;left:50%;transform:translateX(-50%);
+  max-height:calc(100vh - 20px - 88px);z-index:800;
+  border-radius:10px;border:.5px solid var(--win-border);
+  background:rgba(13,13,13,.97);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  box-shadow:0 24px 80px rgba(0,0,0,.65);
+  display:none;flex-direction:column;overflow:hidden;
+}
+.sw.open{display:flex}
+.sw .win-bar{background:rgba(18,18,18,.95);cursor:grab}
+.sw-sub{padding:0 24px;height:38px;display:flex;align-items:center;border-bottom:.5px solid rgba(255,255,255,.06);font-size:11px;color:rgba(255,255,255,.35);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0}
+.sw .win-body{overflow-y:auto;padding:24px}
+.sw .win-body::-webkit-scrollbar{width:4px}
+.sw .win-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+
+.cgrid{display:grid;gap:12px}
+.c4{grid-template-columns:repeat(4,1fr)}.c3{grid-template-columns:repeat(3,1fr)}
+
+.pcard{border-radius:8px;overflow:hidden;cursor:pointer;background:rgba(255,255,255,.03);border:.5px solid rgba(255,255,255,.07);transition:transform .2s,box-shadow .2s}
+.pcard:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.45)}
+.pcard-img{width:100%;position:relative;overflow:hidden;background:rgba(255,255,255,.04)}
+.r914{padding-bottom:calc(14/9*100%)}.r1610{padding-bottom:calc(10/16*100%)}
+.r11{padding-bottom:100%}                                  /* square — Art Direction cards */
+.r169{padding-bottom:calc(9/16*100%)}                      /* 16:9 — UI/UX web design cards */
+.r916{padding-bottom:calc(16/9*100%)}                      /* 9:16 — UI/UX vertical (App Design) */
+.pcard-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+/* ── UI/UX-specific image fit ──
+   Anchor screenshots to the top so the most important UI is visible — same
+   rule applies to teaser, section grid, detail hero, and mobile thumbnails. */
+.uiux-card img,
+.pcard.uiux-card .pcard-img img,
+.uiux-hero img,
+.mob-cimg.uiux-fit img{
+  object-fit:cover;
+  object-position:center center;
+}
+/* App Design vertical card — anchor to top so the phone top shows */
+.pcard.uiux-card.vertical .pcard-img img{object-position:top center}
+
+/* ── UI/UX section grid ──
+   Three columns. Auto rows so each row sizes to the tallest content. The
+   vertical (App Design) card spans 2 rows, sitting alongside the horizontal
+   cards naturally. */
+.uiux-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-auto-rows:minmax(0,auto);
+  gap:12px;
+}
+.uiux-grid .pcard.vertical{ grid-row:span 2 }
+
+/* ── UI/UX detail hero ──
+   The standard d-hero is 16:9. Override for vertical projects (App Design). */
+.dw .uiux-hero{
+  width:100%;padding-bottom:calc(9/16*100%);
+  position:relative;background:rgba(255,255,255,.04);
+}
+.dw .uiux-hero.vertical{
+  padding-bottom:calc(16/9*100%);
+}
+.dw .uiux-hero img{
+  position:absolute;inset:0;width:100%;height:100%;display:block;
+}
+
+@media(max-width:640px){
+  .uiux-grid{grid-template-columns:repeat(2,1fr)}
+  .uiux-grid .pcard.vertical{grid-row:span 2}
+}
+.pcard-img .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,.15);letter-spacing:.05em}
+.pcard-info{padding:10px 12px}
+.pcard-info .pc{font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em}
+.pcard-info .pt{font-family:var(--serif);font-size:15px;color:rgba(255,255,255,.9);margin-top:2px}
+.pcard-info .ps{font-size:10px;color:rgba(255,255,255,.32);margin-top:1px}
+
+/* ── Brand Identity section layout ── */
+.bi-layout{display:flex;flex-direction:column;gap:12px;padding:24px;overflow-y:auto;height:100%}
+.bi-slot{position:relative;overflow:hidden;border-radius:8px;background:#000;flex-shrink:0}
+.bi-slot video,.bi-slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+.bi-landscape{display:flex;flex-direction:column;gap:12px}
+.bi-landscape .bi-slot{aspect-ratio:16/9}
+.bi-verticals{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bi-verticals .bi-slot{aspect-ratio:9/16}
+.bi-slot:hover .mute-btn{opacity:1}
+
+
+/* ── Motion section: 19 vertical video cards ── */
+.motion-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:1100px){.motion-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.motion-grid{grid-template-columns:repeat(2,1fr);gap:8px}}
+.mvcard{
+  position:relative;aspect-ratio:9/16;
+  border-radius:8px;overflow:hidden;cursor:pointer;
+  background:#000;border:.5px solid rgba(255,255,255,.07);
+  transition:transform .2s,box-shadow .2s;
+}
+.mvcard:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(0,0,0,.5)}
+.mvcard video, .mvcard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.mvcard .num{
+  position:absolute;top:8px;left:10px;z-index:2;
+  font-size:10px;color:rgba(255,255,255,.85);letter-spacing:.08em;font-weight:500;
+  text-shadow:0 1px 2px rgba(0,0,0,.6);
+}
+.mvcard .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,.18);letter-spacing:.05em}
+
+/* Mute button (small, on hover, on grid cards) */
+.mute-btn{
+  position:absolute;bottom:8px;right:8px;z-index:3;
+  width:24px;height:24px;border-radius:50%;
+  background:rgba(0,0,0,.45);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:.5px solid rgba(255,255,255,.18);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;opacity:0;transition:opacity .15s,background .15s,transform .15s;
+}
+.mvcard:hover .mute-btn,
+.motion-card:hover .mute-btn{opacity:1}
+.mute-btn:hover{background:rgba(0,0,0,.65);transform:scale(1.06)}
+.mute-btn svg{width:12px;height:12px;stroke:rgba(255,255,255,.92);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+/* Larger variant for the detail-window video */
+.mute-btn.lg{width:36px;height:36px;bottom:14px;right:14px;opacity:1}
+.mute-btn.lg svg{width:16px;height:16px}
+
+/* ── Detail window — vertical variant (Motion projects) ── */
+.dw.vertical .d-hero{padding-bottom:0;aspect-ratio:9/16;width:100%}
+.dw.vertical .d-hero video, .dw.vertical .d-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.d-hero video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+
+/* ── 3D section: mixed-orientation video grid ──
+   Two columns. Landscape cards are 16:10 and pair up per row; vertical cards
+   are 9:14 and pair up per row. Each row keeps consistent heights this way. */
+.threed-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;align-items:start}
+.threed-card{
+  position:relative;border-radius:8px;overflow:hidden;cursor:pointer;
+  background:#000;border:.5px solid rgba(255,255,255,.07);
+  transition:transform .2s,box-shadow .2s;
+}
+.threed-card:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(0,0,0,.5)}
+.threed-card.landscape{aspect-ratio:16/10}
+.threed-card.vertical{aspect-ratio:9/14}
+.threed-card video, .threed-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.threed-card .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:rgba(255,255,255,.18);letter-spacing:.05em}
+.threed-card .info{
+  position:absolute;bottom:0;left:0;right:0;z-index:2;padding:14px 16px;pointer-events:none;
+  background:linear-gradient(to top,rgba(0,0,0,.78) 0%,transparent 100%);
+}
+.threed-card .info .pc{font-size:9px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.1em}
+.threed-card .info .pt{font-family:var(--serif);font-size:16px;color:#fff;margin-top:2px}
+.threed-card .info .ps{font-size:10px;color:rgba(255,255,255,.55);margin-top:1px}
+.threed-card:hover .mute-btn{opacity:1}
+@media(max-width:600px){
+  .threed-grid{grid-template-columns:1fr}
+}
+
+/* ── Motion fullscreen video player ── */
+/* Opened when a Motion grid card is clicked. Just the video, no project page. */
+.video-player{
+  position:fixed;inset:0;z-index:4000;
+  display:flex;align-items:center;justify-content:center;
+  animation:vp-in .25s ease;
+}
+@keyframes vp-in{from{opacity:0}to{opacity:1}}
+.video-player-bg{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,.92);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  cursor:pointer;
+}
+.video-player video{
+  position:relative;z-index:1;
+  height:92vh;max-width:92vw;aspect-ratio:9/16;
+  background:#000;border-radius:10px;
+  box-shadow:0 30px 100px rgba(0,0,0,.7);
+}
+.video-player-close{
+  position:absolute;top:24px;right:24px;z-index:2;
+  width:42px;height:42px;border-radius:50%;
+  background:rgba(255,255,255,.08);border:.5px solid rgba(255,255,255,.22);
+  color:#fff;font-size:22px;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  transition:background .15s,transform .15s;
+}
+.video-player-close:hover{background:rgba(255,255,255,.18);transform:scale(1.06)}
+
+/* ── DVD-style idle screensaver ── */
+#dvd-overlay{
+  position:fixed;inset:0;z-index:9000;
+  background:rgba(0,0,0,.78);
+  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+  cursor:pointer;
+  animation:dvd-in .35s ease;
+}
+@keyframes dvd-in{from{opacity:0}to{opacity:1}}
+#dvd-logo{
+  position:absolute;top:0;left:0;
+  width:280px;max-width:32vw;height:auto;
+  pointer-events:none;user-select:none;
+  filter:drop-shadow(0 6px 24px rgba(0,0,0,.5));
+}
+
+.msec{display:flex;flex-direction:column;gap:2px}
+.mrow{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:8px;cursor:pointer;transition:background .15s}
+.mrow:hover{background:rgba(255,255,255,.05)}
+.playbtn{width:32px;height:32px;border-radius:50%;border:.5px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.playbtn svg{width:12px;height:12px;fill:rgba(255,255,255,.7);stroke:none}
+.mrow .ti{flex:1}.mrow .nm{font-size:14px;color:rgba(255,255,255,.85)}
+.mrow .gn{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px}
+.mrow .td{font-size:11px;color:rgba(255,255,255,.3);flex-shrink:0}
+
+/* Background image on the About section + teaser. Drop a photo at
+   assets/about/bg.jpg and the dark overlay keeps text readable. */
+#sw-about{
+  background:
+    linear-gradient(rgba(10,10,10,.86),rgba(10,10,10,.86)),
+    url('assets/about/bg.jpg') center/cover no-repeat,
+    rgba(13,13,13,.97);
+}
+#tw-about .win-body{
+  background:
+    linear-gradient(rgba(16,16,16,.78),rgba(16,16,16,.78)),
+    url('assets/about/bg.jpg') center/cover no-repeat;
+}
+.absec{max-width:640px;margin:0 auto}
+.absec .loc{font-size:12px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px}
+.absec h1{font-family:var(--serif);font-size:56px;line-height:1.05;margin-bottom:20px}
+.absec .stat{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,.6);background:rgba(40,201,65,.1);border:.5px solid rgba(40,201,65,.28);border-radius:100px;padding:5px 12px;margin-bottom:28px}
+.absec .stat::before{content:'';width:6px;height:6px;border-radius:50%;background:#28c941}
+.absec p{font-size:16px;line-height:1.75;color:rgba(255,255,255,.58);margin-bottom:28px}
+
+.absec-label{font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.14em;margin-bottom:12px}
+
+.skills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:32px}
+.skill{display:inline-block;font-size:11px;color:rgba(255,255,255,.7);background:rgba(255,255,255,.05);border:.5px solid rgba(255,255,255,.12);border-radius:100px;padding:5px 12px;letter-spacing:.02em}
+
+/* ── Experience / Education list ──
+   Identical row layout for both. Title left, dates right; description sits
+   below as a soft secondary line. Stacks vertically on narrow screens. */
+.exp-list{margin-bottom:32px}
+.exp-row{
+  display:grid;
+  grid-template-columns:40px 1fr auto;
+  column-gap:14px;
+  align-items:center;
+  padding:14px 0;
+  border-bottom:.5px solid rgba(255,255,255,.08);
+}
+.exp-row:last-child{border-bottom:none}
+.exp-logo{
+  width:40px;height:40px;border-radius:10px;
+  background:rgba(255,255,255,.06);
+  border:.5px solid rgba(255,255,255,.1);
+  overflow:hidden;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.exp-logo img{width:100%;height:100%;object-fit:contain;padding:5px;display:block}
+.exp-role{
+  font-family:var(--sans);font-weight:500;font-size:16px;color:#fff;
+  line-height:1.3;
+}
+.exp-company{
+  font-family:var(--sans);font-weight:400;font-size:13px;
+  color:rgba(255,255,255,.55);margin-top:3px;
+}
+.exp-date{
+  font-family:var(--sans);font-size:12px;color:rgba(255,255,255,.4);
+  white-space:nowrap;text-align:right;justify-self:end;
+}
+.exp-desc{
+  grid-column:1 / -1;
+  font-family:var(--sans);font-size:12px;line-height:1.55;
+  color:rgba(255,255,255,.45);
+  margin-top:6px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;
+}
+@media(max-width:640px){
+  .exp-row{
+    grid-template-columns:36px 1fr;
+    column-gap:10px;
+  }
+  .exp-logo{width:36px;height:36px}
+  .exp-date{
+    grid-column:1;
+    grid-row:auto;
+    text-align:left;
+    justify-self:start;
+    margin-top:6px;
+  }
+}
+
+/* ── Social icons ── */
+.socials{display:inline-flex;align-items:center;gap:8px}
+.social-link{
+  display:inline-flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.5);text-decoration:none;
+  transition:color .15s,transform .15s;
+}
+.social-link:hover{color:#fff;transform:translateY(-1px)}
+.social-link svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+/* Larger variant in About section */
+.socials-lg{gap:10px;margin-bottom:36px}
+.socials-lg .social-link svg{width:22px;height:22px}
+
+/* ── Contact form ── */
+.cform{display:flex;flex-direction:column;gap:18px;margin-top:8px}
+.cform-row{display:flex;flex-direction:column;gap:6px}
+.cform-row.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cform-row.row2 > div{display:flex;flex-direction:column;gap:6px}
+.cform label{font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.14em}
+.cform input, .cform textarea{
+  background:transparent;color:#fff;
+  border:.5px solid rgba(255,255,255,.15);border-radius:6px;
+  padding:10px 12px;font-size:13px;font-family:var(--sans);
+  outline:none;transition:border-color .15s,background .15s;
+  width:100%;
+}
+.cform input::placeholder, .cform textarea::placeholder{color:rgba(255,255,255,.25)}
+.cform input:focus, .cform textarea:focus{border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.02)}
+.cform textarea{resize:vertical;min-height:96px;line-height:1.5}
+.cform-submit{
+  align-self:flex-start;background:rgba(255,255,255,.08);
+  color:#fff;border:.5px solid rgba(255,255,255,.2);
+  border-radius:100px;padding:9px 22px;font-size:12px;font-family:var(--sans);font-weight:500;
+  letter-spacing:.04em;cursor:pointer;
+  transition:transform .15s,background .15s,border-color .15s;
+  margin-top:6px;
+}
+.cform-submit:hover{transform:translateY(-1px);background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.32)}
+.cform-submit:disabled{opacity:.5;cursor:wait}
+.cform-success{
+  font-size:13px;color:rgba(255,255,255,.7);
+  background:rgba(40,201,65,.08);border:.5px solid rgba(40,201,65,.28);
+  border-radius:8px;padding:14px 16px;line-height:1.5;
+}
+.cform-success::before{content:'✓ ';color:#28c941;font-weight:600}
+.cform-error{font-size:12px;color:#ff6b6b;margin-top:4px}
+
+/* About teaser socials placement */
+.abteaser .socials{margin-top:2px}
+.abteaser .ab-cta{
+  align-self:flex-start;margin-top:4px;
+  background:transparent;border:none;padding:0;cursor:pointer;
+  display:block;line-height:0;
+  transition:transform .15s ease;
+}
+.abteaser .ab-cta:hover{transform:translateY(-1px) scale(1.02)}
+.abteaser .ab-cta img{display:block;max-width:100%;height:auto;pointer-events:none}
+
+/* ── Detail windows ── */
+.dw{
+  position:fixed;width:62vw;height:80vh;
+  border-radius:10px;border:.5px solid var(--win-border);
+  background:rgba(11,11,11,.98);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  box-shadow:0 32px 100px rgba(0,0,0,.75);
+  display:flex;flex-direction:column;overflow:hidden;z-index:900;
+}
+.dw .win-bar{background:rgba(16,16,16,.96);cursor:grab}
+.dw .win-body{overflow-y:auto;flex:1}
+.dw .win-body::-webkit-scrollbar{width:4px}
+.dw .win-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+.d-hero{width:100%;padding-bottom:calc(9/16*100%);position:relative;background:rgba(255,255,255,.04)}
+.d-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.d-hero .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:rgba(255,255,255,.12)}
+.d-info{padding:24px}
+.d-cat{font-size:10px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px}
+.d-client{font-family:var(--serif);font-size:34px;color:rgba(255,255,255,.95);line-height:1.1}
+.d-proj{font-family:var(--serif);font-style:italic;font-size:20px;color:rgba(255,255,255,.38);margin-top:4px;margin-bottom:18px}
+.d-desc{font-size:13px;line-height:1.75;color:rgba(255,255,255,.48);margin-bottom:24px}
+.d-imgs{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 24px 24px}
+
+/* ── Art Direction detail grid (8 squares, 4×2 desktop / 2×4 mobile) ──
+   Failed images hide via onerror; the dark `.ad-cell` background reads as
+   a placeholder square so there's no broken-image icon. */
+.ad-single{
+  width:100%;height:100%;
+  overflow:hidden;
+}
+.ad-single img{
+  width:100%;height:100%;
+  object-fit:cover;
+  display:block;
+}
+/* ── UI/UX embed layouts ── */
+.uiux-xd-single{width:100%;height:100%;overflow:hidden;position:relative}
+.uiux-xd-single iframe{position:absolute;inset:0;width:100%;height:100%;border:none;display:block;z-index:2}
+/* Fallback shown behind iframe — project thumbnail + open button.
+   Visible if iframe fails to load (XD blocks embedding). */
+.uiux-xd-fallback{
+  position:absolute;inset:0;z-index:1;
+  display:flex;align-items:center;justify-content:center;
+  background-size:cover;background-position:center;
+  background-color:#111;
+}
+.uiux-xd-fallback::before{
+  content:'';position:absolute;inset:0;
+  background:rgba(0,0,0,.55);
+}
+.uiux-xd-open{
+  position:relative;z-index:2;
+  display:inline-block;
+  padding:12px 24px;border-radius:8px;
+  background:rgba(255,255,255,.12);
+  border:.5px solid rgba(255,255,255,.25);
+  color:#fff;font-size:13px;font-family:var(--sans);
+  text-decoration:none;letter-spacing:.04em;
+  backdrop-filter:blur(8px);
+  transition:background .15s;
+}
+.uiux-xd-open:hover{background:rgba(255,255,255,.22)}
+.uiux-embeds-grid{display:grid;grid-template-columns:repeat(3,1fr);height:100%;border-top:.5px solid rgba(255,255,255,.06)}
+.uiux-embed-panel{display:flex;flex-direction:column;height:100%;border-right:.5px solid rgba(255,255,255,.06)}
+.uiux-embed-panel:last-child{border-right:none}
+.uiux-embed-panel iframe{flex:1;width:100%;height:100%;border:none;display:block}
+.uiux-embed-label{flex-shrink:0;padding:5px 10px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.28);background:rgba(0,0,0,.35);text-align:center}
+.d-slot{border-radius:6px;overflow:hidden;padding-bottom:62%;position:relative;background:rgba(255,255,255,.04)}
+.d-slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.d-slot .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,.12)}
+
+/* ── Mobile ──
+   Editorial-style stacked layout. Smooth scroll-jump from the bottom nav
+   to each section's anchor. All desktop chrome (#desktop, #pill, #airplane)
+   is hidden, the background image is dimmed for legibility, and #mob takes
+   over as the document body. */
+@media(max-width:767px){
+  html,body{overflow:auto;background:#0a0a0a}
+  html{scroll-behavior:smooth}
+  body{padding:0;margin:0}
+  #bg{display:block;opacity:.45}
+  #desktop,#pill,#airplane{display:none !important}
+
+  #mob{
+    display:flex;flex-direction:column;
+    min-height:100vh;background:transparent;
+    padding-bottom:84px;position:relative;z-index:2;
+    color:var(--text);
+  }
+
+  /* ── Hero ── */
+  .mob-hero{
+    padding:72px 24px 48px;
+    border-bottom:.5px solid rgba(255,255,255,.06);
+  }
+  .mob-hero .loc{font-size:11px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.16em;margin-bottom:18px}
+  .mob-hero h1{
+    font-family:var(--serif);font-size:64px;line-height:.94;letter-spacing:-.02em;
+    margin-bottom:20px;
+  }
+  .mob-hero .role{
+    font-family:var(--serif);font-style:italic;font-size:19px;line-height:1.35;
+    color:rgba(255,255,255,.55);margin-bottom:28px;
+  }
+  .mob-hero p{font-size:15px;line-height:1.7;color:rgba(255,255,255,.62);margin-bottom:24px}
+  .mob-hero .socials{display:flex;gap:10px}
+  .mob-hero .social-link{
+    width:36px;height:36px;border-radius:50%;
+    background:rgba(255,255,255,.05);border:.5px solid rgba(255,255,255,.18);
+    display:flex;align-items:center;justify-content:center;
+    color:rgba(255,255,255,.7);transition:all .15s;
+  }
+  .mob-hero .social-link:active{background:rgba(255,255,255,.14);color:#fff}
+  .mob-hero .social-link svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+  /* ── Section ── */
+  .mob-sec{padding:56px 24px;border-top:.5px solid rgba(255,255,255,.06);scroll-margin-top:8px}
+  .mob-sec .sec-kicker{font-size:11px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.16em;margin-bottom:10px}
+  .mob-sec h2{font-family:var(--serif);font-size:38px;line-height:1.02;letter-spacing:-.01em;margin-bottom:28px}
+
+  /* ── Card grid ── */
+  .mob-grid{display:grid;gap:14px;grid-template-columns:1fr}
+  .mob-grid.cols-2{grid-template-columns:1fr 1fr;gap:10px}
+  .mob-card{border-radius:8px;overflow:hidden;background:rgba(255,255,255,.04);border:.5px solid rgba(255,255,255,.07);cursor:pointer}
+  .mob-cimg{width:100%;position:relative;background:rgba(255,255,255,.05);overflow:hidden}
+  .mob-cimg.r1610{aspect-ratio:16/10}
+  .mob-cimg.r914{aspect-ratio:9/14}
+  .mob-cimg.r11{aspect-ratio:1/1}
+  .mob-cimg img,.mob-cimg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  .mob-cimg .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:rgba(255,255,255,.18)}
+  .mob-ci{padding:12px 14px 14px}
+  .mob-ci .pt{font-family:var(--serif);font-size:18px;line-height:1.2}
+  .mob-ci .ps{font-size:11px;color:rgba(255,255,255,.4);margin-top:3px}
+
+  /* ── Music ── */
+  .mob-music{display:flex;flex-direction:column;gap:0}
+  .mob-music-cover{width:100%;aspect-ratio:1/1;border-radius:10px;overflow:hidden;position:relative;background:rgba(255,255,255,.05);margin-bottom:18px}
+  .mob-music-cover img{width:100%;height:100%;object-fit:cover;display:block}
+  .mob-music-cover .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:rgba(255,255,255,.18)}
+  .mob-music .pn{font-family:var(--serif);font-size:34px;line-height:1.05;margin-bottom:8px}
+  .mob-music .pt{font-size:11px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.14em;margin-bottom:20px}
+  .mob-music .spotify-btn{font-size:13px;padding:9px 16px;align-self:flex-start}
+  .mob-music .spotify-btn svg{width:16px;height:16px}
+  .mob-music-tracks{margin-top:28px;border-top:.5px solid rgba(255,255,255,.06);padding-top:20px}
+  .mob-music-tracks h3{font-size:11px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.14em;margin-bottom:14px}
+  .mob-track{display:flex;align-items:center;gap:14px;padding:11px 0;border-bottom:.5px solid rgba(255,255,255,.04)}
+  .mob-track:last-child{border-bottom:none}
+  .mob-track .tn{font-size:11px;color:rgba(255,255,255,.3);width:18px;text-align:right;flex-shrink:0}
+  .mob-track .ti{flex:1;min-width:0}
+  .mob-track .nm{font-size:13px;color:rgba(255,255,255,.82);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mob-track .gn{font-size:10px;color:rgba(255,255,255,.34);margin-top:2px}
+  .mob-track .td{font-size:11px;color:rgba(255,255,255,.32);flex-shrink:0}
+
+  /* ── About skills ── */
+  .mob-skills{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+  .mob-skills .skill{background:rgba(255,255,255,.05);border:.5px solid rgba(255,255,255,.12);border-radius:100px;padding:7px 13px;font-size:12px;color:rgba(255,255,255,.72)}
+
+  /* ── Bottom nav (anchor links to sections) ── */
+  .mob-nav{
+    position:fixed;bottom:0;left:0;right:0;height:68px;
+    background:rgba(20,20,20,.94);
+    backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+    border-top:.5px solid rgba(255,255,255,.1);
+    display:flex;align-items:center;justify-content:space-around;
+    z-index:100;padding:0 4px;
+  }
+  .mob-nbtn{
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+    color:rgba(255,255,255,.5);font-size:9px;letter-spacing:.06em;
+    text-transform:uppercase;cursor:pointer;text-decoration:none;
+    padding:8px 4px;flex:1;transition:color .15s;
+  }
+  .mob-nbtn:active,.mob-nbtn:hover{color:#fff}
+  .mob-nbtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+}
+@media(min-width:768px){#mob{display:none}}
+/* ── Food Map ── */
+.food-map-toggle{display:flex;gap:8px;margin:12px 0 14px}
+.food-map-btn{padding:5px 16px;border-radius:100px;font-family:var(--sans);font-size:11px;cursor:pointer;transition:all .18s;line-height:1.4}
+.food-map-btn.active{background:#fff;color:#000;border:none}
+.food-map-btn:not(.active){background:transparent;color:#fff;border:.5px solid rgba(255,255,255,.2)}
+#food-map{width:100%;height:380px;border-radius:8px;overflow:hidden;filter:contrast(1.05) saturate(.9)}
+.food-map-note{font-size:11px;color:rgba(255,255,255,.25);margin-top:10px;text-align:center}
+.food-popup .leaflet-popup-content-wrapper{background:rgba(12,12,12,.97);color:#fff;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;box-shadow:0 8px 32px rgba(0,0,0,.7);border:.5px solid rgba(255,255,255,.12);padding:4px 2px;min-width:160px;max-width:220px}
+.food-popup .leaflet-popup-content{margin:10px 14px;line-height:1.5}
+.food-popup .leaflet-popup-tip-container{display:none}
+.food-popup .leaflet-popup-close-button{display:none}
+.food-popup .fp-name{font-family:'DM Serif Display',serif;font-size:14px;color:#fff;display:block;margin-bottom:4px}
+.food-popup .fp-link{font-size:10px;color:rgba(255,255,255,.45);text-decoration:none;display:block}
+.food-popup .fp-link:hover{text-decoration:underline}
+</style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+
+<div id="bg"></div>
+
+<!-- ══════════ DESKTOP ══════════ -->
+<div id="desktop">
+
+<!-- Airplane flyby. Sits behind every window because it's the first child of
+     #desktop and has the lowest z-index in this stacking context. JS triggers
+     a fly across the screen every 30s. -->
+<img src="assets/airplane.gif" id="airplane" alt="" aria-hidden="true">
+
+<!-- Teaser: Motion (tall, 9:16, far left) -->
+<div class="win" id="tw-motion" data-cat="motion" style="left:30.4vw;top:4.8vh;width:23.7vw;height:78.3vh;z-index:6">
+  <div class="win-bar" style="background:#0b1422">
+    <div class="dots"><div class="dot r" data-role="min"></div><div class="dot y" data-role="min"></div><div class="dot g" data-role="open"></div></div>
+    <div class="win-label">Motion Design</div>
+  </div>
+  <div class="win-body">
+    <div class="motion-card" id="story-card">
+      <video id="story-video" src="assets/motion/01.mp4" autoplay muted loop playsinline preload="metadata"></video>
+      <div class="ov"><small id="story-cat">Motion Design — 1 / 5</small><h3 id="story-title">Fashion Reel</h3></div>
+      <div class="story-bars">
+        <div class="sb"><div class="sb-fill"></div></div>
+        <div class="sb"><div class="sb-fill"></div></div>
+        <div class="sb"><div class="sb-fill"></div></div>
+        <div class="sb"><div class="sb-fill"></div></div>
+        <div class="sb"><div class="sb-fill"></div></div>
+      </div>
+      <div class="story-tap left" data-dir="-1"></div>
+      <div class="story-tap right" data-dir="1"></div>
+      <button id="story-play-btn" aria-label="Play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></button>
+    </div>
+  </div>
+  <div class="grip"></div>
+</div>
+
+<!-- Teaser: 3D -->
+<!-- Landscape teaser: single 16:9 looped video. Dimensions chosen so the body
+     ends up close to 16:9 once the title bar is subtracted. -->
+<div class="win" id="tw-3d" data-cat="3d" style="left:61.9vw;top:49vh;width:35.4vw;height:42.6vh;z-index:1">
+  <div class="win-bar" style="background:#160c1c">
+    <div class="dots"><div class="dot r" data-role="min"></div><div class="dot y" data-role="min"></div><div class="dot g" data-role="open"></div></div>
+    <div class="win-label">3D Design</div>
+  </div>
+  <div class="win-body">
+    <div class="motion-card" id="td3-card">
+      <video id="td3-video" src="assets/3d/teaser.mp4" autoplay muted loop playsinline preload="metadata"></video>
+      <div class="ov"><small>3D Design</small><h3>Ducks in Distress</h3></div>
+      <div class="mute-btn" id="td3-mute" data-mute></div>
+    </div>
+  </div>
+  <div class="grip"></div>
+</div>
+
+<!-- Teaser: UI/UX -->
+<div class="win" id="tw-uiux" data-cat="uiux" style="left:3.3vw;top:56.4vh;width:25.6vw;height:33.1vh;z-index:3">
+  <div class="win-bar" style="background:#081810">
+    <div class="dots"><div class="dot r" data-role="min"></div><div class="dot y" data-role="min"></div><div class="dot g" data-role="open"></div></div>
+    <div class="win-label">Brand Identity</div>
+  </div>
+  <div class="win-body">
+    <div class="motion-card" style="background:#081810">
+      <video id="bi-teaser-video" src="assets/uiux/cover.mp4" autoplay muted loop playsinline preload="metadata"></video>
+      <div class="mute-btn" id="bi-teaser-mute" data-mute></div>
+    </div>
+  </div>
+  <div class="grip"></div>
+</div>
+
+<!-- Teaser: Art Direction -->
+<div class="win" id="tw-artdir" data-cat="artdir" style="left:56.7vw;top:11.5vh;width:17.8vw;height:27.6vh;z-index:2">
+  <div class="win-bar" style="background:#1c1100">
+    <div class="dots"><div class="dot r" data-role="min"></div><div class="dot y" data-role="min"></div><div class="dot g" data-role="open"></div></div>
+    <div class="win-label">Album Art</div>
+  </div>
+  <div class="win-body">
+    <!-- Single Art Direction work — full-bleed image, no text overlay -->
+    <div class="motion-card" style="background:#1c1100">
+      <img src="assets/artdir/01.jpg" onerror="this.style.display='none'" alt="">
+    </div>
+  </div>
+  <div class="grip"></div>
+</div>
+
+<!-- Teaser: Music -->
+<div class="win" id="tw-music" data-cat="music" style="left:6.2vw;top:19.3vh;width:17.2vw;height:29.2vh;z-index:4">
+  <div class="win-bar" style="background:#0a0a18">
+    <div class="dots"><div class="dot r" data-role="min"></div><div class="dot y" data-role="min"></div><div class="dot g" data-role="open"></div></div>
+    <div class="win-label">Music</div>
+  </div>
+  <div class="win-body">
+    <div class="music-teaser">
+      <div class="music-cover">
+        <img src="assets/music/cover.jpg" onerror="this.style.display='none'" alt="">
+        <div class="phl">music/cover</div>
+      </div>
+      <div class="music-name">Dekolte</div>
+      <div class="music-tag">Short tagline here</div>
+      <a class="spotify-btn" href="https://open.spotify.com/artist/4p2oENWnvlHUyTNlide7LK?si=y9GssZSzRbSLiuEn3a2oOg" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.56.3z"/></svg>
+        Open in Spotify
+      </a>
+    </div>
+  </div>
+  <div class="grip"></div>
+</div>
+
+<!-- Teaser: About (far right, tall) -->
+<div class="win" id="tw-about" data-cat="about" style="left:82.4vw;top:3.6vh;width:15.1vw;height:42.8vh;z-index:5">
+  <div class="win-bar" style="background:#101010">
+    <div class="dots"><div class="dot r" data-role="min"></div><div class="dot y" data-role="min"></div><div class="dot g" data-role="open"></div></div>
+    <div class="win-label">About</div>
+  </div>
+  <div class="win-body">
+    <div class="abteaser">
+      <div class="abn">Baran</div>
+      <div class="abl">London, UK</div>
+      <div class="socials" id="ab-teaser-socials"><!-- Social icons injected by JS from SOCIAL_LINKS --></div>
+      <div class="abb">Based in London. Kingston University London, MA Media &amp; Communications student. Özyeğin University, Communication Design graduate. Skilled in Motion Graphics, Art Direction, Creative Direction, 3D Design, UI/UX, Visual Design and Social Media Marketing.</div>
+      <!-- GIF CTA — opens the full About section. Sits below the bio text. -->
+      <button class="ab-cta" type="button" aria-label="Open about" data-open-about>
+        <img src="assets/button.gif" alt="Read more">
+      </button>
+    </div>
+  </div>
+  <div class="grip"></div>
+</div>
+
+<!-- Portfolio sticker — pure decorative element, top-right.
+     No window chrome, no drag/resize, not click-to-front. The image scales
+     with the viewport and the @media query bumps it to 20vw on viewports
+     under 1200px so it stays readable on small laptops. -->
+<div class="logo-sticker" id="tw-logo" style="left:1.6vw;top:2vh;width:17.6vw;height:16.9vh;z-index:10">
+  <img src="assets/logo.png" onerror="this.style.display='none'" alt="Portfolio">
+</div>
+
+<!-- ══════════ SECTION WINDOWS ══════════ -->
+
+<!-- Motion section -->
+<div class="sw" id="sw-motion">
+  <div class="win-bar"><div class="dots"><div class="dot r" data-role="sc" data-id="sw-motion"></div><div class="dot y" data-role="sy" data-id="sw-motion"></div><div class="dot g" data-role="sg" data-id="sw-motion"></div></div><div class="win-label">Motion Design</div></div>
+  <div class="sw-sub">Motion Design</div>
+  <div class="win-body">
+    <!-- 19 vertical-video cards rendered by JS from PROJECTS.motion -->
+    <div class="motion-grid" id="motion-grid"></div>
+  </div>
+</div>
+
+<!-- 3D section -->
+<div class="sw" id="sw-3d">
+  <div class="win-bar"><div class="dots"><div class="dot r" data-role="sc" data-id="sw-3d"></div><div class="dot y" data-role="sy" data-id="sw-3d"></div><div class="dot g" data-role="sg" data-id="sw-3d"></div></div><div class="win-label">3D Design</div></div>
+  <div class="sw-sub">3D Design</div>
+  <div class="win-body">
+    <!-- Mixed-orientation video grid rendered by JS from PROJECTS['3d'] -->
+    <div class="threed-grid" id="threed-grid"></div>
+  </div>
+</div>
+
+<!-- UI/UX section -->
+<div class="sw" id="sw-uiux">
+  <div class="win-bar"><div class="dots"><div class="dot r" data-role="sc" data-id="sw-uiux"></div><div class="dot y" data-role="sy" data-id="sw-uiux"></div><div class="dot g" data-role="sg" data-id="sw-uiux"></div></div><div class="win-label">Brand Identity</div></div>
+  <div class="sw-sub">Brand Identity</div>
+  <div class="win-body"><div class="bi-layout">
+    <div class="bi-landscape">
+      <div class="bi-slot">
+        <video src="assets/uiux/01.mp4" autoplay muted loop playsinline></video>
+        <div class="mute-btn" data-mute></div>
+      </div>
+      <div class="bi-slot"><img src="assets/uiux/02.png" alt=""></div>
+      <div class="bi-slot"><img src="assets/uiux/03.png" alt=""></div>
+      <div class="bi-slot"><img src="assets/uiux/04.png" alt=""></div>
+      <div class="bi-slot"><img src="assets/uiux/05.png" alt=""></div>
+    </div>
+    <div class="bi-verticals">
+      <div class="bi-slot">
+        <video src="assets/uiux/06.mp4" autoplay muted loop playsinline></video>
+        <div class="mute-btn" data-mute></div>
+      </div>
+      <div class="bi-slot">
+        <video src="assets/uiux/07.mp4" autoplay muted loop playsinline></video>
+        <div class="mute-btn" data-mute></div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<!-- Art Direction section -->
+<div class="sw" id="sw-artdir">
+  <div class="win-bar"><div class="dots"><div class="dot r" data-role="sc" data-id="sw-artdir"></div><div class="dot y" data-role="sy" data-id="sw-artdir"></div><div class="dot g" data-role="sg" data-id="sw-artdir"></div></div><div class="win-label">Album Art</div></div>
+  <div class="sw-sub">Album Art</div>
+  <div class="win-body"><div class="cgrid c3">
+    <div class="pcard" data-cat="artdir" data-idx="0"><div class="pcard-img r11"><img src="assets/artdir/01.jpg" onerror="this.style.display='none'" alt=""><div class="phl">artdir/01</div></div><div class="pcard-info"><div class="pc">Art Direction</div><div class="pt">Cover Art</div></div></div>
+    <div class="pcard" data-cat="artdir" data-idx="1"><div class="pcard-img r11"><img src="assets/artdir/02.jpg" onerror="this.style.display='none'" alt=""><div class="phl">artdir/02</div></div><div class="pcard-info"><div class="pc">Art Direction</div><div class="pt">Cover Art</div></div></div>
+    <div class="pcard" data-cat="artdir" data-idx="2"><div class="pcard-img r11"><img src="assets/artdir/03.jpg" onerror="this.style.display='none'" alt=""><div class="phl">artdir/03</div></div><div class="pcard-info"><div class="pc">Art Direction</div><div class="pt">Cover Art</div></div></div>
+    <div class="pcard" data-cat="artdir" data-idx="3"><div class="pcard-img r11"><img src="assets/artdir/04.jpg" onerror="this.style.display='none'" alt=""><div class="phl">artdir/04</div></div><div class="pcard-info"><div class="pc">Art Direction</div><div class="pt">Cover Art</div></div></div>
+    <div class="pcard" data-cat="artdir" data-idx="4"><div class="pcard-img r11"><img src="assets/artdir/05.jpg" onerror="this.style.display='none'" alt=""><div class="phl">artdir/05</div></div><div class="pcard-info"><div class="pc">Art Direction</div><div class="pt">Cover Art</div></div></div>
+    <div class="pcard" data-cat="artdir" data-idx="5"><div class="pcard-img r11"><img src="assets/artdir/06.jpg" onerror="this.style.display='none'" alt=""><div class="phl">artdir/06</div></div><div class="pcard-info"><div class="pc">Art Direction</div><div class="pt">Cover Art</div></div></div>
+    <div class="pcard" data-cat="artdir" data-idx="6"><div class="pcard-img r11"><img src="assets/artdir/07.jpg" onerror="this.style.display='none'" alt=""><div class="phl">artdir/07</div></div><div class="pcard-info"><div class="pc">Art Direction</div><div class="pt">Cover Art</div></div></div>
+    <div class="pcard" data-cat="artdir" data-idx="7"><div class="pcard-img r11"><img src="assets/artdir/08.jpg" onerror="this.style.display='none'" alt=""><div class="phl">artdir/08</div></div><div class="pcard-info"><div class="pc">Art Direction</div><div class="pt">Cover Art</div></div></div>
+  </div></div>
+</div>
+
+<!-- Music section: project showcase -->
+<div class="sw" id="sw-music">
+  <div class="win-bar"><div class="dots"><div class="dot r" data-role="sc" data-id="sw-music"></div><div class="dot y" data-role="sy" data-id="sw-music"></div><div class="dot g" data-role="sg" data-id="sw-music"></div></div><div class="win-label">Music</div></div>
+  <div class="sw-sub">Music Project</div>
+  <div class="win-body">
+    <div class="mshow">
+      <div class="mshow-cover">
+        <img src="assets/music/cover.jpg" onerror="this.style.display='none'" alt="">
+        <div class="phl">music/cover</div>
+      </div>
+      <div class="mshow-info" id="mshow-info"><!-- rendered from MUSIC by JS --></div>
+    </div>
+    <div class="mgallery">
+      <div class="mgallery-item"><img src="assets/music/01.jpg" onerror="this.style.display='none'" alt=""><div class="phl">music/01</div></div>
+      <div class="mgallery-item"><img src="assets/music/02.jpg" onerror="this.style.display='none'" alt=""><div class="phl">music/02</div></div>
+      <div class="mgallery-item"><img src="assets/music/03.jpg" onerror="this.style.display='none'" alt=""><div class="phl">music/03</div></div>
+      <div class="mgallery-item"><img src="assets/music/04.jpg" onerror="this.style.display='none'" alt=""><div class="phl">music/04</div></div>
+      <div class="mgallery-item"><img src="assets/music/05.jpg" onerror="this.style.display='none'" alt=""><div class="phl">music/05</div></div>
+      <div class="mgallery-item"><img src="assets/music/06.jpg" onerror="this.style.display='none'" alt=""><div class="phl">music/06</div></div>
+    </div>
+    <div class="mtracks">
+      <h3>Tracks</h3>
+      <div id="mtracks-list"><!-- rendered from MUSIC.tracks by JS --></div>
+    </div>
+  </div>
+</div>
+
+<!-- About section -->
+<div class="sw" id="sw-about">
+  <div class="win-bar"><div class="dots"><div class="dot r" data-role="sc" data-id="sw-about"></div><div class="dot y" data-role="sy" data-id="sw-about"></div><div class="dot g" data-role="sg" data-id="sw-about"></div></div><div class="win-label">About</div></div>
+  <div class="sw-sub">About</div>
+  <div class="win-body"><div class="absec">
+    <div class="loc">London, United Kingdom</div>
+    <h1>Baran</h1>
+    <p>Based in London. Kingston University London, MA Media &amp; Communications student. Özyeğin University, Communication Design graduate. Skilled in Motion Graphics, Art Direction, Creative Direction, 3D Design, UI/UX Design, Visual Design and Social Media Marketing. Various work in design, fashion and music industries. Last role: Motion Designer at 365 creative agency, September Content Management.</p>
+
+    <div class="absec-label">Skills</div>
+    <div class="skills">
+      <span class="skill">Motion Graphics</span>
+      <span class="skill">3D Animation</span>
+      <span class="skill">Creative Direction</span>
+      <span class="skill">Music</span>
+      <span class="skill">UI/UX</span>
+      <span class="skill">Social Media</span>
+      <span class="skill">Marketing Art</span>
+      <span class="skill">Graphic Design</span>
+      <span class="skill">Video Editing</span>
+    </div>
+
+    <!-- ── Experience ── -->
+    <div class="absec-label">Experience</div>
+    <div class="exp-list">
+      <div class="exp-row">
+        <div class="exp-logo"><img src="assets/logos/september.png" alt="September"></div>
+        <div>
+          <div class="exp-role">Motion Designer</div>
+          <div class="exp-company">September Content Management</div>
+        </div>
+        <div class="exp-date">2024 — 2025</div>
+      </div>
+      <div class="exp-row">
+        <div class="exp-logo"><img src="assets/logos/jaff.png" alt="Jaff Digital"></div>
+        <div>
+          <div class="exp-role">Jr. Art Director</div>
+          <div class="exp-company">Jaff Digital</div>
+        </div>
+        <div class="exp-date">2024</div>
+      </div>
+      <div class="exp-row">
+        <div class="exp-logo"><img src="assets/logos/shopigo.png" alt="Shopigo"></div>
+        <div>
+          <div class="exp-role">Creative Intern</div>
+          <div class="exp-company">shopi go 買物</div>
+        </div>
+        <div class="exp-date">2023</div>
+      </div>
+      <div class="exp-row">
+        <div class="exp-logo"><img src="assets/logos/dknd.png" alt="DKND Law Firm"></div>
+        <div>
+          <div class="exp-role">UI/UX Freelancer</div>
+          <div class="exp-company">DKND Law Firm</div>
+        </div>
+        <div class="exp-date">2023</div>
+      </div>
+      <div class="exp-row">
+        <div class="exp-logo"><img src="assets/logos/mopp.png" alt="Mopp Agency"></div>
+        <div>
+          <div class="exp-role">Graphic Design Intern</div>
+          <div class="exp-company">Mopp Agency</div>
+        </div>
+        <div class="exp-date">2022</div>
+      </div>
+      <div class="exp-row">
+        <div class="exp-logo"><img src="assets/logos/e365.png" alt="E365 Digital Technologies"></div>
+        <div>
+          <div class="exp-role">Project Manager</div>
+          <div class="exp-company">E365 Digital Technologies</div>
+        </div>
+        <div class="exp-date">2021</div>
+      </div>
+    </div>
+
+    <!-- ── Education ── -->
+    <div class="absec-label">Education</div>
+    <div class="exp-list">
+      <div class="exp-row">
+        <div class="exp-logo"><img src="assets/logos/kingston.png" alt="Kingston University"></div>
+        <div>
+          <div class="exp-role">MA Media &amp; Communications</div>
+          <div class="exp-company">Kingston University London</div>
+        </div>
+        <div class="exp-date">2025 — 2026</div>
+      </div>
+      <div class="exp-row">
+        <div class="exp-logo"><img src="assets/logos/ozyegin.png" alt="Özyeğin University"></div>
+        <div>
+          <div class="exp-role">BA Communication Design</div>
+          <div class="exp-company">Özyeğin University</div>
+        </div>
+        <div class="exp-date">2019 — 2024</div>
+      </div>
+    </div>
+
+    <div class="absec-label">Connect</div>
+    <div class="socials socials-lg" id="ab-section-socials"><!-- injected by JS --></div>
+
+    <div class="absec-label">Get in touch</div>
+    <!--
+      ── Contact form via Formspree ──
+      Setup steps:
+        1. Sign up at formspree.io with abanozbaran@hotmail.com
+        2. Create a new form (the inbox is automatically tied to that email)
+        3. Copy the form ID and replace PLACEHOLDER below in the form action URL
+    -->
+    <form id="contact-form" class="cform" action="https://formspree.io/f/xqenkdqy" method="POST">
+      <div class="cform-row row2">
+        <div>
+          <label for="cf-name">Name *</label>
+          <input id="cf-name" name="name" type="text" required autocomplete="name" placeholder="Your name">
+        </div>
+        <div>
+          <label for="cf-email">Email *</label>
+          <input id="cf-email" name="email" type="email" required autocomplete="email" placeholder="you@email.com">
+        </div>
+      </div>
+      <div class="cform-row">
+        <label for="cf-subject">Subject</label>
+        <input id="cf-subject" name="subject" type="text" placeholder="What's this about?">
+      </div>
+      <div class="cform-row">
+        <label for="cf-message">Message *</label>
+        <textarea id="cf-message" name="message" required rows="4" placeholder="Tell me about your project, idea, or just say hi."></textarea>
+      </div>
+      <div class="cform-error" id="cf-error" hidden></div>
+      <button type="submit" class="cform-submit">Send Message</button>
+    </form>
+    <div class="cform-success" id="cf-success" hidden>Message sent — I'll be in touch soon.</div>
+
+    <div class="absec-label" style="padding-top:32px;border-top:.5px solid rgba(255,255,255,.08);margin-top:32px">Food Map</div>
+    <div class="food-map-toggle">
+      <button class="food-map-btn active" data-city="london">London</button>
+      <button class="food-map-btn" data-city="istanbul">Istanbul</button>
+    </div>
+    <div id="food-map"></div>
+    <div class="food-map-note" id="food-map-note">19 spots · more coming soon</div>
+  </div></div>
+</div>
+
+</div><!-- /desktop -->
+
+<!-- ══════════ PILL NAV ══════════ -->
+<div id="pill">
+  <div class="pbtn" id="pill-home" data-tip="Home">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+  </div>
+  <div class="psep"></div>
+  <div class="pbtn" data-tip="Motion Design" data-sec="motion"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
+  <div class="pbtn" data-tip="3D Design" data-sec="3d"><svg viewBox="0 0 24 24"><polygon points="12,2 2,7 12,12 22,7"/><polyline points="2,17 12,22 22,17"/><line x1="2" y1="12" x2="2" y2="17"/><line x1="22" y1="12" x2="22" y2="17"/><line x1="12" y1="12" x2="12" y2="22"/></svg></div>
+  <div class="pbtn" data-tip="Brand Identity" data-sec="uiux"><svg viewBox="0 0 24 24"><polygon points="12,2 22,9 18,21 6,21 2,9"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="6" y1="21" x2="12" y2="2"/><line x1="18" y1="21" x2="12" y2="2"/></svg></div>
+  <div class="pbtn" data-tip="Album Art" data-sec="artdir"><svg viewBox="0 0 24 24"><line x1="18" y1="2" x2="22" y2="6"/><path d="M7.5 20.5L19 9l-4-4L3.5 16.5 2 22z"/></svg></div>
+  <div class="pbtn" data-tip="Music" data-sec="music"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+  <div class="pbtn" data-tip="About" data-sec="about"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+  <div class="psep" id="tsep" style="display:none"></div>
+  <div id="thumbs"></div>
+</div>
+
+<!-- ══════════ MOBILE ══════════ -->
+<div id="mob">
+  <!-- ── Hero ── -->
+  <header class="mob-hero" id="m-top">
+    <div class="loc">London · UK</div>
+    <h1>Baran<br>Abanoz</h1>
+    <div class="role">Motion Designer &amp; Art Director, building story-led work for fashion, music and brand.</div>
+    <p>Based in London. Kingston University London, MA Media &amp; Communications student. Özyeğin University, Communication Design graduate. Skilled in Motion Graphics, Art Direction, Creative Direction, 3D Design, UI/UX Design, Visual Design and Social Media Marketing.</p>
+    <div class="socials" id="m-socials"><!-- Populated by renderSocials() --></div>
+  </header>
+
+  <!-- ── Motion Design ── -->
+  <section class="mob-sec" id="m-motion">
+    <div class="sec-kicker">01 · Motion Design</div>
+    <h2>Motion Design</h2>
+    <div class="mob-grid cols-2" id="m-motion-grid"><!-- Cards rendered from PROJECTS.motion --></div>
+  </section>
+
+  <!-- ── 3D Design ── -->
+  <section class="mob-sec" id="m-3d">
+    <div class="sec-kicker">02 · 3D Design</div>
+    <h2>3D Design</h2>
+    <div class="mob-grid" id="m-3d-grid"><!-- Cards rendered from PROJECTS['3d'] --></div>
+  </section>
+
+  <!-- ── Brand Identity ── -->
+  <section class="mob-sec" id="m-uiux">
+    <div class="sec-kicker">03 · Brand Identity</div>
+    <h2>Brand Identity</h2>
+    <div class="mob-grid" id="m-uiux-grid"><!-- Cards rendered from PROJECTS.uiux --></div>
+  </section>
+
+  <!-- ── Album Art ── -->
+  <section class="mob-sec" id="m-artdir">
+    <div class="sec-kicker">04 · Album Art</div>
+    <h2>Album Art</h2>
+    <div class="mob-grid cols-2" id="m-artdir-grid"><!-- Cards rendered from PROJECTS.artdir --></div>
+  </section>
+
+  <!-- ── Music ── -->
+  <section class="mob-sec" id="m-music">
+    <div class="sec-kicker">05 · Music</div>
+    <h2 id="m-music-name">Dekolte</h2>
+    <div class="mob-music">
+      <div class="mob-music-cover">
+        <img src="assets/music/cover.jpg" onerror="this.style.display='none'" alt="">
+        <div class="phl">music/cover</div>
+      </div>
+      <div class="pt" id="m-music-tag">Short tagline here</div>
+      <a class="spotify-btn" id="m-music-spotify" href="https://open.spotify.com/artist/4p2oENWnvlHUyTNlide7LK?si=y9GssZSzRbSLiuEn3a2oOg" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.56.3z"/></svg>
+        Open in Spotify
+      </a>
+      <div class="mob-music-tracks">
+        <h3>Tracks</h3>
+        <div id="m-music-tracks"><!-- Track rows rendered from MUSIC.tracks --></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── About / Get in touch ── -->
+  <section class="mob-sec" id="m-about">
+    <div class="sec-kicker">06 · About</div>
+    <h2>Hello, I'm Baran.</h2>
+    <p>Based in London. Last role: Motion Designer at <em>365</em> creative agency, September Content Management. Open to commissions and collaborations across motion, brand and music.</p>
+    <div class="mob-skills">
+      <span class="skill">Motion Graphics</span>
+      <span class="skill">Art Direction</span>
+      <span class="skill">Creative Direction</span>
+      <span class="skill">3D Design</span>
+      <span class="skill">UI/UX</span>
+      <span class="skill">Visual Design</span>
+      <span class="skill">Social Media</span>
+    </div>
+  </section>
+
+  <!-- ── Bottom nav (anchor scroll) ── -->
+  <nav class="mob-nav">
+    <a class="mob-nbtn" href="#m-top"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Home</a>
+    <a class="mob-nbtn" href="#m-motion"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>Motion</a>
+    <a class="mob-nbtn" href="#m-3d"><svg viewBox="0 0 24 24"><polygon points="12,2 2,7 12,12 22,7"/><polyline points="2,17 12,22 22,17"/></svg>3D</a>
+    <a class="mob-nbtn" href="#m-uiux"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="12" y1="17" x2="12" y2="21"/></svg>UI/UX</a>
+    <a class="mob-nbtn" href="#m-artdir"><svg viewBox="0 0 24 24"><line x1="18" y1="2" x2="22" y2="6"/><path d="M7.5 20.5L19 9l-4-4L3.5 16.5 2 22z"/></svg>Art</a>
+    <a class="mob-nbtn" href="#m-music"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Music</a>
+  </nav>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ── Easy-edit constants ──
+// Replace these with your own URLs.
+const SOCIAL_LINKS = {
+  linkedin:  'https://www.linkedin.com/in/baran-abanoz-779b62153/',
+  instagram: 'https://www.instagram.com/baranabanoz/',
+};
+
+// ── Data ──
+// Motion: 17 vertical-video projects. Each card looks for assets/motion/NN.mp4
+// (with assets/motion/NN.jpg as a poster/fallback when the video is missing).
+const PROJECTS = {
+  // First five motion projects have explicit titles (these drive the teaser
+  // story carousel); 6–17 remain generic placeholders.
+  motion: (() => {
+    const titles = [
+      'Promo Video for Concept App "Nudge"',
+      'Nocturne x Hande Erçel #InspiredByHer Collection Promo',
+      'Concept Promo for Evernote',
+      'September Wrapped 2024',
+      'Koton Paper Launch Video',
+    ];
+    return Array.from({length:19}, (_, i) => {
+      const n = String(i+1).padStart(2,'0');
+      return {
+        title: titles[i] || `Project ${n}`,
+        client: '',
+        cat: 'Motion Design',
+        video: `assets/motion/${n}.mp4`,
+        img:   `assets/motion/${n}.jpg`,
+      };
+    });
+  })(),
+  // 3D — six slots:
+  //   1× landscape video (the hero, "Ducks in Distress") with 1 PNG image extra
+  //   3× landscape stills (jpg-only)
+  //   2× vertical videos that open the fullscreen player on click
+  // `orientation` controls grid-card shape and detail-window aspect.
+  // `extraImgs` lists secondary images shown below the hero in the detail
+  // window — explicit `[]` means "no extras", absence means "default placeholders".
+  '3d':[
+    {title:'Ducks in Distress',           client:'', cat:'3D Design',
+     video:'assets/3d/01.mp4', img:'assets/3d/01.jpg',
+     orientation:'landscape', extraImgs:['assets/3d/01b.png']},
+    {title:'The Doughnuts',                client:'', cat:'3D Design',
+     img:'assets/3d/02.jpg',
+     orientation:'landscape', extraImgs:[]},
+    {title:'The Ramen',                    client:'', cat:'3D Design',
+     img:'assets/3d/03.jpg',
+     orientation:'landscape', extraImgs:[]},
+    {title:'OTTO Suadiye Antique Shop',    client:'', cat:'3D Design',
+     img:'assets/3d/04.jpg',
+     orientation:'landscape', extraImgs:[]},
+    {title:'Tape Animation for Dekolte',   client:'', cat:'3D Design',
+     video:'assets/3d/05.mp4',
+     orientation:'vertical', extraImgs:[]},
+    {title:'Tape Animation for Dekolte',   client:'', cat:'3D Design',
+     video:'assets/3d/06.mp4',
+     orientation:'vertical', extraImgs:[]},
+  ],
+  // UI/UX projects.
+  //   • Project 01 ("App Design") is vertical (9:16) — its grid card spans
+  //     2 rows so it sits alongside the horizontal cards naturally.
+  //   • Projects 02–04 are horizontal (16:9), titled "UI/UX Design".
+  uiux:[
+    {title:'App Design',       client:'', cat:'Brand Identity', img:'assets/uiux/01.jpg', vertical:true,
+     xdUrl:'https://xd.adobe.com/view/0dd6aae2-9218-4e6e-b5db-410126b4302f-5885/?fullscreen'},
+    {title:'Brand Identity',   client:'', cat:'Brand Identity', img:'assets/uiux/02.jpg',
+     xdUrl:'https://xd.adobe.com/view/0dd6aae2-9218-4e6e-b5db-410126b4302f-5885/?fullscreen'},
+    {title:'Brand Identity',   client:'', cat:'Brand Identity', img:'assets/uiux/03.jpg',
+     xdUrl:'https://xd.adobe.com/view/9de21215-9e80-4220-bf23-7c37e1c5252d-c8b1/?fullscreen'},
+    {title:'Brand Identity',   client:'', cat:'Brand Identity', img:'assets/uiux/04.jpg',
+     xdUrl:'https://xd.adobe.com/view/add6f34d-1f5a-4709-bfc7-acd79b5ff198-f885/?fullscreen'},
+  ],
+  artdir:[
+    {title:'Cover Art', client:'Album Art', cat:'Album Art', img:'assets/artdir/01.jpg'},
+    {title:'Cover Art', client:'Album Art', cat:'Album Art', img:'assets/artdir/02.jpg'},
+    {title:'Cover Art', client:'Album Art', cat:'Album Art', img:'assets/artdir/03.jpg'},
+    {title:'Cover Art', client:'Album Art', cat:'Album Art', img:'assets/artdir/04.jpg'},
+    {title:'Cover Art', client:'Album Art', cat:'Album Art', img:'assets/artdir/05.jpg'},
+    {title:'Cover Art', client:'Album Art', cat:'Album Art', img:'assets/artdir/06.jpg'},
+    {title:'Cover Art', client:'Album Art', cat:'Album Art', img:'assets/artdir/07.jpg'},
+    {title:'Cover Art', client:'Album Art', cat:'Album Art', img:'assets/artdir/08.jpg'},
+  ],
+};
+
+// ── Music project ──
+const MUSIC = {
+  projectName: 'Dekolte',
+  tagline: 'D\u00e9collet\u00e9 for Turkish',
+  description:
+    "Alternative Pop duo based in \u0130stanbul, created by Onat Demir and Baran Abanoz in 2018. " +
+    "With their knowledge from different musical cultures, Dekolte aims to further diversify and contribute " +
+    "to the artistic music scene of Istanbul. With powerhouse vocals, groovy guitars, driving drums, and a " +
+    "fusion of diverse influences, the duo offers a unique listening experience.\n\n" +
+    "Since their debut in 2023 with Ge\u00e7ti Gitti, Dekolte has built a growing discography blending pop, rock, " +
+    "and indigenous sounds releasing singles like, Ba\u015fka Evler, Is\u0131nmaz, Telefon, Haziran, and Savruluyorum.\n\n" +
+    "Now, the duo is gearing up for their next chapter with their new EP Hisler Kervan\u0131. " +
+    "Introduced by its first singles Yine Yakmaz, Ar\u0131yorum and A\u015fk \u0130lac\u0131, the project marks an even deeper " +
+    "dive into their evolving sound.",
+  coverImage: 'assets/music/cover.jpg',
+  spotifyUrl: 'https://open.spotify.com/artist/4p2oENWnvlHUyTNlide7LK?si=y9GssZSzRbSLiuEn3a2oOg',
+  gallery: [
+    'assets/music/01.jpg','assets/music/02.jpg','assets/music/03.jpg',
+    'assets/music/04.jpg','assets/music/05.jpg','assets/music/06.jpg',
+  ],
+  // Singles released by Dekolte. Durations come from Spotify; if you want to
+  // pull these dynamically you'd need an API integration (Spotify Web API +
+  // Client Credentials flow). Hard-coded here for a static deploy.
+  tracks: [
+    {n:'Ge\u00e7ti Gitti',        g:'Alternative Pop', d:'3:21'},
+    {n:'Ba\u015fka Evler',        g:'Alternative Pop', d:'3:45'},
+    {n:'Is\u0131nmaz',            g:'Alternative Pop', d:'2:58'},
+    {n:'Telefon',                  g:'Alternative Pop', d:'3:12'},
+    {n:'Haziran',                  g:'Alternative Pop', d:'2:48'},
+    {n:'Savruluyorum',             g:'Alternative Pop', d:'3:05'},
+    {n:'Ar\u0131yorum',           g:'Alternative Pop', d:'3:18'},
+    {n:'Yine Yakmaz',              g:'Alternative Pop', d:'2:52'},
+    {n:'A\u015fk \u0130lac\u0131', g:'Alternative Pop', d:'3:08'},
+  ],
+};
+
+const CAT_COLORS = {motion:'#0b1422','3d':'#160c1c',uiux:'#081810',artdir:'#1c1100',music:'#0a0a18',about:'#101010',logo:'#2a0a14'};
+const CAT_LABELS = {motion:'Mo','3d':'3D',uiux:'UX',artdir:'Art',music:'Mu',about:'Ab',logo:'P'};
+
+// Icons rendered inside the pill's minimised-window thumbnails. Drop a PNG/SVG
+// at each of these paths and it'll show in place of the text fallback. Any
+// missing file is handled gracefully — the abbreviation from CAT_LABELS shows.
+const DOCK_ICONS = {
+  motion: 'assets/icons/dock/motion.png',
+  '3d':   'assets/icons/dock/3d.png',
+  uiux:   'assets/icons/dock/uiux.png',
+  artdir: 'assets/icons/dock/artdir.png',
+  music:  'assets/icons/dock/music.png',
+  about:  'assets/icons/dock/about.png',
+  logo:   'assets/icons/dock/logo.png',
+};
+
+// ── Z-index ──
+let Z = 200;
+function front(el){
+  el.style.zIndex = ++Z;
+  document.querySelectorAll('.win').forEach(w => w.classList.remove('focused'));
+  el.classList.add('focused');
+}
+
+// ── Drag (works for teaser + detail windows) ──
+// Uses offsetLeft/Top so rotated windows don't jump on grab.
+// Chrome-less windows (no .win-bar) become draggable from anywhere on the surface.
+function makeDrag(win){
+  const bar = win.querySelector('.win-bar') || win;
+  let on=false, ox=0, oy=0;
+  bar.addEventListener('mousedown', e=>{
+    if(e.target.closest('.dots,.grip')) return;
+    on=true;
+    if(win.style.right){ win.style.left=win.offsetLeft+'px'; win.style.right='auto'; }
+    // Lock layout position to px so subsequent moves are stable.
+    win.style.left=win.offsetLeft+'px';
+    win.style.top=win.offsetTop+'px';
+    ox=e.clientX-win.offsetLeft; oy=e.clientY-win.offsetTop;
+    front(win); e.preventDefault();
+  });
+  document.addEventListener('mousemove', e=>{
+    if(!on) return;
+    let x=Math.max(-win.offsetWidth*.6,Math.min(innerWidth-win.offsetWidth*.4, e.clientX-ox));
+    let y=Math.max(0,Math.min(innerHeight-40, e.clientY-oy));
+    win.style.left=x+'px'; win.style.top=y+'px';
+  });
+  document.addEventListener('mouseup',()=>{ on=false; });
+}
+
+// ── Resize ──
+function makeResize(win){
+  const g=win.querySelector('.grip'); if(!g) return;
+  let on=false, sx,sy,sw,sh;
+  g.addEventListener('mousedown',e=>{
+    on=true; sx=e.clientX; sy=e.clientY;
+    sw=win.offsetWidth; sh=win.offsetHeight;
+    e.preventDefault(); e.stopPropagation();
+  });
+  document.addEventListener('mousemove',e=>{
+    if(!on) return;
+    win.style.width=Math.max(140,sw+(e.clientX-sx))+'px';
+    win.style.height=Math.max(100,sh+(e.clientY-sy))+'px';
+  });
+  document.addEventListener('mouseup',()=>{ on=false; });
+}
+
+// ── Minimise to pill ──
+const MINNED={};
+
+function minimise(win){
+  const cat=win.dataset.cat;
+  if(MINNED[cat]) return;
+  // Lock layout box to px so animation math is stable.
+  const l=win.offsetLeft, t=win.offsetTop, w=win.offsetWidth, h=win.offsetHeight;
+  win.style.left=l+'px'; win.style.top=t+'px'; win.style.right='auto';
+  win.style.width=w+'px'; win.style.height=h+'px';
+  MINNED[cat]={win, l, t, w, h};
+  const pr=document.getElementById('pill').getBoundingClientRect();
+  const tx=pr.left+pr.width/2-18, ty=pr.top+8;
+  win.style.transformOrigin='top left';
+  win.style.transition='transform .42s cubic-bezier(.4,0,.2,1),opacity .38s ease';
+  win.style.transform=`translate(${tx-l}px,${ty-t}px) scale(${36/w},${36/h})`;
+  win.style.opacity='0';
+  setTimeout(()=>{
+    win.style.display='none';
+    win.style.transform=''; win.style.transition=''; win.style.opacity='';
+    win.style.transformOrigin='';
+    addThumb(cat, false);
+  },440);
+}
+
+function addThumb(cat, isSW, swId){
+  const box=document.getElementById('thumbs');
+  const sep=document.getElementById('tsep');
+  if(box.querySelector(`[data-tcat="${cat}"]`)) return;
+  const t=document.createElement('div');
+  t.className='pthumb'; t.dataset.tcat=cat; if(swId) t.dataset.swid=swId;
+  t.title=cat; t.style.background=CAT_COLORS[cat];
+  // Try the icon first; fall back to the text label if the file isn't there.
+  const label = CAT_LABELS[cat] || '';
+  const iconPath = DOCK_ICONS[cat];
+  if(iconPath){
+    const img = document.createElement('img');
+    img.src = iconPath;
+    img.alt = cat;
+    img.draggable = false;
+    img.addEventListener('error', () => {
+      img.remove();
+      t.textContent = label;
+    });
+    t.appendChild(img);
+  } else {
+    t.textContent = label;
+  }
+  // Start collapsed (zero width + margin) so the pill expands smoothly when added.
+  t.style.width='0px';
+  t.style.marginLeft='0px';
+  t.style.opacity='0';
+  t.style.transform='scale(.6)';
+  box.appendChild(t);
+  sep.style.display='block';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    // Clearing inline lets the CSS rules (width:36px, margin-left:4px) take over with transition.
+    t.style.width='';
+    t.style.marginLeft='';
+    t.style.opacity='';
+    t.style.transform='scale(1)';
+  }));
+  t.addEventListener('click',()=>{ isSW ? restoreSW(cat,swId) : restoreWin(cat); });
+}
+
+function restoreWin(cat){
+  const s=MINNED[cat]; if(!s) return;
+  const win=s.win;
+  removeThumb(cat);
+  const pr=document.getElementById('pill').getBoundingClientRect();
+  win.style.left=s.l+'px'; win.style.top=s.t+'px'; win.style.right='auto';
+  win.style.width=s.w+'px'; win.style.height=s.h+'px';
+  const ix=pr.left+pr.width/2-18-s.l, iy=pr.top+8-s.t;
+  win.style.transformOrigin='top left';
+  win.style.transform=`translate(${ix}px,${iy}px) scale(${36/s.w},${36/s.h})`;
+  win.style.opacity='0'; win.style.display='flex';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    win.style.transition='transform .45s cubic-bezier(.34,1.56,.64,1),opacity .3s ease';
+    win.style.transform='translate(0,0) scale(1)';
+    win.style.opacity='1';
+  }));
+  setTimeout(()=>{
+    win.style.transition=''; win.style.transformOrigin='';
+    win.style.transform='';
+    front(win);
+  },470);
+  delete MINNED[cat];
+}
+
+function restoreSW(cat, swId){
+  removeThumb(cat);
+  openSection(cat);
+}
+
+function removeThumb(cat){
+  const box=document.getElementById('thumbs');
+  const t=box.querySelector(`[data-tcat="${cat}"]`);
+  if(!t){
+    if(!box.children.length) document.getElementById('tsep').style.display='none';
+    return;
+  }
+  // Animate width/margin back to 0 so the pill contracts smoothly,
+  // then remove from the DOM and hide the separator if empty.
+  t.style.width='0px';
+  t.style.marginLeft='0px';
+  t.style.opacity='0';
+  t.style.transform='scale(.6)';
+  setTimeout(()=>{
+    t.remove();
+    if(!box.children.length) document.getElementById('tsep').style.display='none';
+  }, 260);
+}
+
+// ── Section windows ──
+const SW_MAX={};
+
+function openSection(cat){
+  document.querySelectorAll('.sw').forEach(s=>{ s.classList.remove('open'); });
+  const sw=document.getElementById('sw-'+cat); if(!sw) return;
+  sw.classList.add('open'); sw.style.zIndex=++Z;
+  sw.style.cssText += ';left:50%;top:20px;transform:translateX(-50%);width:90vw;height:;border-radius:10px';
+  sw.style.left='50%'; sw.style.top='20px'; sw.style.transform='translateX(-50%)';
+  sw.style.width='90vw'; sw.style.height=''; sw.style.borderRadius='10px';
+  SW_MAX[sw.id]=false;
+  initSwDrag(sw);
+}
+
+function initSwDrag(sw){
+  if(sw._drag) return; sw._drag=true;
+  const bar=sw.querySelector('.win-bar');
+  let on=false, ox=0, oy=0;
+  // Mousedown anywhere on the section also raises it to the front.
+  sw.addEventListener('mousedown',()=>{ sw.style.zIndex = ++Z; });
+  bar.addEventListener('mousedown',e=>{
+    if(e.target.closest('.dots')) return;
+    on=true;
+    const r=sw.getBoundingClientRect();
+    sw.style.left=r.left+'px'; sw.style.top=r.top+'px'; sw.style.transform='none';
+    ox=e.clientX-r.left; oy=e.clientY-r.top; e.preventDefault();
+  });
+  document.addEventListener('mousemove',e=>{
+    if(!on) return;
+    sw.style.left=Math.max(0,e.clientX-ox)+'px';
+    sw.style.top=Math.max(0,e.clientY-oy)+'px';
+  });
+  document.addEventListener('mouseup',()=>{ on=false; });
+}
+
+document.querySelectorAll('.sw .dot[data-role]').forEach(dot=>{
+  dot.addEventListener('click',e=>{
+    e.stopPropagation();
+    const role=dot.dataset.role, id=dot.dataset.id;
+    const sw=document.getElementById(id);
+    // Red — close the section, return to the teaser desktop.
+    if(role==='sc'){
+      sw.classList.remove('open');
+      SW_MAX[id]=false;
+      // Reset size so the next reopen starts at 90vw default.
+      sw.style.width='90vw'; sw.style.height='';
+      sw.style.top='20px'; sw.style.left='50%'; sw.style.transform='translateX(-50%)'; sw.style.borderRadius='10px';
+    }
+    // Green — maximise / restore toggle.
+    else if(role==='sg'){
+      if(SW_MAX[id]){
+        sw.style.width='90vw'; sw.style.height='';
+        sw.style.top='20px'; sw.style.left='50%'; sw.style.transform='translateX(-50%)'; sw.style.borderRadius='10px';
+        SW_MAX[id]=false;
+      } else {
+        sw.style.width='100vw'; sw.style.height='100vh';
+        sw.style.top='0'; sw.style.left='0'; sw.style.transform='none'; sw.style.borderRadius='0';
+        SW_MAX[id]=true;
+      }
+    }
+    // Yellow — minimise to the dock pill.
+    else if(role==='sy'){
+      const cat=id.replace('sw-','');
+      sw.classList.remove('open'); SW_MAX[id]=false;
+      addThumb(cat, true, id);
+    }
+  });
+});
+
+// ── Speaker SVGs (used by mute buttons) ──
+const SPEAKER_OFF = '<svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
+const SPEAKER_ON  = '<svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
+
+// Wire any mute button: clicking toggles its sibling <video>'s `muted` and updates the icon.
+function wireMute(btn, video){
+  const update = () => { btn.innerHTML = video.muted ? SPEAKER_OFF : SPEAKER_ON; };
+  update();
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    video.muted = !video.muted;
+    if(!video.muted) video.play().catch(()=>{});  // some browsers need a fresh play() after unmute
+    update();
+  });
+}
+
+// ── Detail windows ──
+let dOff=0;
+function openDetail(cat,idx){
+  const p=PROJECTS[cat]?.[idx]; if(!p) return;
+  dOff=(dOff+24)%96;
+  const dw=document.createElement('div');
+  dw.className='dw';
+  // A project's `orientation` field controls window shape:
+  //   • 'vertical'  → 30vw × 85vh, tall, video fits 9:16 with no letterboxing.
+  //   • otherwise   → 62vw × 80vh, regular landscape detail layout.
+  const isVertical = (p.orientation === 'vertical') || (p.vertical === true);
+  const wPct = isVertical ? .30 : .62;
+  const hPct = isVertical ? .85 : .80;
+  if(isVertical) dw.classList.add('vertical');
+  const cx=Math.max(20,(innerWidth-innerWidth*wPct)/2+dOff);
+  const cy=Math.max(20,(innerHeight-innerHeight*hPct)/2+dOff);
+  dw.style.left=cx+'px'; dw.style.top=cy+'px';
+  dw.style.width=(wPct*100)+'vw'; dw.style.height=(hPct*100)+'vh';
+  dw.style.zIndex=++Z;
+
+  // Hero: video if the project has one, otherwise image fallback.
+  const heroHTML = p.video
+    ? `<div class="d-hero">
+         <video src="${p.video}" autoplay muted loop playsinline preload="metadata"></video>
+         <div class="phl">${p.video}</div>
+         <div class="mute-btn lg" data-mute>${SPEAKER_OFF}</div>
+       </div>`
+    : `<div class="d-hero"><img src="${p.img}" onerror="this.style.display='none'" alt=""><div class="phl">${p.img}</div></div>`;
+
+  // Extra image slots: data-driven. If a project explicitly defines `extraImgs`
+  // (even as an empty array), we honor that. Otherwise we fall back to two
+  // placeholder slots — keeps existing UI/UX + Art Direction details unchanged.
+  let extrasHTML = '';
+  if(Array.isArray(p.extraImgs)){
+    if(p.extraImgs.length){
+      extrasHTML = `<div class="d-imgs" style="grid-template-columns:repeat(${Math.min(p.extraImgs.length,2)},1fr)">${
+        p.extraImgs.map(src => `<div class="d-slot"><img src="${src}" onerror="this.style.display='none'" alt=""><div class="phl">${src}</div></div>`).join('')
+      }</div>`;
+    }
+  } else {
+    extrasHTML = `<div class="d-imgs">
+      <div class="d-slot"><div class="phl">image 2</div></div>
+      <div class="d-slot"><div class="phl">image 3</div></div>
+    </div>`;
+  }
+
+  // Art Direction projects use an 8-up square grid instead of the standard
+  // hero/description/extras layout. Each project's images live in
+  // assets/artdir/NN/01.jpg through 08.jpg (NN = 1-based, zero-padded index).
+  const isArtdir = (cat === 'artdir');
+  // UI/UX projects: title + image only. No category label, no description,
+  // no client subtitle. Vertical projects use a 9:16 hero, others 16:9.
+  const isUiux = (cat === 'uiux');
+  let bodyHTML;
+  if(isArtdir){
+    // Square window — always centered, no cascade offset
+    const sq = Math.min(innerWidth * 0.55, innerHeight * 0.78);
+    const barH = 32;
+    dw.style.width  = sq + 'px';
+    dw.style.height = (sq + barH) + 'px';
+    dw.style.left   = Math.max(20, (innerWidth  - sq) / 2) + 'px';
+    dw.style.top    = Math.max(20, (innerHeight - (sq + barH)) / 2) + 'px';
+    bodyHTML = `<div class="ad-single"><img src="${p.img}" alt="${p.title}"></div>`;
+  } else if(isUiux){
+    if(p.xdUrl){
+      // Convert share URL → embed URL: /view/ID/?fullscreen → /embed/ID
+      const embedUrl = p.xdUrl.replace('/view/', '/embed/').split('?')[0].replace(/\/$/, '');
+      // All UX projects — single XD embed, portrait window, always centered
+      const w = Math.min(innerWidth * 0.38, 580);
+      const h = innerHeight * 0.86;
+      dw.style.width  = w + 'px';
+      dw.style.height = h + 'px';
+      dw.style.left   = Math.max(20, (innerWidth  - w) / 2) + 'px';
+      dw.style.top    = Math.max(20, (innerHeight - h) / 2) + 'px';
+      bodyHTML = `
+        <div class="uiux-xd-single">
+          <iframe src="${embedUrl}" frameborder="0" allowfullscreen allow="fullscreen"></iframe>
+          <div class="uiux-xd-fallback" style="background-image:url('${p.img}')">
+            <a class="uiux-xd-open" href="${p.xdUrl}" target="_blank" rel="noopener">Open Prototype ↗</a>
+          </div>
+        </div>`;
+    } else {
+      const heroCls = p.vertical ? 'd-hero uiux-hero vertical' : 'd-hero uiux-hero';
+      bodyHTML = `
+  <div class="${heroCls}"><img src="${p.img}" onerror="this.style.display='none'" alt=""><div class="phl">${p.img}</div></div>
+  <div class="d-info"><div class="d-client">${p.title}</div></div>`;
+    }
+  } else {
+    bodyHTML = `
+  ${heroHTML}
+  <div class="d-info">
+    <div class="d-cat">${p.cat}</div>
+    <!-- Project title is the sole headline. Italic-gray subtitle removed. -->
+    <div class="d-client">${p.title}</div>
+    <div class="d-desc">Project description placeholder. A brief overview of the creative process, tools used, and direction behind this work.</div>
+  </div>
+  ${extrasHTML}`;
+  }
+
+  dw.innerHTML=`
+<div class="win-bar">
+  <div class="dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+  <div class="win-label">${p.title}</div>
+</div>
+<div class="win-body">${bodyHTML}
+</div>`;
+
+  // Wire the mute button if this is a motion detail.
+  const muteBtn = dw.querySelector('[data-mute]');
+  const heroVid = dw.querySelector('.d-hero video');
+  if(muteBtn && heroVid) wireMute(muteBtn, heroVid);
+
+  const [dr,dy,dg]=dw.querySelectorAll('.dot');
+  dr.addEventListener('click',e=>{ e.stopPropagation(); dw.remove(); });
+  dy.addEventListener('click',e=>{ e.stopPropagation(); dw.style.display='none'; });
+  dg.addEventListener('click',e=>{
+    e.stopPropagation();
+    if(dw._max){
+      dw.style.width=(wPct*100)+'vw'; dw.style.height=(hPct*100)+'vh';
+      dw.style.top=cy+'px'; dw.style.left=cx+'px'; dw.style.borderRadius='10px'; dw._max=false;
+    } else {
+      dw.style.width='100vw'; dw.style.height='100vh'; dw.style.top='0'; dw.style.left='0'; dw.style.borderRadius='0'; dw._max=true;
+    }
+  });
+  document.getElementById('desktop').appendChild(dw);
+  makeDrag(dw);
+  dw.addEventListener('mousedown',()=>front(dw));
+}
+
+// ── Wire teaser dots ──
+// Red + yellow → minimise to the dock pill.
+// Green → open the matching section view.
+document.querySelectorAll('.win[data-cat]').forEach(win=>{
+  win.querySelectorAll('.dot[data-role="min"]').forEach(d=>{
+    d.addEventListener('click',e=>{ e.stopPropagation(); minimise(win); });
+  });
+  win.querySelectorAll('.dot[data-role="open"]').forEach(d=>{
+    d.addEventListener('click',e=>{
+      e.stopPropagation();
+      const cat = win.dataset.cat;
+      if(cat && cat !== 'logo') openSection(cat);
+    });
+  });
+  win.addEventListener('mousedown',()=>front(win));
+  makeDrag(win); makeResize(win);
+
+  // Click anywhere on the window body to open the section —
+  // but not on links/buttons (e.g. Spotify), and not after a drag.
+  const body = win.querySelector('.win-body');
+  if(body){
+    let _x=0, _y=0;
+    body.addEventListener('mousedown', e=>{ _x=e.clientX; _y=e.clientY; });
+    body.addEventListener('click', e=>{
+      if(e.target.closest('a,button,[data-mute],[data-role],.grip')) return;
+      if(Math.hypot(e.clientX-_x, e.clientY-_y) > 6) return; // was a drag
+      const cat = win.dataset.cat;
+      if(cat && cat !== 'logo') openSection(cat);
+    });
+  }
+});
+
+// ── Pill buttons ──
+document.querySelectorAll('.pbtn[data-sec]').forEach(btn=>{
+  btn.addEventListener('click',()=>openSection(btn.dataset.sec));
+});
+document.getElementById('pill-home').addEventListener('click',()=>{
+  document.querySelectorAll('.sw').forEach(s=>{ s.classList.remove('open'); SW_MAX[s.id]=false; });
+  document.querySelectorAll('.dw').forEach(d=>d.remove());
+});
+
+// ── Project cards ──
+document.querySelectorAll('.pcard').forEach(c=>{
+  c.addEventListener('click',()=>openDetail(c.dataset.cat, +c.dataset.idx));
+});
+
+// ── Motion section: render 17 vertical-video cards ──
+// Behaviour:
+//   • Always: muted autoplay + loop, regardless of hover state. No poster image
+//             — the video itself is the visual.
+//   • Click:  opens the detail window. Card stays muted (audio is opted into
+//             via the mute toggle on either the card or the detail window).
+//   • Mute:   small button revealed on hover toggles audio for that one card.
+(function renderMotionGrid(){
+  const grid = document.getElementById('motion-grid');
+  if(!grid) return;
+  PROJECTS.motion.forEach((p, i) => {
+    const n = String(i+1).padStart(2,'0');
+    const card = document.createElement('div');
+    card.className = 'mvcard';
+    card.dataset.idx = i;
+    card.innerHTML = `
+      <video autoplay muted loop playsinline preload="metadata">
+        <source src="${p.video}" type="video/mp4">
+      </video>
+      <div class="phl">motion/${n}</div>
+      <div class="num">${n}</div>
+      <div class="mute-btn" data-mute>${SPEAKER_OFF}</div>
+    `;
+    const video = card.querySelector('video');
+    const mute  = card.querySelector('[data-mute]');
+    wireMute(mute, video);
+
+    // Some browsers block the first autoplay until a play() call fires post-load.
+    // Calling play() on loadedmetadata is harmless if autoplay already started.
+    video.addEventListener('loadedmetadata', () => { video.play().catch(()=>{}); });
+
+    // Click → open the fullscreen vertical player (no project page).
+    card.addEventListener('click', e => {
+      if(e.target.closest('[data-mute]')) return; // don't trigger on the mute toggle
+      openMotionPlayer(p.video);
+    });
+
+    grid.appendChild(card);
+  });
+})();
+
+// ── Motion fullscreen player ──
+// Drops a centered 9:16 video over a darkened backdrop. Autoplay unmuted on
+// user-initiated click; if the browser still blocks unmuted autoplay we fall
+// back to muted so the video at least plays. Click the backdrop, the close
+// button, or press Esc to dismiss.
+function openMotionPlayer(videoSrc){
+  const player = document.createElement('div');
+  player.className = 'video-player';
+  player.innerHTML = `
+    <div class="video-player-bg"></div>
+    <video src="${videoSrc}" autoplay loop playsinline controls></video>
+    <button class="video-player-close" aria-label="Close">×</button>
+  `;
+  document.body.appendChild(player);
+  const video = player.querySelector('video');
+  video.muted = false;
+  video.play().catch(() => {
+    // Browser blocked unmuted autoplay despite the click — recover gracefully.
+    video.muted = true;
+    video.play().catch(()=>{});
+  });
+  const close = () => {
+    document.removeEventListener('keydown', onKey);
+    player.remove();
+  };
+  const onKey = e => { if(e.key === 'Escape') close(); };
+  player.querySelector('.video-player-bg').addEventListener('click', close);
+  player.querySelector('.video-player-close').addEventListener('click', close);
+  document.addEventListener('keydown', onKey);
+}
+
+// ── 3D section: render mixed-orientation grid ──
+// Three card variants are possible:
+//   • Has video + landscape  → autoplay video card, click opens detail window.
+//   • Has video + vertical   → autoplay video card, click opens fullscreen
+//                              player (same UX as Motion).
+//   • Image-only             → static <img> card, click opens detail window.
+(function render3DGrid(){
+  const grid = document.getElementById('threed-grid');
+  if(!grid) return;
+  PROJECTS['3d'].forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = `threed-card ${p.orientation || 'landscape'}`;
+    card.dataset.idx = i;
+
+    const mediaHTML = p.video
+      ? `<video autoplay muted loop playsinline preload="metadata"><source src="${p.video}" type="video/mp4"></video>`
+      : `<img src="${p.img}" onerror="this.style.display='none'" alt="">`;
+    const muteHTML = p.video ? `<div class="mute-btn" data-mute>${SPEAKER_OFF}</div>` : '';
+    const labelText = p.video || p.img;
+
+    card.innerHTML = `
+      ${mediaHTML}
+      <div class="phl">${labelText}</div>
+      <div class="info">
+        <div class="pc">3D Design</div>
+        <div class="pt">${p.title}</div>
+        <div class="ps">${p.client}</div>
+      </div>
+      ${muteHTML}
+    `;
+
+    if(p.video){
+      const video = card.querySelector('video');
+      const mute  = card.querySelector('[data-mute]');
+      wireMute(mute, video);
+      video.addEventListener('loadedmetadata', () => { video.play().catch(()=>{}); });
+    }
+
+    card.addEventListener('click', e => {
+      if(e.target.closest('[data-mute]')) return;
+      // Vertical videos → fullscreen player. Everything else → detail window.
+      if(p.orientation === 'vertical' && p.video){
+        openMotionPlayer(p.video);
+      } else {
+        openDetail('3d', i);
+      }
+    });
+
+    grid.appendChild(card);
+  });
+})();
+
+// ── Wire the 3D teaser's mute button ──
+(function wireBITeaserMute(){
+  const btn   = document.getElementById('bi-teaser-mute');
+  const video = document.getElementById('bi-teaser-video');
+  if(btn && video) wireMute(btn, video);
+})();
+
+(function wire3DTeaserMute(){
+  const btn   = document.getElementById('td3-mute');
+  const video = document.getElementById('td3-video');
+  if(btn && video) wireMute(btn, video);
+})();
+
+// ── Mobile rendering ──
+// Builds every mobile section from the same PROJECTS / MUSIC / SOCIAL_LINKS
+// data the desktop uses, so titles, taglines, and images stay in lockstep.
+// Static images only (no autoplay videos on mobile) — keeps the page light
+// and avoids Safari/Chrome autoplay quirks on phones.
+(function renderMobile(){
+  const linkedinSVG  = '<svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>';
+  const instagramSVG = '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
+
+  // Hero socials
+  const socials = document.getElementById('m-socials');
+  if(socials){
+    socials.innerHTML =
+      `<a class="social-link" href="${SOCIAL_LINKS.linkedin}"  target="_blank" rel="noopener" aria-label="LinkedIn">${linkedinSVG}</a>` +
+      `<a class="social-link" href="${SOCIAL_LINKS.instagram}" target="_blank" rel="noopener" aria-label="Instagram">${instagramSVG}</a>`;
+  }
+
+  // Card template (ratio = 'r1610' | 'r914' | 'r11', extraClass = e.g. 'uiux-fit')
+  function card(p, ratio, extraClass){
+    const labelText = p.img || p.video || '';
+    const sub = p.client || p.cat || '';
+    const cls = extraClass ? ` ${extraClass}` : '';
+    return `<div class="mob-card">
+      <div class="mob-cimg ${ratio}${cls}">
+        ${p.img ? `<img src="${p.img}" onerror="this.style.display='none'" alt="">` : ''}
+        <div class="phl">${labelText}</div>
+      </div>
+      <div class="mob-ci">
+        <div class="pt">${p.title || ''}</div>
+        ${sub ? `<div class="ps">${sub}</div>` : ''}
+      </div>
+    </div>`;
+  }
+
+  // Section grids
+  const motionGrid = document.getElementById('m-motion-grid');
+  if(motionGrid) motionGrid.innerHTML = PROJECTS.motion.map(p => card(p, 'r914')).join('');
+
+  const threedGrid = document.getElementById('m-3d-grid');
+  if(threedGrid) threedGrid.innerHTML = PROJECTS['3d'].map(p =>
+    card(p, p.orientation === 'vertical' ? 'r914' : 'r1610')
+  ).join('');
+
+  // UI/UX — vertical (App Design) gets a 9:14 thumb, others 16:10. The
+  // 'uiux-fit' class anchors screenshots top-center so the most important
+  // chrome stays visible.
+  const uiuxGrid = document.getElementById('m-uiux-grid');
+  if(uiuxGrid) uiuxGrid.innerHTML = PROJECTS.uiux.map(p =>
+    card(p, p.vertical ? 'r914' : 'r1610', 'uiux-fit')
+  ).join('');
+
+  const artdirGrid = document.getElementById('m-artdir-grid');
+  if(artdirGrid) artdirGrid.innerHTML = PROJECTS.artdir.map(p => card(p, 'r11')).join('');
+
+  // Music section
+  const musicName = document.getElementById('m-music-name');
+  const musicTag  = document.getElementById('m-music-tag');
+  const musicSpotify = document.getElementById('m-music-spotify');
+  if(musicName && MUSIC.projectName) musicName.textContent = MUSIC.projectName;
+  if(musicTag  && MUSIC.tagline)     musicTag.textContent  = MUSIC.tagline;
+  if(musicSpotify && MUSIC.spotifyUrl) musicSpotify.href   = MUSIC.spotifyUrl;
+
+  const tracksEl = document.getElementById('m-music-tracks');
+  if(tracksEl && MUSIC.tracks){
+    tracksEl.innerHTML = MUSIC.tracks.map((t, i) => `
+      <div class="mob-track">
+        <span class="tn">${i+1}</span>
+        <div class="ti">
+          <div class="nm">${t.n}</div>
+          <div class="gn">${t.g}</div>
+        </div>
+        <span class="td">${t.d}</span>
+      </div>
+    `).join('');
+  }
+})();
+
+// ── Airplane flyby ──
+// 20-second cycle: 8s flight + 12s wait. The GIF itself contains the entire
+// right-to-left motion over its native 8-second runtime, so we don't add any
+// CSS transform. JS just shows the element for 8s, then hides it.
+//
+// Sequence per cycle:
+//   1. Hide element (display:none) and clear its src so the GIF unloads.
+//   2. Reattach the src and switch to display:block. Layout flush guarantees
+//      the browser commits the hidden state before reattaching, so the GIF
+//      reliably starts from frame 0.
+//   3. After 8s (matches the GIF's runtime), hide again — 12s of empty sky.
+const FLY_INTERVAL = 20000;          // 8s flight + 12s wait = 20s total cycle
+const FLY_DURATION = 8000;           // matches the GIF's own 8s length
+const AIRPLANE_SRC = 'assets/airplane.gif';
+
+(function airplaneLoop(){
+  const plane = document.getElementById('airplane');
+  if(!plane) return;
+
+  function fly(){
+    // Clean reset: kill any in-flight animation, hide, and unload the GIF.
+    plane.classList.remove('flying');
+    plane.style.display = 'none';
+    plane.removeAttribute('src');
+
+    // Next frame, reattach src + show. The double rAF guarantees the browser
+    // commits the start state before the animation triggers, so it never
+    // jumps mid-transform.
+    requestAnimationFrame(()=>{
+      plane.src = AIRPLANE_SRC;
+      plane.style.display = 'block';
+      void plane.offsetWidth;        // force a layout flush — restart-safe
+      requestAnimationFrame(()=>{
+        plane.classList.add('flying');
+      });
+    });
+
+    // After the 8s flight, hide cleanly until the next cycle starts.
+    setTimeout(()=>{
+      plane.classList.remove('flying');
+      plane.style.display = 'none';
+    }, FLY_DURATION);
+  }
+
+  setTimeout(fly, 2000);              // first flight 2s after page load
+  setInterval(fly, FLY_INTERVAL);     // then exactly every 20s
+})();
+
+// ── About teaser GIF button → opens the full About section ──
+(function wireAboutCta(){
+  document.querySelectorAll('[data-open-about]').forEach(btn=>{
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      openSection('about');
+    });
+  });
+})();
+
+// ── Music teaser: pull text from the same MUSIC data the section uses ──
+// Keeps the teaser tagline (and name) in sync with the music page — change
+// MUSIC.tagline / MUSIC.projectName once and both update.
+(function syncMusicTeaser(){
+  const nameEl = document.querySelector('#tw-music .music-name');
+  const tagEl  = document.querySelector('#tw-music .music-tag');
+  if(nameEl && MUSIC.projectName) nameEl.textContent = MUSIC.projectName;
+  if(tagEl  && MUSIC.tagline)     tagEl.textContent  = MUSIC.tagline;
+})();
+
+// ── Portfolio sticker — draggable, no chrome, no resize ──
+// The sticker is a chromeless interactive element. It's draggable from
+// anywhere on its surface (mousedown → mousemove → mouseup) using offsetLeft/
+// offsetTop so it stays stable across viewport resizes. No click action wired
+// — drop a handler in the marked TODO if you want one later.
+(function wireLogoSticker(){
+  const logo = document.getElementById('tw-logo');
+  if(!logo) return;
+
+  let dragging = false, ox = 0, oy = 0;
+  logo.addEventListener('mousedown', e => {
+    dragging = true;
+    // Lock current layout position to px so subsequent moves don't jump
+    // when we leave the vw/vh values behind.
+    logo.style.left = logo.offsetLeft + 'px';
+    logo.style.top  = logo.offsetTop  + 'px';
+    ox = e.clientX - logo.offsetLeft;
+    oy = e.clientY - logo.offsetTop;
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if(!dragging) return;
+    logo.style.left = (e.clientX - ox) + 'px';
+    logo.style.top  = (e.clientY - oy) + 'px';
+  });
+  document.addEventListener('mouseup', () => { dragging = false; });
+
+  // TODO: wire a click action for the portfolio sticker (modal, credits, etc.)
+})();
+
+// ── Inject social icons into the About teaser + section ──
+(function renderSocials(){
+  const linkedinSVG  = '<svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>';
+  const instagramSVG = '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
+  const html =
+    `<a class="social-link" href="${SOCIAL_LINKS.linkedin}"  target="_blank" rel="noopener" aria-label="LinkedIn">${linkedinSVG}</a>` +
+    `<a class="social-link" href="${SOCIAL_LINKS.instagram}" target="_blank" rel="noopener" aria-label="Instagram">${instagramSVG}</a>`;
+  const teaser  = document.getElementById('ab-teaser-socials');
+  const section = document.getElementById('ab-section-socials');
+  if(teaser)  teaser.innerHTML  = html;
+  if(section) section.innerHTML = html;
+})();
+
+// ── Render the music section from MUSIC data ──
+// Tagline, description and track list all live in the MUSIC object up top
+// (single source of truth). The static markup just leaves containers for
+// us to fill in; this keeps future copy edits in one place.
+(function renderMusicSection(){
+  const info  = document.getElementById('mshow-info');
+  const list  = document.getElementById('mtracks-list');
+  if(!info || !list) return;
+
+  // Spotify icon — extracted once so it's shared between teaser/section/mobile.
+  const spotifySVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.56.3z"/></svg>';
+
+  // Description preserves paragraph breaks from the data block ("\n\n").
+  const paragraphs = MUSIC.description
+    .split(/\n\s*\n/)
+    .map(t => `<p>${t.replace(/\n/g,'<br>')}</p>`).join('');
+
+  info.innerHTML =
+    `<h1>${MUSIC.projectName}</h1>` +
+    `<div class="tag">${MUSIC.tagline}</div>` +
+    paragraphs +
+    `<a class="spotify-btn-lg" href="${MUSIC.spotifyUrl}" target="_blank" rel="noopener">` +
+      spotifySVG + ' Open in Spotify' +
+    `</a>`;
+
+  list.innerHTML = MUSIC.tracks.map((t,i) => (
+    `<div class="mtrack">` +
+      `<span class="tn">${String(i+1).padStart(2,'0')}</span>` +
+      `<div class="ti"><div class="nm">${t.n}</div><div class="gn">${t.g}</div></div>` +
+      `<span class="td">${t.d || ''}</span>` +
+    `</div>`
+  )).join('');
+})();
+
+// ── Contact form: submit to Formspree via fetch, show inline success ──
+(function wireContactForm(){
+  const form    = document.getElementById('contact-form');
+  const success = document.getElementById('cf-success');
+  const errorEl = document.getElementById('cf-error');
+  if(!form || !success) return;
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    errorEl.hidden = true;
+    const submit = form.querySelector('.cform-submit');
+    submit.disabled = true;
+    submit.textContent = 'Sending…';
+    try{
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { Accept: 'application/json' },
+      });
+      if(res.ok){
+        form.hidden = true;
+        success.hidden = false;
+        form.reset();
+      } else {
+        // Formspree returns a JSON body with errors when something is wrong;
+        // surface the first one if present, else a generic message.
+        const data = await res.json().catch(()=>({}));
+        const msg = (data.errors && data.errors[0] && data.errors[0].message)
+          || 'Something went wrong. Please try again or email me directly.';
+        errorEl.textContent = msg;
+        errorEl.hidden = false;
+      }
+    } catch(err){
+      errorEl.textContent = 'Network error. Please try again or email me directly.';
+      errorEl.hidden = false;
+    } finally {
+      submit.disabled = false;
+      submit.textContent = 'Send Message';
+    }
+  });
+})();
+
+// ── Motion teaser: Instagram-stories cycling ──
+// Only the first 5 motion projects feature in the teaser (the full 17 live
+// in the section view) so the progress bars stay readable.
+const STORY_COUNT = 5;
+const STORIES = PROJECTS.motion.slice(0, STORY_COUNT).map((p,i)=>({
+  video: p.video, title: p.title, cat: `Motion Design — ${i+1} / ${STORY_COUNT}`
+}));
+const STORY_DUR_FALLBACK = 5000;   // used if the video duration isn't known yet
+let storyIdx = 0;
+let storyTimer = null;
+let storyStart = 0;                // ms timestamp of current bar's animation start
+let storyPausedAt = null;          // ms remaining if paused (null when running)
+let storyTotal = STORY_DUR_FALLBACK; // duration of the *current* story in ms
+
+function _bars(){ return document.querySelectorAll('#story-card .sb-fill'); }
+
+// Read the current video's duration in ms, or fall back if metadata isn't ready.
+function _videoDurMs(){
+  const vid = document.getElementById('story-video');
+  const d = vid && vid.duration;
+  return (d && isFinite(d) && d > 0) ? d * 1000 : STORY_DUR_FALLBACK;
+}
+
+function _showStoryPlayBtn(){
+  const btn = document.getElementById('story-play-btn');
+  if(btn) btn.classList.add('visible');
+}
+function _hideStoryPlayBtn(){
+  const btn = document.getElementById('story-play-btn');
+  if(btn) btn.classList.remove('visible');
+}
+
+function _kickStoryVideo(vid){
+  // Used for resume and visibility-recovery — does NOT reload src.
+  if(!vid) return;
+  vid.muted = true;
+  vid.play().then(() => _hideStoryPlayBtn()).catch(() => _showStoryPlayBtn());
+}
+
+function showStory(i){
+  storyIdx = (i + STORIES.length) % STORIES.length;
+  const s = STORIES[storyIdx];
+  const vid = document.getElementById('story-video');
+
+  // Always set src + load + play — never skip even if src looks the same.
+  // load() resets Safari's buffer state; play() must follow load() directly.
+  vid.src = s.video;
+  vid.load();
+  vid.muted = true;
+  _hideStoryPlayBtn();
+  vid.play().catch(() => _showStoryPlayBtn());
+
+  document.getElementById('story-title').textContent = s.title;
+  document.getElementById('story-cat').textContent = s.cat;
+
+  // Reset all bars synchronously, then animate the active one.
+  const bars = _bars();
+  bars.forEach((b, j) => {
+    b.style.transition = 'none';
+    b.style.width = (j < storyIdx) ? '100%' : '0%';
+  });
+  void bars[storyIdx].offsetWidth; // flush styles
+
+  // 1s fallback in case loadedmetadata never fires; real duration used once it does.
+  let metaTimer = setTimeout(() => {
+    if(STORIES[storyIdx] === s) startBar(8000);
+  }, 1000);
+  vid.addEventListener('loadedmetadata', () => {
+    clearTimeout(metaTimer);
+    if(STORIES[storyIdx] !== s) return; // user tapped through
+    startBar(Math.max(vid.duration * 1000, 1000));
+  }, { once: true });
+}
+
+function startBar(remaining){
+  const bars = _bars();
+  const b = bars[storyIdx];
+  storyTotal = remaining;
+  b.style.transition = 'none';
+  b.style.width = '0%';
+  void b.offsetWidth;
+  b.style.transition = `width ${remaining}ms linear`;
+  b.style.width = '100%';
+  storyStart = performance.now();
+  storyPausedAt = null;
+  clearTimeout(storyTimer);
+  storyTimer = setTimeout(()=>showStory(storyIdx + 1), remaining);
+}
+
+function pauseStory(){
+  if(storyPausedAt !== null) return;       // already paused
+  const elapsed = performance.now() - storyStart;
+  storyPausedAt = Math.max(0, storyTotal - elapsed);
+  clearTimeout(storyTimer);
+  // Freeze the active bar at its current width.
+  const bars = _bars();
+  const b = bars[storyIdx];
+  const cs = getComputedStyle(b);
+  const w = cs.width;
+  b.style.transition = 'none';
+  b.style.width = w;
+  // Pause the video too so it doesn't keep advancing while invisible.
+  const vid = document.getElementById('story-video');
+  if(vid) try{ vid.pause(); }catch(_){}
+}
+
+function resumeStory(){
+  if(storyPausedAt === null) return;       // wasn't paused
+  const vid = document.getElementById('story-video');
+  if(vid) _kickStoryVideo(vid);
+  startBar(storyPausedAt);
+}
+
+// ── Story playback recovery ──
+// Browsers occasionally pause our video for reasons we don't directly control:
+// tab visibility, power-saver throttling, codec hiccups, an inadvertent click
+// on the element. A 1.5s heartbeat checks for an unintended pause and nudges
+// the element back to playing — but only when we're not in an explicit
+// pauseStory() state and the page is visible.
+setInterval(() => {
+  const vid = document.getElementById('story-video');
+  if(!vid) return;
+  if(storyPausedAt !== null) return;        // explicitly paused (window minimised)
+  if(document.hidden) return;               // tab not visible
+  if(vid.paused && vid.readyState >= 2){
+    vid.muted = true;
+    vid.play().then(() => _hideStoryPlayBtn()).catch(()=>{});
+  }
+}, 1500);
+
+// Pause when the tab is hidden, resume when shown — but never override an
+// explicit pauseStory() (i.e. minimised window).
+document.addEventListener('visibilitychange', () => {
+  const vid = document.getElementById('story-video');
+  if(!vid) return;
+  if(document.hidden){
+    try{ vid.pause(); }catch(_){}
+  } else if(storyPausedAt === null){
+    _kickStoryVideo(vid);
+  }
+});
+
+// If the active video errors (bad path, codec issue, network), advance to the
+// next story after a short delay rather than getting stuck on a black frame.
+(function wireStoryErrorRecovery(){
+  const vid = document.getElementById('story-video');
+  if(!vid) return;
+  vid.addEventListener('error', () => {
+    if(storyPausedAt !== null) return;
+    setTimeout(() => showStory(storyIdx + 1), 600);
+  });
+  // Sometimes the source itself errors (404). Listen on the video too.
+  vid.addEventListener('stalled', () => {
+    // Stalled isn't always fatal, but try a light nudge.
+    if(storyPausedAt === null) vid.play().catch(()=>{});
+  });
+})();
+
+// Wire the autoplay-blocked play button overlay.
+(function wireStoryPlayBtn(){
+  const btn = document.getElementById('story-play-btn');
+  const vid = document.getElementById('story-video');
+  if(!btn || !vid) return;
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    vid.muted = true;
+    vid.play().then(() => { _hideStoryPlayBtn(); }).catch(() => {});
+  });
+})();
+
+// Tap zones — left = back, right = forward.
+document.querySelectorAll('#story-card .story-tap').forEach(el=>{
+  el.addEventListener('click',e=>{
+    e.stopPropagation();
+    showStory(storyIdx + parseInt(el.dataset.dir));
+  });
+});
+
+// Hook minimise/restore so the timer pauses while the window is hidden,
+// and resumes from where it left off when restored.
+const _origMinimise = minimise;
+minimise = function(win){
+  if(win.dataset.cat === 'motion') pauseStory();
+  return _origMinimise(win);
+};
+const _origRestoreWin = restoreWin;
+restoreWin = function(cat){
+  _origRestoreWin(cat);
+  if(cat === 'motion') resumeStory();
+};
+
+// Kick off the first story.
+showStory(0);
+
+// ── DVD-style idle screensaver ──
+// After 1 minute with no input, drop a darkened overlay with the portfolio
+// logo bouncing around the screen DVD-player style. Any user activity hides
+// it and resets the countdown.
+(function dvdScreensaver(){
+  const IDLE_MS = 60_000;
+  let idleTimer = null;
+  let overlay = null, logo = null, raf = null;
+  let x = 0, y = 0, vx = 0, vy = 0, w = 0, h = 0;
+
+  function bounce(){
+    if(!overlay) return;
+    x += vx; y += vy;
+    if(x <= 0){ x = 0; vx = Math.abs(vx); }
+    else if(x + w >= innerWidth){ x = innerWidth - w; vx = -Math.abs(vx); }
+    if(y <= 0){ y = 0; vy = Math.abs(vy); }
+    else if(y + h >= innerHeight){ y = innerHeight - h; vy = -Math.abs(vy); }
+    logo.style.transform = `translate(${x}px,${y}px)`;
+    raf = requestAnimationFrame(bounce);
+  }
+
+  function show(){
+    if(overlay) return;
+    overlay = document.createElement('div');
+    overlay.id = 'dvd-overlay';
+    overlay.innerHTML = `<img id="dvd-logo" src="assets/screensaver.png" alt="">`;
+    document.body.appendChild(overlay);
+    logo = overlay.querySelector('#dvd-logo');
+    const start = () => {
+      w = logo.offsetWidth || 280;
+      h = logo.offsetHeight || (w * 0.4);
+      x = Math.random() * Math.max(1, innerWidth  - w);
+      y = Math.random() * Math.max(1, innerHeight - h);
+      const speed = 1.6;
+      const angle = (Math.random() * Math.PI / 2) + Math.PI / 4; // 45–135°
+      vx = Math.cos(angle) * speed * (Math.random() < .5 ? -1 : 1);
+      vy = Math.sin(angle) * speed * (Math.random() < .5 ? -1 : 1);
+      bounce();
+    };
+    if(logo.complete && logo.naturalWidth) start();
+    else logo.addEventListener('load', start, { once:true });
+  }
+
+  function hide(){
+    if(raf) cancelAnimationFrame(raf);
+    raf = null;
+    if(overlay){ overlay.remove(); overlay = null; logo = null; }
+  }
+
+  function reset(){
+    hide();
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(show, IDLE_MS);
+  }
+
+  ['mousemove','mousedown','keydown','wheel','touchstart','touchmove'].forEach(ev=>{
+    window.addEventListener(ev, reset, { passive:true });
+  });
+  reset();
+})();
+
+/* ── Brand Identity section: wire mute buttons on static videos ── */
+(function wireBrandIdentityMutes(){
+  document.querySelectorAll('#sw-uiux .bi-slot').forEach(slot => {
+    const video = slot.querySelector('video');
+    const btn   = slot.querySelector('[data-mute]');
+    if(!video || !btn) return;
+    btn.innerHTML = SPEAKER_OFF;
+    wireMute(btn, video);
+    video.addEventListener('loadedmetadata', () => { video.play().catch(()=>{}); });
+  });
+})();
+
+/* ── Food Map (Leaflet + CartoDB dark) ── */
+(function wireFoodMap(){
+  const btns   = document.querySelectorAll('.food-map-btn');
+  const mapEl  = document.getElementById('food-map');
+  const noteEl = document.getElementById('food-map-note');
+  if(!mapEl || typeof L === 'undefined') return;
+
+  const LONDON_SPOTS = [
+    [[51.4985, -0.1270], 'Haanbaagasuteki'],
+    [[51.4122, -0.3063], 'Poor Boys Kingston'],
+    [[51.4613, -0.3042], 'Hollyhock Vegetarian Cafe Richmond'],
+    [[51.4608, -0.3167], 'Napoli on the Road Richmond'],
+    [[51.4601, -0.3065], 'Via Romana Deli Richmond'],
+    [[51.4597, -0.3055], 'Danieli on the Green Richmond'],
+    [[51.5393, -0.1425], 'Mestizo Mexican Restaurant Camden'],
+    [[51.5116, -0.2021], 'Earl of Lonsdale Notting Hill'],
+    [[51.5129, -0.1333], 'Heard Burger Soho'],
+    [[51.5131, -0.1340], 'Breadstall Pizza Soho'],
+    [[51.5127, -0.1338], 'Antico Vinaio Soho'],
+    [[51.5113, -0.1285], 'YiQi Chinatown'],
+    [[51.5117, -0.1353], 'Bar Termini'],
+    [[51.5120, -0.1264], 'Rock and Sole Plaice'],
+    [[51.5155, -0.0613], 'Tarim Uyghur Restaurant'],
+    [[51.5278, -0.0573], 'E Pelicci'],
+    [[51.5008, -0.0199], 'Dishoom Canary Wharf'],
+    [[51.4118, -0.3055], 'Korea Hero Kingston'],
+    [[51.4115, -0.3049], 'Al Forno Kingston'],
+  ];
+  // Istanbul spots coming soon
+
+  // Circle marker style
+  const dotOpts = { radius:8, fillColor:'#ff5f57', color:'rgba(255,255,255,0.6)', weight:1.5, fillOpacity:1 };
+
+  // Rich popup HTML — name in DM Serif Display + Google Maps link
+  function makePopupHTML(name, city){
+    const q = name.replace(/ /g,'+') + '+' + city;
+    return `<span class="fp-name">${name}</span>` +
+           `<a class="fp-link" href="https://www.google.com/maps/search/${q}" target="_blank" rel="noopener">Open in Google Maps</a>`;
+  }
+
+  const map = L.map(mapEl, {
+    center: [51.505, -0.09],
+    zoom: 12,
+    zoomControl: true,
+    attributionControl: false,
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+    maxZoom: 19,
+  }).addTo(map);
+
+  // London markers
+  const londonLayer = L.layerGroup();
+  LONDON_SPOTS.forEach(([latlng, name]) => {
+    const m = L.circleMarker(latlng, dotOpts);
+    m.bindPopup(makePopupHTML(name, 'London'), { className:'food-popup', closeButton:false, autoPan:false });
+    m.on('mouseover', function(){ this.openPopup(); });
+    m.on('mouseout',  function(){ this.closePopup(); });
+    londonLayer.addLayer(m);
+  });
+
+  // Istanbul layer — empty for now
+  const istanbulLayer = L.layerGroup();
+  // Istanbul spots coming soon
+
+  const CITIES = {
+    london:   { layer: londonLayer,   center: [51.505,  -0.09  ], zoom: 12, note: '19 spots · more coming soon' },
+    istanbul: { layer: istanbulLayer, center: [41.0082, 28.9784], zoom: 12, note: 'Coming soon' },
+  };
+
+  londonLayer.addTo(map);
+
+  function switchCity(city) {
+    const cfg = CITIES[city]; if(!cfg) return;
+    Object.values(CITIES).forEach(c => { if(map.hasLayer(c.layer)) map.removeLayer(c.layer); });
+    map.addLayer(cfg.layer);
+    map.flyTo(cfg.center, cfg.zoom, { duration: 0.8 });
+    if(noteEl) noteEl.textContent = cfg.note;
+  }
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      switchCity(btn.dataset.city);
+    });
+  });
+
+  // Invalidate size when About section is opened (sw-about gets class 'open')
+  const aboutSW = document.getElementById('sw-about');
+  if(aboutSW) {
+    new MutationObserver(() => {
+      if(aboutSW.classList.contains('open')) {
+        setTimeout(() => { map.invalidateSize(); }, 80);
+      }
+    }).observe(aboutSW, { attributes: true, attributeFilter: ['class'] });
+  }
+})();
+
+</script>
+</body>
+</html>
