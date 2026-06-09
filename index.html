@@ -657,109 +657,205 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 .d-slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .d-slot .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,.12)}
 
-/* ── Mobile ──
-   Editorial-style stacked layout. Smooth scroll-jump from the bottom nav
-   to each section's anchor. All desktop chrome (#desktop, #pill, #airplane)
-   is hidden, the background image is dimmed for legibility, and #mob takes
-   over as the document body. */
+/* ── Mobile — macOS-card layout, rebuilt from scratch ── */
 @media(max-width:767px){
-  html,body{overflow:auto;background:#0a0a0a}
-  html{scroll-behavior:smooth}
-  body{padding:0;margin:0}
-  #bg{display:block;opacity:.45}
+  html,body{overflow:hidden;background:#0c0c0c;height:100%}
+  #bg{display:none}
   #desktop,#pill,#airplane{display:none !important}
+  #mob{display:block}
 
-  #mob{
-    display:flex;flex-direction:column;
-    min-height:100vh;background:transparent;
-    padding-bottom:84px;position:relative;z-index:2;
-    color:var(--text);
-  }
-
-  /* ── Hero ── */
-  .mob-hero{
-    padding:72px 24px 48px;
-    border-bottom:.5px solid rgba(255,255,255,.06);
-  }
-  .mob-hero .loc{font-size:11px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.16em;margin-bottom:18px}
-  .mob-hero h1{
-    font-family:var(--serif);font-size:64px;line-height:.94;letter-spacing:-.02em;
-    margin-bottom:20px;
-  }
-  .mob-hero .role{
-    font-family:var(--serif);font-style:italic;font-size:19px;line-height:1.35;
-    color:rgba(255,255,255,.55);margin-bottom:28px;
-  }
-  .mob-hero p{font-size:15px;line-height:1.7;color:rgba(255,255,255,.62);margin-bottom:24px}
-  .mob-hero .socials{display:flex;gap:10px}
-  .mob-hero .social-link{
-    width:36px;height:36px;border-radius:50%;
-    background:rgba(255,255,255,.05);border:.5px solid rgba(255,255,255,.18);
+  /* ── Fixed header ── */
+  #m-header{
+    position:fixed;top:0;left:0;right:0;height:52px;z-index:100;
+    background:rgba(10,10,10,.97);
+    border-bottom:.5px solid rgba(255,255,255,.08);
     display:flex;align-items:center;justify-content:center;
-    color:rgba(255,255,255,.7);transition:all .15s;
   }
-  .mob-hero .social-link:active{background:rgba(255,255,255,.14);color:#fff}
-  .mob-hero .social-link svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  .m-logo-img{height:28px;width:auto;object-fit:contain;display:block}
 
-  /* ── Section ── */
-  .mob-sec{padding:56px 24px;border-top:.5px solid rgba(255,255,255,.06);scroll-margin-top:8px}
-  .mob-sec .sec-kicker{font-size:11px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.16em;margin-bottom:10px}
-  .mob-sec h2{font-family:var(--serif);font-size:38px;line-height:1.02;letter-spacing:-.01em;margin-bottom:28px}
-
-  /* ── Card grid ── */
-  .mob-grid{display:grid;gap:14px;grid-template-columns:1fr}
-  .mob-grid.cols-2{grid-template-columns:1fr 1fr;gap:10px}
-  .mob-card{border-radius:8px;overflow:hidden;background:rgba(255,255,255,.04);border:.5px solid rgba(255,255,255,.07);cursor:pointer}
-  .mob-cimg{width:100%;position:relative;background:rgba(255,255,255,.05);overflow:hidden}
-  .mob-cimg.r1610{aspect-ratio:16/10}
-  .mob-cimg.r914{aspect-ratio:9/14}
-  .mob-cimg.r11{aspect-ratio:1/1}
-  .mob-cimg img,.mob-cimg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-  .mob-cimg .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:rgba(255,255,255,.18)}
-  .mob-ci{padding:12px 14px 14px}
-  .mob-ci .pt{font-family:var(--serif);font-size:18px;line-height:1.2}
-  .mob-ci .ps{font-size:11px;color:rgba(255,255,255,.4);margin-top:3px}
-
-  /* ── Music ── */
-  .mob-music{display:flex;flex-direction:column;gap:0}
-  .mob-music-cover{width:100%;aspect-ratio:1/1;border-radius:10px;overflow:hidden;position:relative;background:rgba(255,255,255,.05);margin-bottom:18px}
-  .mob-music-cover img{width:100%;height:100%;object-fit:cover;display:block}
-  .mob-music-cover .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:rgba(255,255,255,.18)}
-  .mob-music .pn{font-family:var(--serif);font-size:34px;line-height:1.05;margin-bottom:8px}
-  .mob-music .pt{font-size:11px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.14em;margin-bottom:20px}
-  .mob-music .spotify-btn{font-size:13px;padding:9px 16px;align-self:flex-start}
-  .mob-music .spotify-btn svg{width:16px;height:16px}
-  .mob-music-tracks{margin-top:28px;border-top:.5px solid rgba(255,255,255,.06);padding-top:20px}
-  .mob-music-tracks h3{font-size:11px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.14em;margin-bottom:14px}
-  .mob-track{display:flex;align-items:center;gap:14px;padding:11px 0;border-bottom:.5px solid rgba(255,255,255,.04)}
-  .mob-track:last-child{border-bottom:none}
-  .mob-track .tn{font-size:11px;color:rgba(255,255,255,.3);width:18px;text-align:right;flex-shrink:0}
-  .mob-track .ti{flex:1;min-width:0}
-  .mob-track .nm{font-size:13px;color:rgba(255,255,255,.82);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .mob-track .gn{font-size:10px;color:rgba(255,255,255,.34);margin-top:2px}
-  .mob-track .td{font-size:11px;color:rgba(255,255,255,.32);flex-shrink:0}
-
-  /* ── About skills ── */
-  .mob-skills{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
-  .mob-skills .skill{background:rgba(255,255,255,.05);border:.5px solid rgba(255,255,255,.12);border-radius:100px;padding:7px 13px;font-size:12px;color:rgba(255,255,255,.72)}
-
-  /* ── Bottom nav (anchor links to sections) ── */
-  .mob-nav{
-    position:fixed;bottom:0;left:0;right:0;height:68px;
-    background:rgba(20,20,20,.94);
-    backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-    border-top:.5px solid rgba(255,255,255,.1);
-    display:flex;align-items:center;justify-content:space-around;
-    z-index:100;padding:0 4px;
+  /* ── Page containers ── */
+  #m-home{
+    position:fixed;top:52px;bottom:60px;left:0;right:0;
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
+    background:#0c0c0c;z-index:1;
+    padding:12px 12px 20px;display:flex;flex-direction:column;gap:8px;
   }
-  .mob-nbtn{
-    display:flex;flex-direction:column;align-items:center;gap:4px;
-    color:rgba(255,255,255,.5);font-size:9px;letter-spacing:.06em;
-    text-transform:uppercase;cursor:pointer;text-decoration:none;
-    padding:8px 4px;flex:1;transition:color .15s;
+  .m-sec-page{
+    position:fixed;inset:0;background:#0c0c0c;
+    transform:translateX(100%);transition:transform .25s ease;
+    z-index:10;display:flex;flex-direction:column;will-change:transform;
   }
-  .mob-nbtn:active,.mob-nbtn:hover{color:#fff}
-  .mob-nbtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  .m-sec-page.open{transform:translateX(0)}
+  #m-detail{
+    position:fixed;inset:0;background:#000;
+    transform:translateX(100%);transition:transform .25s ease;
+    z-index:20;display:flex;flex-direction:column;will-change:transform;
+  }
+  #m-detail.open{transform:translateX(0)}
+
+  /* ── Section page header ── */
+  .m-sec-hdr{
+    flex-shrink:0;height:52px;
+    background:rgba(10,10,10,.97);
+    border-bottom:.5px solid rgba(255,255,255,.08);
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .m-back{
+    position:absolute;left:14px;top:50%;transform:translateY(-50%);
+    background:none;border:none;padding:6px;
+    color:rgba(255,255,255,.7);cursor:pointer;font-size:22px;line-height:1;
+    display:flex;align-items:center;
+  }
+  .m-sec-body{
+    flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:16px 12px 80px;
+  }
+
+  /* ── Home category cards ── */
+  .m-card{border-radius:10px;overflow:hidden;flex-shrink:0;cursor:pointer}
+  .m-card-bar{
+    height:32px;display:flex;align-items:center;padding:0 10px;gap:6px;
+    border-bottom:.5px solid rgba(255,255,255,.08);flex-shrink:0;
+  }
+  .m-dots{display:flex;gap:5px;align-items:center}
+  .m-dot{width:8px;height:8px;border-radius:50%;display:block;flex-shrink:0}
+  .m-dot.r{background:#ff5f57}.m-dot.y{background:#ffbd2e}.m-dot.g{background:#28c941}
+  .m-card-label{flex:1;text-align:center;font-size:9px;text-transform:uppercase;
+    letter-spacing:.1em;color:rgba(255,255,255,.3);pointer-events:none}
+
+  /* Motion card — 9:16 video */
+  #m-card-motion .m-card-body{position:relative;aspect-ratio:9/16;overflow:hidden}
+  #m-card-motion video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+  .m-card-ov{position:absolute;bottom:0;left:0;right:0;padding:12px 14px 14px;
+    background:linear-gradient(to bottom,rgba(0,0,0,0),rgba(0,0,0,.72));pointer-events:none}
+  .m-card-ov-name{font-family:var(--serif);font-size:18px;color:#fff;line-height:1.2}
+
+  /* 3D card — 16:9 video */
+  #m-card-3d .m-card-body{position:relative;aspect-ratio:16/9;overflow:hidden}
+  #m-card-3d video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+
+  /* 2×2 image grid (Brand Identity & Album Art) */
+  .m-card-grid2{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+  .m-cell{aspect-ratio:1/1;overflow:hidden;position:relative}
+  .m-cell img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+
+  /* Music card */
+  #m-card-music{cursor:default}
+  .m-card-cover{width:100%;aspect-ratio:1/1;overflow:hidden}
+  .m-card-cover img{width:100%;height:100%;object-fit:cover;display:block}
+  .m-card-info{padding:14px;display:flex;flex-direction:column;gap:6px}
+  .m-card-music-name{font-family:var(--serif);font-size:20px;color:#fff;line-height:1.1}
+  .m-card-music-tag{font-size:11px;color:rgba(255,255,255,.45);line-height:1.4}
+
+  /* About card */
+  #m-card-about{cursor:default}
+  #m-card-about .m-card-body{padding:18px;display:flex;flex-direction:column;gap:10px}
+  .m-about-name{font-family:var(--serif);font-size:32px;color:#fff;line-height:1.1}
+  .m-about-role{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3)}
+  .m-about-bio{font-size:12px;color:rgba(255,255,255,.45);line-height:1.8}
+  .m-avail{display:inline-flex;align-items:center;gap:5px;font-size:9px;
+    color:rgba(255,255,255,.6);background:rgba(40,201,65,.1);
+    border:.5px solid rgba(40,201,65,.28);border-radius:100px;
+    padding:3px 9px;width:fit-content}
+  .m-avail::before{content:'';width:5px;height:5px;border-radius:50%;background:#28c941;
+    animation:m-pulse 1.8s ease-in-out infinite}
+  @keyframes m-pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .m-card-socials{display:flex;gap:8px;align-items:center}
+  .m-card-socials a{display:flex;align-items:center;justify-content:center;
+    color:rgba(255,255,255,.5);text-decoration:none}
+  .m-card-socials a svg{width:18px;height:18px;stroke:currentColor;fill:none;
+    stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+  /* ── Motion section: 2-col vertical grid ── */
+  .m-motion-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .m-mvcard{position:relative;aspect-ratio:9/16;border-radius:8px;overflow:hidden;background:#000;cursor:pointer}
+  .m-mvcard video,.m-mvcard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  .m-mute-btn{position:absolute;bottom:8px;right:8px;z-index:3;
+    width:28px;height:28px;border-radius:50%;
+    background:rgba(0,0,0,.5);border:.5px solid rgba(255,255,255,.2);
+    display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .m-mute-btn svg{width:11px;height:11px;stroke:rgba(255,255,255,.9);fill:none;
+    stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+  /* ── 3D section: single column ── */
+  .m-3d-list{display:flex;flex-direction:column;gap:12px}
+  .m-3d-card{border-radius:8px;overflow:hidden;background:#111;cursor:pointer;
+    border:.5px solid rgba(255,255,255,.07)}
+  .m-3d-media{position:relative;overflow:hidden}
+  .m-3d-media.landscape{aspect-ratio:16/9}
+  .m-3d-media.vertical{aspect-ratio:9/16}
+  .m-3d-media video,.m-3d-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  .m-3d-info{padding:10px 12px 12px}
+  .m-3d-title{font-family:var(--serif);font-size:16px;color:rgba(255,255,255,.9)}
+
+  /* ── Brand Identity: reuse bi-layout, override height ── */
+  #m-sec-uiux .m-sec-body{padding:0 0 80px}
+  #m-sec-uiux .bi-layout{height:auto;overflow-y:visible;padding:12px}
+
+  /* ── Album Art: 2-col square grid ── */
+  .m-art-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+  .m-art-cell{aspect-ratio:1/1;overflow:hidden;cursor:pointer}
+  .m-art-cell img{width:100%;height:100%;object-fit:cover;display:block}
+
+  /* ── Music section ── */
+  .m-music-full-cover{width:100%;aspect-ratio:1/1;overflow:hidden}
+  .m-music-full-cover img{width:100%;height:100%;object-fit:cover;display:block}
+  .m-music-sec-info{padding:18px 0 20px;display:flex;flex-direction:column;gap:8px}
+  .m-music-sec-info h2{font-family:var(--serif);font-size:32px;color:#fff}
+  .m-music-sec-tag{font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em}
+  .m-music-sec-desc{font-size:13px;line-height:1.75;color:rgba(255,255,255,.5);margin-bottom:4px}
+  .m-photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:24px}
+  .m-photo{aspect-ratio:1/1;overflow:hidden}
+  .m-photo img{width:100%;height:100%;object-fit:cover;display:block}
+
+  /* ── About section ── */
+  #m-sec-about .absec{max-width:none}
+  #m-sec-about .absec h1{font-size:40px}
+  #m-food-map{width:100%;height:300px;border-radius:8px;overflow:hidden;filter:contrast(1.05) saturate(.9)}
+  .m-fm-toggle{display:flex;gap:8px;margin:12px 0 14px}
+  .m-fm-btn{padding:5px 16px;border-radius:100px;font-family:var(--sans);font-size:11px;cursor:pointer;transition:all .18s;line-height:1.4}
+  .m-fm-btn.active{background:#fff;color:#000;border:none}
+  .m-fm-btn:not(.active){background:transparent;color:#fff;border:.5px solid rgba(255,255,255,.2)}
+
+  /* ── Lightbox ── */
+  #m-lightbox{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.95);
+    display:none;align-items:center;justify-content:center}
+  #m-lightbox.open{display:flex}
+  #m-lb-img{max-width:96%;max-height:90vh;object-fit:contain;display:block}
+  .m-lb-close{position:absolute;top:16px;right:16px;width:36px;height:36px;
+    border-radius:50%;background:rgba(255,255,255,.1);border:none;
+    color:#fff;font-size:20px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center}
+
+  /* ── Detail page ── */
+  #m-detail .m-sec-hdr{background:rgba(0,0,0,.95)}
+  .m-detail-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#000}
+  .m-detail-video-wrap{position:relative;aspect-ratio:9/16;overflow:hidden;background:#000}
+  .m-detail-video-wrap video{width:100%;height:100%;object-fit:cover;display:block}
+  .m-detail-mute{position:absolute;bottom:14px;right:14px;z-index:3;
+    width:36px;height:36px;border-radius:50%;
+    background:rgba(0,0,0,.5);border:.5px solid rgba(255,255,255,.2);
+    display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .m-detail-mute svg{width:14px;height:14px;stroke:rgba(255,255,255,.9);fill:none;
+    stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .m-detail-img-wrap{width:100%;aspect-ratio:16/9;overflow:hidden}
+  .m-detail-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+  .m-detail-info{padding:18px}
+  .m-detail-cat{font-size:10px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+  .m-detail-title{font-family:var(--serif);font-size:26px;color:#fff;line-height:1.2}
+
+  /* ── Bottom nav ── */
+  #m-nav{position:fixed;bottom:0;left:0;right:0;height:60px;z-index:100;
+    background:rgba(10,10,10,.97);border-top:.5px solid rgba(255,255,255,.08);
+    display:flex;align-items:center}
+  .m-nav-btn{flex:1;height:100%;border:none;background:none;padding:0;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;position:relative}
+  .m-nav-btn svg{width:22px;height:22px;stroke:rgba(255,255,255,.55);fill:none;
+    stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s}
+  .m-nav-btn.active svg{stroke:#fff}
+  .m-nav-btn.active::after{content:'';position:absolute;bottom:8px;left:50%;
+    transform:translateX(-50%);width:3px;height:3px;border-radius:50%;background:#fff}
 }
 @media(min-width:768px){#mob{display:none}}
 /* ── Food Map ── */
@@ -1170,89 +1266,339 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 
 <!-- ══════════ MOBILE ══════════ -->
 <div id="mob">
-  <!-- ── Hero ── -->
-  <header class="mob-hero" id="m-top">
-    <div class="loc">London · UK</div>
-    <h1>Baran<br>Abanoz</h1>
-    <div class="role">Motion Designer &amp; Art Director, building story-led work for fashion, music and brand.</div>
-    <p>Based in London. Kingston University London, MA Media &amp; Communications student. Özyeğin University, Communication Design graduate. Skilled in Motion Graphics, Art Direction, Creative Direction, 3D Design, UI/UX Design, Visual Design and Social Media Marketing.</p>
-    <div class="socials" id="m-socials"><!-- Populated by renderSocials() --></div>
+
+  <!-- Fixed header -->
+  <header id="m-header">
+    <img class="m-logo-img" src="assets/logo.png" alt="Baran Abanoz">
   </header>
 
-  <!-- ── Motion Design ── -->
-  <section class="mob-sec" id="m-motion">
-    <div class="sec-kicker">01 · Motion Design</div>
-    <h2>Motion Design</h2>
-    <div class="mob-grid cols-2" id="m-motion-grid"><!-- Cards rendered from PROJECTS.motion --></div>
-  </section>
+  <!-- ── Home: stacked category cards ── -->
+  <div id="m-home">
 
-  <!-- ── 3D Design ── -->
-  <section class="mob-sec" id="m-3d">
-    <div class="sec-kicker">02 · 3D Design</div>
-    <h2>3D Design</h2>
-    <div class="mob-grid" id="m-3d-grid"><!-- Cards rendered from PROJECTS['3d'] --></div>
-  </section>
-
-  <!-- ── Brand Identity ── -->
-  <section class="mob-sec" id="m-uiux">
-    <div class="sec-kicker">03 · Brand Identity</div>
-    <h2>Brand Identity</h2>
-    <div class="mob-grid" id="m-uiux-grid"><!-- Cards rendered from PROJECTS.uiux --></div>
-  </section>
-
-  <!-- ── Album Art ── -->
-  <section class="mob-sec" id="m-artdir">
-    <div class="sec-kicker">04 · Album Art</div>
-    <h2>Album Art</h2>
-    <div class="mob-grid cols-2" id="m-artdir-grid"><!-- Cards rendered from PROJECTS.artdir --></div>
-  </section>
-
-  <!-- ── Music ── -->
-  <section class="mob-sec" id="m-music">
-    <div class="sec-kicker">05 · Music</div>
-    <h2 id="m-music-name">Dekolte</h2>
-    <div class="mob-music">
-      <div class="mob-music-cover">
-        <img src="assets/music/cover.jpg" onerror="this.style.display='none'" alt="">
-        <div class="phl">music/cover</div>
+    <!-- Motion Design -->
+    <div class="m-card" id="m-card-motion" style="background:#0b1422">
+      <div class="m-card-bar" style="background:#0b1422">
+        <div class="m-dots"><span class="m-dot r"></span><span class="m-dot y"></span><span class="m-dot g"></span></div>
+        <span class="m-card-label">Motion Design</span>
       </div>
-      <div class="pt" id="m-music-tag">Short tagline here</div>
-      <a class="spotify-btn" id="m-music-spotify" href="https://open.spotify.com/artist/4p2oENWnvlHUyTNlide7LK?si=y9GssZSzRbSLiuEn3a2oOg" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.56.3z"/></svg>
-        Open in Spotify
-      </a>
-      <div class="mob-music-tracks">
+      <div class="m-card-body">
+        <video src="assets/motion/01.mp4" autoplay muted loop playsinline></video>
+        <div class="m-card-ov"><div class="m-card-ov-name">Promo Video for Concept App &ldquo;Nudge&rdquo;</div></div>
+      </div>
+    </div>
+
+    <!-- 3D Design -->
+    <div class="m-card" id="m-card-3d" style="background:#160c1c">
+      <div class="m-card-bar" style="background:#160c1c">
+        <div class="m-dots"><span class="m-dot r"></span><span class="m-dot y"></span><span class="m-dot g"></span></div>
+        <span class="m-card-label">3D Design</span>
+      </div>
+      <div class="m-card-body">
+        <video src="assets/3d/01.mp4" autoplay muted loop playsinline></video>
+        <div class="m-card-ov"><div class="m-card-ov-name">Ducks in Distress</div></div>
+      </div>
+    </div>
+
+    <!-- Brand Identity -->
+    <div class="m-card" id="m-card-uiux" style="background:#081810">
+      <div class="m-card-bar" style="background:#081810">
+        <div class="m-dots"><span class="m-dot r"></span><span class="m-dot y"></span><span class="m-dot g"></span></div>
+        <span class="m-card-label">Brand Identity</span>
+      </div>
+      <div class="m-card-body">
+        <div class="m-card-grid2">
+          <div class="m-cell"><img src="assets/uiux/02.png" alt=""></div>
+          <div class="m-cell"><img src="assets/uiux/03.png" alt=""></div>
+          <div class="m-cell"><img src="assets/uiux/04.png" alt=""></div>
+          <div class="m-cell"><img src="assets/uiux/05.png" alt=""></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Album Art -->
+    <div class="m-card" id="m-card-artdir" style="background:#1c1100">
+      <div class="m-card-bar" style="background:#1c1100">
+        <div class="m-dots"><span class="m-dot r"></span><span class="m-dot y"></span><span class="m-dot g"></span></div>
+        <span class="m-card-label">Album Art</span>
+      </div>
+      <div class="m-card-body">
+        <div class="m-card-grid2">
+          <div class="m-cell"><img src="assets/artdir/01.jpg" alt=""></div>
+          <div class="m-cell"><img src="assets/artdir/02.jpg" alt=""></div>
+          <div class="m-cell"><img src="assets/artdir/03.jpg" alt=""></div>
+          <div class="m-cell"><img src="assets/artdir/04.jpg" alt=""></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Music -->
+    <div class="m-card" id="m-card-music" style="background:#0a0a18">
+      <div class="m-card-bar" style="background:#0a0a18">
+        <div class="m-dots"><span class="m-dot r"></span><span class="m-dot y"></span><span class="m-dot g"></span></div>
+        <span class="m-card-label">Music</span>
+      </div>
+      <div class="m-card-body">
+        <div class="m-card-cover"><img src="assets/music/cover.jpg" alt="Dekolte"></div>
+        <div class="m-card-info">
+          <div class="m-card-music-name">Dekolte</div>
+          <div class="m-card-music-tag">D&eacute;collet&eacute; for Turkish</div>
+          <a class="spotify-btn" href="https://open.spotify.com/artist/4p2oENWnvlHUyTNlide7LK?si=y9GssZSzRbSLiuEn3a2oOg" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.56.3z"/></svg>
+            Open in Spotify
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- About -->
+    <div class="m-card" id="m-card-about" style="background:#101010">
+      <div class="m-card-bar" style="background:#101010">
+        <div class="m-dots"><span class="m-dot r"></span><span class="m-dot y"></span><span class="m-dot g"></span></div>
+        <span class="m-card-label">About</span>
+      </div>
+      <div class="m-card-body">
+        <div class="m-about-name">Baran</div>
+        <div class="m-about-role">Motion Designer &middot; Art Director</div>
+        <div class="m-about-bio">Based in London. MA Media &amp; Communications, Kingston University. BA Communication Design, Özyeğin University. Skilled in Motion Graphics, Art Direction, Creative Direction, 3D Design, UI/UX and Visual Design.</div>
+        <div class="skills">
+          <span class="skill">Motion Graphics</span>
+          <span class="skill">Art Direction</span>
+          <span class="skill">3D Design</span>
+          <span class="skill">UI/UX</span>
+          <span class="skill">Creative Direction</span>
+        </div>
+        <div class="m-avail">Open to work</div>
+        <div class="m-card-socials" id="m-card-socials"></div>
+      </div>
+    </div>
+
+  </div><!-- #m-home -->
+
+  <!-- ── Section pages ── -->
+
+  <!-- Motion section -->
+  <div class="m-sec-page" id="m-sec-motion">
+    <header class="m-sec-hdr">
+      <button class="m-back" aria-label="Back">&#8592;</button>
+      <img class="m-logo-img" src="assets/logo.png" alt="">
+    </header>
+    <div class="m-sec-body">
+      <div class="m-motion-grid" id="m-sec-motion-grid"></div>
+    </div>
+  </div>
+
+  <!-- 3D section -->
+  <div class="m-sec-page" id="m-sec-3d">
+    <header class="m-sec-hdr">
+      <button class="m-back" aria-label="Back">&#8592;</button>
+      <img class="m-logo-img" src="assets/logo.png" alt="">
+    </header>
+    <div class="m-sec-body">
+      <div class="m-3d-list" id="m-sec-3d-list"></div>
+    </div>
+  </div>
+
+  <!-- Brand Identity section -->
+  <div class="m-sec-page" id="m-sec-uiux">
+    <header class="m-sec-hdr">
+      <button class="m-back" aria-label="Back">&#8592;</button>
+      <img class="m-logo-img" src="assets/logo.png" alt="">
+    </header>
+    <div class="m-sec-body">
+      <div class="bi-layout">
+        <div class="bi-landscape">
+          <div class="bi-slot"><video src="assets/uiux/01.mp4" autoplay muted loop playsinline></video></div>
+          <div class="bi-slot"><img src="assets/uiux/02.png" alt=""></div>
+          <div class="bi-slot"><img src="assets/uiux/03.png" alt=""></div>
+          <div class="bi-slot"><img src="assets/uiux/04.png" alt=""></div>
+          <div class="bi-slot"><img src="assets/uiux/05.png" alt=""></div>
+        </div>
+        <div class="bi-verticals">
+          <div class="bi-slot"><video src="assets/uiux/06.mp4" autoplay muted loop playsinline></video></div>
+          <div class="bi-slot"><video src="assets/uiux/07.mp4" autoplay muted loop playsinline></video></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Album Art section -->
+  <div class="m-sec-page" id="m-sec-artdir">
+    <header class="m-sec-hdr">
+      <button class="m-back" aria-label="Back">&#8592;</button>
+      <img class="m-logo-img" src="assets/logo.png" alt="">
+    </header>
+    <div class="m-sec-body" style="padding:0 0 80px">
+      <div class="m-art-grid" id="m-sec-artdir-grid"></div>
+    </div>
+  </div>
+
+  <!-- Music section -->
+  <div class="m-sec-page" id="m-sec-music">
+    <header class="m-sec-hdr">
+      <button class="m-back" aria-label="Back">&#8592;</button>
+      <img class="m-logo-img" src="assets/logo.png" alt="">
+    </header>
+    <div class="m-sec-body">
+      <div class="m-music-full-cover"><img src="assets/music/cover.jpg" alt="Dekolte"></div>
+      <div class="m-music-sec-info">
+        <h2 id="m-music-sec-name">Dekolte</h2>
+        <div class="m-music-sec-tag" id="m-music-sec-tag">D&eacute;collet&eacute; for Turkish</div>
+        <div class="m-music-sec-desc" id="m-music-sec-desc"></div>
+        <a class="spotify-btn" id="m-music-sec-spotify" href="https://open.spotify.com/artist/4p2oENWnvlHUyTNlide7LK?si=y9GssZSzRbSLiuEn3a2oOg" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.299.421-1.02.599-1.56.3z"/></svg>
+          Open in Spotify
+        </a>
+      </div>
+      <div class="m-photo-grid">
+        <div class="m-photo"><img src="assets/music/01.jpg" alt=""></div>
+        <div class="m-photo"><img src="assets/music/02.jpg" alt=""></div>
+        <div class="m-photo"><img src="assets/music/03.jpg" alt=""></div>
+        <div class="m-photo"><img src="assets/music/04.jpg" alt=""></div>
+        <div class="m-photo"><img src="assets/music/05.jpg" alt=""></div>
+        <div class="m-photo"><img src="assets/music/06.jpg" alt=""></div>
+      </div>
+      <div class="mtracks">
         <h3>Tracks</h3>
-        <div id="m-music-tracks"><!-- Track rows rendered from MUSIC.tracks --></div>
+        <div id="m-music-sec-tracks"></div>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- ── About / Get in touch ── -->
-  <section class="mob-sec" id="m-about">
-    <div class="sec-kicker">06 · About</div>
-    <h2>Hello, I'm Baran.</h2>
-    <p>Based in London. Last role: Motion Designer at <em>365</em> creative agency, September Content Management. Open to commissions and collaborations across motion, brand and music.</p>
-    <div class="mob-skills">
-      <span class="skill">Motion Graphics</span>
-      <span class="skill">Art Direction</span>
-      <span class="skill">Creative Direction</span>
-      <span class="skill">3D Design</span>
-      <span class="skill">UI/UX</span>
-      <span class="skill">Visual Design</span>
-      <span class="skill">Social Media</span>
+  <!-- About section -->
+  <div class="m-sec-page" id="m-sec-about">
+    <header class="m-sec-hdr">
+      <button class="m-back" aria-label="Back">&#8592;</button>
+      <img class="m-logo-img" src="assets/logo.png" alt="">
+    </header>
+    <div class="m-sec-body">
+      <div class="absec">
+        <div class="loc">London, United Kingdom</div>
+        <h1>Baran</h1>
+        <div class="stat">Open to work</div>
+        <p>Based in London. Kingston University London, MA Media &amp; Communications student. Özyeğin University, Communication Design graduate. Skilled in Motion Graphics, Art Direction, Creative Direction, 3D Design, UI/UX Design, Visual Design and Social Media Marketing. Various work in design, fashion and music industries.</p>
+        <div class="absec-label">Skills</div>
+        <div class="skills">
+          <span class="skill">Motion Graphics</span>
+          <span class="skill">3D Animation</span>
+          <span class="skill">Creative Direction</span>
+          <span class="skill">Music</span>
+          <span class="skill">UI/UX</span>
+          <span class="skill">Social Media</span>
+          <span class="skill">Marketing Art</span>
+          <span class="skill">Graphic Design</span>
+          <span class="skill">Video Editing</span>
+        </div>
+        <div class="absec-label">Experience</div>
+        <div class="exp-list">
+          <div class="exp-row">
+            <div class="exp-logo"><img src="assets/logos/september.png" alt="September"></div>
+            <div><div class="exp-role">Motion Designer</div><div class="exp-company">September Content Management</div></div>
+            <div class="exp-date">2024 — 2025</div>
+          </div>
+          <div class="exp-row">
+            <div class="exp-logo"><img src="assets/logos/jaff.png" alt="Jaff Digital"></div>
+            <div><div class="exp-role">Jr. Art Director</div><div class="exp-company">Jaff Digital</div></div>
+            <div class="exp-date">2024</div>
+          </div>
+          <div class="exp-row">
+            <div class="exp-logo"><img src="assets/logos/shopigo.png" alt="Shopigo"></div>
+            <div><div class="exp-role">Creative Intern</div><div class="exp-company">shopi go 買物</div></div>
+            <div class="exp-date">2023</div>
+          </div>
+          <div class="exp-row">
+            <div class="exp-logo"><img src="assets/logos/dknd.png" alt="DKND Law Firm"></div>
+            <div><div class="exp-role">UI/UX Freelancer</div><div class="exp-company">DKND Law Firm</div></div>
+            <div class="exp-date">2023</div>
+          </div>
+          <div class="exp-row">
+            <div class="exp-logo"><img src="assets/logos/mopp.png" alt="Mopp Agency"></div>
+            <div><div class="exp-role">Graphic Design Intern</div><div class="exp-company">Mopp Agency</div></div>
+            <div class="exp-date">2022</div>
+          </div>
+          <div class="exp-row">
+            <div class="exp-logo"><img src="assets/logos/e365.png" alt="E365 Digital Technologies"></div>
+            <div><div class="exp-role">Project Manager</div><div class="exp-company">E365 Digital Technologies</div></div>
+            <div class="exp-date">2021</div>
+          </div>
+        </div>
+        <div class="absec-label">Education</div>
+        <div class="exp-list">
+          <div class="exp-row">
+            <div class="exp-logo"><img src="assets/logos/kingston.png" alt="Kingston University"></div>
+            <div><div class="exp-role">MA Media &amp; Communications</div><div class="exp-company">Kingston University London</div></div>
+            <div class="exp-date">2025 — 2026</div>
+          </div>
+          <div class="exp-row">
+            <div class="exp-logo"><img src="assets/logos/ozyegin.png" alt="Özyeğin University"></div>
+            <div><div class="exp-role">BA Communication Design</div><div class="exp-company">Özyeğin University</div></div>
+            <div class="exp-date">2019 — 2024</div>
+          </div>
+        </div>
+        <div class="absec-label">Connect</div>
+        <div class="socials socials-lg" id="m-about-socials"></div>
+        <div class="absec-label" style="padding-top:28px;border-top:.5px solid rgba(255,255,255,.08);margin-top:28px">Food Map</div>
+        <div class="m-fm-toggle">
+          <button class="m-fm-btn active" data-city="london">London</button>
+          <button class="m-fm-btn" data-city="istanbul">Istanbul</button>
+        </div>
+        <div id="m-food-map"></div>
+        <p style="font-size:11px;color:rgba(255,255,255,.25);margin-top:10px;text-align:center" id="m-fm-note">19 spots &middot; more coming soon</p>
+        <div class="absec-label" style="margin-top:28px">Get in touch</div>
+        <form id="m-contact-form" class="cform" action="https://formspree.io/f/xqenkdqy" method="POST">
+          <div class="cform-row row2">
+            <div><label for="m-cf-name">Name *</label><input id="m-cf-name" name="name" type="text" required autocomplete="name" placeholder="Your name"></div>
+            <div><label for="m-cf-email">Email *</label><input id="m-cf-email" name="email" type="email" required autocomplete="email" placeholder="you@email.com"></div>
+          </div>
+          <div class="cform-row"><label for="m-cf-subject">Subject</label><input id="m-cf-subject" name="subject" type="text" placeholder="What's this about?"></div>
+          <div class="cform-row"><label for="m-cf-msg">Message *</label><textarea id="m-cf-msg" name="message" required rows="4" placeholder="Tell me about your project, idea, or just say hi."></textarea></div>
+          <div class="cform-error" id="m-cf-error" hidden></div>
+          <button type="submit" class="cform-submit">Send Message</button>
+        </form>
+        <div class="cform-success" id="m-cf-success" hidden>Message sent &mdash; I&rsquo;ll be in touch soon.</div>
+      </div>
     </div>
-  </section>
+  </div>
 
-  <!-- ── Bottom nav (anchor scroll) ── -->
-  <nav class="mob-nav">
-    <a class="mob-nbtn" href="#m-top"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Home</a>
-    <a class="mob-nbtn" href="#m-motion"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>Motion</a>
-    <a class="mob-nbtn" href="#m-3d"><svg viewBox="0 0 24 24"><polygon points="12,2 2,7 12,12 22,7"/><polyline points="2,17 12,22 22,17"/></svg>3D</a>
-    <a class="mob-nbtn" href="#m-uiux"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="12" y1="17" x2="12" y2="21"/></svg>UI/UX</a>
-    <a class="mob-nbtn" href="#m-artdir"><svg viewBox="0 0 24 24"><line x1="18" y1="2" x2="22" y2="6"/><path d="M7.5 20.5L19 9l-4-4L3.5 16.5 2 22z"/></svg>Art</a>
-    <a class="mob-nbtn" href="#m-music"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Music</a>
+  <!-- Detail page -->
+  <div id="m-detail">
+    <header class="m-sec-hdr">
+      <button class="m-back" id="m-detail-back" aria-label="Back">&#8592;</button>
+      <img class="m-logo-img" src="assets/logo.png" alt="">
+    </header>
+    <div class="m-detail-body" id="m-detail-body"></div>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="m-lightbox">
+    <img id="m-lb-img" src="" alt="">
+    <button class="m-lb-close" aria-label="Close">&#215;</button>
+  </div>
+
+  <!-- Bottom nav -->
+  <nav id="m-nav">
+    <button class="m-nav-btn active" data-nav="home">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+    </button>
+    <button class="m-nav-btn" data-nav="motion">
+      <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+    </button>
+    <button class="m-nav-btn" data-nav="3d">
+      <svg viewBox="0 0 24 24"><polygon points="12,2 2,7 12,12 22,7"/><polyline points="2,17 12,22 22,17"/><line x1="2" y1="12" x2="2" y2="17"/><line x1="22" y1="12" x2="22" y2="17"/><line x1="12" y1="12" x2="12" y2="22"/></svg>
+    </button>
+    <button class="m-nav-btn" data-nav="uiux">
+      <svg viewBox="0 0 24 24"><polygon points="12,2 22,9 18,21 6,21 2,9"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="6" y1="21" x2="12" y2="2"/><line x1="18" y1="21" x2="12" y2="2"/></svg>
+    </button>
+    <button class="m-nav-btn" data-nav="artdir">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="2" x2="22" y2="6"/><path d="M7.5 20.5L19 9l-4-4L3.5 16.5 2 22z"/></svg>
+    </button>
+    <button class="m-nav-btn" data-nav="music">
+      <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+    </button>
+    <button class="m-nav-btn" data-nav="about">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </button>
   </nav>
+
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -1954,81 +2300,312 @@ function openMotionPlayer(videoSrc){
   if(btn && video) wireMute(btn, video);
 })();
 
-// ── Mobile rendering ──
-// Builds every mobile section from the same PROJECTS / MUSIC / SOCIAL_LINKS
-// data the desktop uses, so titles, taglines, and images stay in lockstep.
-// Static images only (no autoplay videos on mobile) — keeps the page light
-// and avoids Safari/Chrome autoplay quirks on phones.
-(function renderMobile(){
-  const linkedinSVG  = '<svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>';
-  const instagramSVG = '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
+// ── Mobile UI — macOS-card nav layer ──
+(function initMobile(){
+  if(window.innerWidth > 767) return;
 
-  // Hero socials
-  const socials = document.getElementById('m-socials');
-  if(socials){
-    socials.innerHTML =
-      `<a class="social-link" href="${SOCIAL_LINKS.linkedin}"  target="_blank" rel="noopener" aria-label="LinkedIn">${linkedinSVG}</a>` +
-      `<a class="social-link" href="${SOCIAL_LINKS.instagram}" target="_blank" rel="noopener" aria-label="Instagram">${instagramSVG}</a>`;
+  const SPKOFF = '<svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
+  const SPKON  = '<svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
+  const liSVG  = '<svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>';
+  const igSVG  = '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
+
+  // ── Social links ──
+  ['m-card-socials','m-about-socials'].forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.innerHTML =
+      `<a class="social-link" href="${SOCIAL_LINKS.linkedin}" target="_blank" rel="noopener" aria-label="LinkedIn">${liSVG}</a>` +
+      `<a class="social-link" href="${SOCIAL_LINKS.instagram}" target="_blank" rel="noopener" aria-label="Instagram">${igSVG}</a>`;
+  });
+
+  // ── Music section data ──
+  const mSec = {
+    name: document.getElementById('m-music-sec-name'),
+    tag:  document.getElementById('m-music-sec-tag'),
+    desc: document.getElementById('m-music-sec-desc'),
+    spt:  document.getElementById('m-music-sec-spotify'),
+    tracks: document.getElementById('m-music-sec-tracks'),
+  };
+  if(mSec.name) mSec.name.textContent = MUSIC.projectName;
+  if(mSec.tag)  mSec.tag.textContent  = MUSIC.tagline;
+  if(mSec.desc) mSec.desc.textContent = MUSIC.description.split(/\n\s*\n/)[0];
+  if(mSec.spt)  mSec.spt.href         = MUSIC.spotifyUrl;
+  if(mSec.tracks){
+    mSec.tracks.innerHTML = MUSIC.tracks.map((t,i) =>
+      `<div class="mtrack">` +
+        `<span class="tn">${String(i+1).padStart(2,'0')}</span>` +
+        `<div class="ti"><div class="nm">${t.n}</div><div class="gn">${t.g}</div></div>` +
+        `<span class="td">${t.d}</span>` +
+      `</div>`
+    ).join('');
   }
 
-  // Card template (ratio = 'r1610' | 'r914' | 'r11', extraClass = e.g. 'uiux-fit')
-  function card(p, ratio, extraClass){
-    const labelText = p.img || p.video || '';
-    const sub = p.client || p.cat || '';
-    const cls = extraClass ? ` ${extraClass}` : '';
-    return `<div class="mob-card">
-      <div class="mob-cimg ${ratio}${cls}">
-        ${p.img ? `<img src="${p.img}" onerror="this.style.display='none'" alt="">` : ''}
-        <div class="phl">${labelText}</div>
-      </div>
-      <div class="mob-ci">
-        <div class="pt">${p.title || ''}</div>
-        ${sub ? `<div class="ps">${sub}</div>` : ''}
-      </div>
-    </div>`;
+  // ── Motion section: 2-col vertical grid ──
+  const motionGrid = document.getElementById('m-sec-motion-grid');
+  if(motionGrid){
+    motionGrid.innerHTML = PROJECTS.motion.map((p,i) =>
+      `<div class="m-mvcard" data-idx="${i}">` +
+        `<video src="${p.video}" poster="${p.img}" muted playsinline preload="metadata"></video>` +
+        `<button class="m-mute-btn" aria-label="Mute">${SPKOFF}</button>` +
+      `</div>`
+    ).join('');
+    motionGrid.querySelectorAll('.m-mvcard').forEach(card => {
+      const vid = card.querySelector('video');
+      const muteBtn = card.querySelector('.m-mute-btn');
+      card.addEventListener('click', e => {
+        if(e.target.closest('.m-mute-btn')) return;
+        vid.paused ? vid.play().catch(()=>{}) : vid.pause();
+      });
+      muteBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        vid.muted = !vid.muted;
+        muteBtn.innerHTML = vid.muted ? SPKOFF : SPKON;
+      });
+    });
   }
 
-  // Section grids
-  const motionGrid = document.getElementById('m-motion-grid');
-  if(motionGrid) motionGrid.innerHTML = PROJECTS.motion.map(p => card(p, 'r914')).join('');
-
-  const threedGrid = document.getElementById('m-3d-grid');
-  if(threedGrid) threedGrid.innerHTML = PROJECTS['3d'].map(p =>
-    card(p, p.orientation === 'vertical' ? 'r914' : 'r1610')
-  ).join('');
-
-  // UI/UX — vertical (App Design) gets a 9:14 thumb, others 16:10. The
-  // 'uiux-fit' class anchors screenshots top-center so the most important
-  // chrome stays visible.
-  const uiuxGrid = document.getElementById('m-uiux-grid');
-  if(uiuxGrid) uiuxGrid.innerHTML = PROJECTS.uiux.map(p =>
-    card(p, p.vertical ? 'r914' : 'r1610', 'uiux-fit')
-  ).join('');
-
-  const artdirGrid = document.getElementById('m-artdir-grid');
-  if(artdirGrid) artdirGrid.innerHTML = PROJECTS.artdir.map(p => card(p, 'r11')).join('');
-
-  // Music section
-  const musicName = document.getElementById('m-music-name');
-  const musicTag  = document.getElementById('m-music-tag');
-  const musicSpotify = document.getElementById('m-music-spotify');
-  if(musicName && MUSIC.projectName) musicName.textContent = MUSIC.projectName;
-  if(musicTag  && MUSIC.tagline)     musicTag.textContent  = MUSIC.tagline;
-  if(musicSpotify && MUSIC.spotifyUrl) musicSpotify.href   = MUSIC.spotifyUrl;
-
-  const tracksEl = document.getElementById('m-music-tracks');
-  if(tracksEl && MUSIC.tracks){
-    tracksEl.innerHTML = MUSIC.tracks.map((t, i) => `
-      <div class="mob-track">
-        <span class="tn">${i+1}</span>
-        <div class="ti">
-          <div class="nm">${t.n}</div>
-          <div class="gn">${t.g}</div>
-        </div>
-        <span class="td">${t.d}</span>
-      </div>
-    `).join('');
+  // ── 3D section: single column ──
+  const list3d = document.getElementById('m-sec-3d-list');
+  if(list3d){
+    list3d.innerHTML = PROJECTS['3d'].map((p,i) => {
+      const orient = p.orientation || 'landscape';
+      const mediaHtml = p.video
+        ? `<video src="${p.video}" muted loop playsinline autoplay preload="metadata"></video>`
+        : `<img src="${p.img}" loading="lazy" alt="">`;
+      return `<div class="m-3d-card" data-idx="${i}">` +
+        `<div class="m-3d-media ${orient}">${mediaHtml}</div>` +
+        `<div class="m-3d-info"><div class="m-3d-title">${p.title}</div></div>` +
+      `</div>`;
+    }).join('');
+    list3d.querySelectorAll('.m-3d-card').forEach(card => {
+      card.addEventListener('click', () => openDetail('3d', +card.dataset.idx));
+    });
   }
+
+  // ── Album Art section: 2-col grid ──
+  const artGrid = document.getElementById('m-sec-artdir-grid');
+  if(artGrid){
+    artGrid.innerHTML = PROJECTS.artdir.map((p,i) =>
+      `<div class="m-art-cell" data-idx="${i}"><img src="${p.img}" loading="lazy" alt=""></div>`
+    ).join('');
+    artGrid.querySelectorAll('.m-art-cell').forEach(cell => {
+      cell.addEventListener('click', () => openLightbox(cell.querySelector('img').src));
+    });
+  }
+
+  // ── Navigation state ──
+  let currentSec = null;
+  let mapInited  = false;
+
+  function openSection(secId){
+    if(currentSec === secId) return;
+    if(currentSec) document.getElementById(currentSec)?.classList.remove('open');
+    const el = document.getElementById(secId);
+    if(!el) return;
+    el.classList.add('open');
+    const body = el.querySelector('.m-sec-body');
+    if(body) body.scrollTop = 0;
+    currentSec = secId;
+    setNavActive(secId.replace('m-sec-',''));
+    if(secId === 'm-sec-about' && !mapInited) initMobileMap();
+  }
+
+  function closeSection(){
+    if(!currentSec) return;
+    document.getElementById(currentSec)?.classList.remove('open');
+    currentSec = null;
+    closeDetail();
+    setNavActive('home');
+  }
+
+  function openDetail(cat, idx){
+    const p = PROJECTS[cat]?.[idx];
+    if(!p) return;
+    const body = document.getElementById('m-detail-body');
+    if(!body) return;
+    let html = '';
+    if(p.video && cat === 'motion'){
+      html = `<div class="m-detail-video-wrap">` +
+        `<video src="${p.video}" autoplay muted playsinline></video>` +
+        `<button class="m-detail-mute" id="m-det-mute">${SPKOFF}</button>` +
+      `</div>` +
+      `<div class="m-detail-info">` +
+        `<div class="m-detail-cat">${p.cat}</div>` +
+        `<div class="m-detail-title">${p.title}</div>` +
+      `</div>`;
+    } else if(p.video){
+      html = `<div class="m-detail-video-wrap" style="aspect-ratio:${p.orientation==='vertical'?'9/16':'16/9'}">` +
+        `<video src="${p.video}" autoplay muted loop playsinline></video>` +
+      `</div>` +
+      `<div class="m-detail-info">` +
+        `<div class="m-detail-cat">${p.cat}</div>` +
+        `<div class="m-detail-title">${p.title}</div>` +
+      `</div>`;
+    } else {
+      html = `<div class="m-detail-img-wrap"><img src="${p.img||''}" alt=""></div>` +
+      `<div class="m-detail-info">` +
+        `<div class="m-detail-cat">${p.cat}</div>` +
+        `<div class="m-detail-title">${p.title}</div>` +
+      `</div>`;
+    }
+    body.innerHTML = html;
+    document.getElementById('m-detail').classList.add('open');
+    const muteBtn = document.getElementById('m-det-mute');
+    const vid = body.querySelector('video');
+    if(muteBtn && vid){
+      muteBtn.addEventListener('click', () => {
+        vid.muted = !vid.muted;
+        muteBtn.innerHTML = vid.muted ? SPKOFF : SPKON;
+      });
+    }
+  }
+
+  function closeDetail(){
+    const det = document.getElementById('m-detail');
+    if(!det.classList.contains('open')) return;
+    det.classList.remove('open');
+    const vid = det.querySelector('video');
+    if(vid){ vid.pause(); vid.src = ''; }
+    document.getElementById('m-detail-body').innerHTML = '';
+  }
+
+  function openLightbox(src){
+    document.getElementById('m-lb-img').src = src;
+    document.getElementById('m-lightbox').classList.add('open');
+  }
+
+  function closeLightbox(){
+    document.getElementById('m-lightbox').classList.remove('open');
+    document.getElementById('m-lb-img').src = '';
+  }
+
+  function setNavActive(nav){
+    document.querySelectorAll('.m-nav-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.nav === nav)
+    );
+  }
+
+  // ── Home card click → open section ──
+  ['motion','3d','uiux','artdir'].forEach(cat => {
+    document.getElementById(`m-card-${cat}`)?.addEventListener('click', () => openSection(`m-sec-${cat}`));
+  });
+
+  // ── Back buttons ──
+  document.querySelectorAll('.m-sec-page .m-back').forEach(btn =>
+    btn.addEventListener('click', closeSection)
+  );
+  document.getElementById('m-detail-back')?.addEventListener('click', closeDetail);
+
+  // ── Bottom nav ──
+  const secMap = {motion:'m-sec-motion','3d':'m-sec-3d',uiux:'m-sec-uiux',artdir:'m-sec-artdir',music:'m-sec-music',about:'m-sec-about'};
+  document.querySelectorAll('.m-nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const nav = btn.dataset.nav;
+      if(nav === 'home') closeSection();
+      else if(secMap[nav]) openSection(secMap[nav]);
+    });
+  });
+
+  // ── Lightbox ──
+  document.getElementById('m-lightbox')?.addEventListener('click', closeLightbox);
+  document.querySelector('.m-lb-close')?.addEventListener('click', e => {
+    e.stopPropagation(); closeLightbox();
+  });
+
+  // ── Mobile contact form ──
+  const mForm    = document.getElementById('m-contact-form');
+  const mSuccess = document.getElementById('m-cf-success');
+  const mError   = document.getElementById('m-cf-error');
+  if(mForm && mSuccess){
+    mForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      if(mError) mError.hidden = true;
+      const btn = mForm.querySelector('.cform-submit');
+      btn.disabled = true; btn.textContent = 'Sending…';
+      try{
+        const res = await fetch(mForm.action, {
+          method:'POST', headers:{'Accept':'application/json'},
+          body: new FormData(mForm),
+        });
+        if(res.ok){ mForm.style.display='none'; mSuccess.hidden=false; }
+        else throw new Error();
+      } catch(_){
+        if(mError){ mError.textContent='Something went wrong. Please try again.'; mError.hidden=false; }
+        btn.disabled=false; btn.textContent='Send Message';
+      }
+    });
+  }
+
+  // ── Mobile food map (lazy — only when About section opens) ──
+  function initMobileMap(){
+    mapInited = true;
+    const mapEl  = document.getElementById('m-food-map');
+    const noteEl = document.getElementById('m-fm-note');
+    if(!mapEl || typeof L === 'undefined') return;
+
+    const LONDON_SPOTS = [
+      [[51.4985,-0.1270],'Haanbaagasuteki'],
+      [[51.4122,-0.3063],'Poor Boys Kingston'],
+      [[51.4613,-0.3042],'Hollyhock Vegetarian Cafe Richmond'],
+      [[51.4608,-0.3167],'Napoli on the Road Richmond'],
+      [[51.4601,-0.3065],'Via Romana Deli Richmond'],
+      [[51.4597,-0.3055],'Danieli on the Green Richmond'],
+      [[51.5393,-0.1425],'Mestizo Mexican Restaurant Camden'],
+      [[51.5116,-0.2021],'Earl of Lonsdale Notting Hill'],
+      [[51.5129,-0.1333],'Heard Burger Soho'],
+      [[51.5131,-0.1340],'Breadstall Pizza Soho'],
+      [[51.5127,-0.1338],'Antico Vinaio Soho'],
+      [[51.5113,-0.1285],'YiQi Chinatown'],
+      [[51.5117,-0.1353],'Bar Termini'],
+      [[51.5120,-0.1264],'Rock and Sole Plaice'],
+      [[51.5155,-0.0613],'Tarim Uyghur Restaurant'],
+      [[51.5278,-0.0573],'E Pelicci'],
+      [[51.5008,-0.0199],'Dishoom Canary Wharf'],
+      [[51.4118,-0.3055],'Korea Hero Kingston'],
+      [[51.4115,-0.3049],'Al Forno Kingston'],
+    ];
+
+    const dotOpts = {radius:7,fillColor:'#ff5f57',color:'rgba(255,255,255,0.6)',weight:1.5,fillOpacity:1};
+    function popHtml(name, city){
+      const q = name.replace(/ /g,'+') + '+' + city;
+      return `<span class="fp-name">${name}</span>` +
+             `<a class="fp-link" href="https://www.google.com/maps/search/${q}" target="_blank" rel="noopener">Open in Google Maps</a>`;
+    }
+
+    const mmap = L.map(mapEl,{center:[51.505,-0.09],zoom:11,zoomControl:true,attributionControl:false});
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(mmap);
+
+    const londonLayer   = L.layerGroup();
+    const istanbulLayer = L.layerGroup();
+    LONDON_SPOTS.forEach(([latlng,name]) => {
+      const m = L.circleMarker(latlng, dotOpts);
+      m.bindPopup(popHtml(name,'London'),{className:'food-popup',closeButton:false,autoPan:false});
+      m.on('click', function(){ this.openPopup(); });
+      londonLayer.addLayer(m);
+    });
+    londonLayer.addTo(mmap);
+
+    const CITIES = {
+      london:   {layer:londonLayer,  center:[51.505,-0.09],   zoom:11, note:'19 spots · more coming soon'},
+      istanbul: {layer:istanbulLayer,center:[41.0082,28.9784],zoom:12, note:'Coming soon'},
+    };
+
+    document.querySelectorAll('.m-fm-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.m-fm-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const cfg = CITIES[btn.dataset.city];
+        if(!cfg) return;
+        Object.values(CITIES).forEach(c => { if(mmap.hasLayer(c.layer)) mmap.removeLayer(c.layer); });
+        mmap.addLayer(cfg.layer);
+        mmap.flyTo(cfg.center, cfg.zoom, {duration:0.8});
+        if(noteEl) noteEl.textContent = cfg.note;
+      });
+    });
+
+    setTimeout(() => mmap.invalidateSize(), 200);
+  }
+
 })();
 
 // ── Airplane flyby ──
