@@ -1915,11 +1915,6 @@ function restoreWin(cat){
   delete MINNED[cat];
 }
 
-function restoreSW(cat, swId){
-  removeThumb(cat);
-  undimPillBtn(cat);
-  openSection(cat);
-}
 
 function removeThumb(cat){
   const box=document.getElementById('thumbs');
@@ -2014,18 +2009,12 @@ document.querySelectorAll('.sw .dot[data-role]').forEach(dot=>{
     const role=dot.dataset.role, id=dot.dataset.id;
     const sw=document.getElementById(id);
     const cat=id.replace('sw-','');
-    // Red — minimise to pill.
-    // Fix 1: force-remove any existing thumb synchronously before addThumb so the
-    // 260ms fade-out animation can't block the guard in addThumb.
+    // Red — close section. No thumb, no dim. Identical to yellow.
     if(role==='sc'){
       sw.classList.remove('open'); SW_MAX[id]=false;
-      sw.style.width='90vw'; sw.style.height='';
-      sw.style.top='20px'; sw.style.left='50%'; sw.style.transform='translateX(-50%)'; sw.style.borderRadius='10px';
-      const _tb=document.getElementById('thumbs');
-      const _ex=_tb.querySelector(`[data-tcat="${cat}"]`);
-      if(_ex) _ex.remove();
-      addThumb(cat, true, id); dimPillBtn(cat);
       delete sectionEls[cat]; checkRestoreTeasers();
+      undimPillBtn(cat);
+      if(MINNED[cat]) restoreWin(cat);
     }
     // Green — maximise / restore toggle (unchanged).
     else if(role==='sg'){
@@ -2195,6 +2184,53 @@ function openDetail(cat,idx){
   dw.addEventListener('mousedown',()=>front(dw));
 }
 
+// ── Vertical video detail window ──
+// Opens a 30vw × 85vh dw window for any standalone 9:16 video
+// (e.g. Brand Identity verticals). Autoplays with sound on user click;
+// falls back to muted if the browser blocks unmuted autoplay.
+function openVideoDetail(src){
+  dOff=(dOff+24)%96;
+  const dw=document.createElement('div');
+  dw.className='dw vertical';
+  const wPct=0.30, hPct=0.85;
+  const cx=Math.max(20,(innerWidth-innerWidth*wPct)/2+dOff);
+  const cy=Math.max(20,(innerHeight-innerHeight*hPct)/2+dOff);
+  dw.style.left=cx+'px'; dw.style.top=cy+'px';
+  dw.style.width=(wPct*100)+'vw'; dw.style.height=(hPct*100)+'vh';
+  dw.style.zIndex=++Z;
+  dw.innerHTML=`
+<div class="win-bar">
+  <div class="dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+  <div class="win-label"></div>
+</div>
+<div class="win-body">
+  <div class="d-hero">
+    <video src="${src}" loop playsinline preload="auto"></video>
+    <div class="mute-btn lg" data-mute>${SPEAKER_OFF}</div>
+  </div>
+</div>`;
+  const vid=dw.querySelector('video');
+  // User-initiated click: attempt unmuted autoplay; fall back to muted.
+  vid.muted=false;
+  vid.play().catch(()=>{ vid.muted=true; vid.play().catch(()=>{}); });
+  wireMute(dw.querySelector('[data-mute]'), vid);
+  const [dr,dy,dg]=dw.querySelectorAll('.dot');
+  dr.addEventListener('click',e=>{ e.stopPropagation(); dw.remove(); });
+  dy.addEventListener('click',e=>{ e.stopPropagation(); dw.remove(); });
+  dg.addEventListener('click',e=>{
+    e.stopPropagation();
+    if(dw._max){
+      dw.style.width=(wPct*100)+'vw'; dw.style.height=(hPct*100)+'vh';
+      dw.style.top=cy+'px'; dw.style.left=cx+'px'; dw.style.borderRadius='10px'; dw._max=false;
+    } else {
+      dw.style.width='100vw'; dw.style.height='100vh'; dw.style.top='0'; dw.style.left='0'; dw.style.borderRadius='0'; dw._max=true;
+    }
+  });
+  document.getElementById('desktop').appendChild(dw);
+  makeDrag(dw);
+  dw.addEventListener('mousedown',()=>front(dw));
+}
+
 // ── Wire teaser dots ──
 // Red + yellow → minimise to the dock pill.
 // Green → open the matching section view.
@@ -2231,10 +2267,7 @@ document.querySelectorAll('.win[data-cat]').forEach(win=>{
 document.querySelectorAll('.pbtn[data-sec]').forEach(btn=>{
   btn.addEventListener('click',()=>{
     const cat=btn.dataset.sec;
-    // If the pill is dim the section was minimised — clear the thumb too.
-    if(btn.classList.contains('dim')){ removeThumb(cat); undimPillBtn(cat); }
-    // Fix 1: if the teaser is minimised, restore it first so section and dock
-    // don't both show at the same time (simultaneous dock + open bug).
+    // If the teaser is minimised, restore it alongside opening the section.
     if(MINNED[cat]) restoreWin(cat);
     openSection(cat);
   });
@@ -3260,6 +3293,19 @@ showStory(0);
     btn.innerHTML = SPEAKER_OFF;
     wireMute(btn, video);
     video.addEventListener('loadedmetadata', () => { video.play().catch(()=>{}); });
+  });
+})();
+
+/* ── Brand Identity section: click vertical videos → fullscreen detail window ── */
+(function wireBrandIdentityVerticals(){
+  document.querySelectorAll('#sw-uiux .bi-verticals .bi-slot').forEach(slot => {
+    const vid = slot.querySelector('video');
+    if(!vid) return;
+    slot.style.cursor = 'pointer';
+    slot.addEventListener('click', e => {
+      if(e.target.closest('[data-mute]')) return;
+      openVideoDetail(vid.src);
+    });
   });
 })();
 
