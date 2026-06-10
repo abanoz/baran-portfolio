@@ -698,16 +698,18 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   }
   .m-sec-page{
     position:fixed;inset:0;background:#0c0c0c;
-    transform:translateX(100%);transition:transform .25s ease;
-    z-index:10;display:flex;flex-direction:column;will-change:transform;
+    opacity:0;pointer-events:none;
+    transition:opacity .2s ease;
+    z-index:10;display:flex;flex-direction:column;
   }
-  .m-sec-page.open{transform:translateX(0)}
+  .m-sec-page.open{opacity:1;pointer-events:auto}
   #m-detail{
     position:fixed;inset:0;background:#000;
-    transform:translateX(100%);transition:transform .25s ease;
-    z-index:20;display:flex;flex-direction:column;will-change:transform;
+    opacity:0;pointer-events:none;
+    transition:opacity .2s ease;
+    z-index:20;display:flex;flex-direction:column;
   }
-  #m-detail.open{transform:translateX(0)}
+  #m-detail.open{opacity:1;pointer-events:auto}
 
   /* ── Section page header ── */
   .m-sec-hdr{
@@ -753,7 +755,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 
   /* 2×2 image grid (Brand Identity & Album Art) */
   .m-card-grid2{display:grid;grid-template-columns:1fr 1fr;gap:2px}
-  .m-cell{aspect-ratio:1/1;overflow:hidden;position:relative}
+  .m-cell{aspect-ratio:16/10;overflow:hidden;position:relative}
   .m-cell img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
 
   /* Music card */
@@ -828,11 +830,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   /* ── About section ── */
   #m-sec-about .absec{max-width:none}
   #m-sec-about .absec h1{font-size:40px}
-  #m-food-map{width:100%;height:300px;border-radius:8px;overflow:hidden;filter:contrast(1.05) saturate(.9)}
-  .m-fm-toggle{display:flex;gap:8px;margin:12px 0 14px}
-  .m-fm-btn{padding:5px 16px;border-radius:100px;font-family:var(--sans);font-size:11px;cursor:pointer;transition:all .18s;line-height:1.4}
-  .m-fm-btn.active{background:#fff;color:#000;border:none}
-  .m-fm-btn:not(.active){background:transparent;color:#fff;border:.5px solid rgba(255,255,255,.2)}
 
   /* ── Lightbox ── */
   #m-lightbox{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.95);
@@ -872,6 +869,18 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   .m-nav-btn.active svg{stroke:#fff}
   .m-nav-btn.active::after{content:'';position:absolute;bottom:8px;left:50%;
     transform:translateX(-50%);width:3px;height:3px;border-radius:50%;background:#fff}
+
+  /* Mobile motion card: Instagram-style story bars + tap zones */
+  #m-card-motion .story-bars{position:absolute;top:8px;left:8px;right:8px;display:flex;gap:4px;z-index:4;pointer-events:none}
+  .m-story-tap{position:absolute;top:0;bottom:0;z-index:3;cursor:pointer}
+  .m-story-tap-l{left:0;width:40%}
+  .m-story-tap-r{right:0;width:60%}
+
+  /* 3D fullscreen overlay */
+  #m-3d-overlay{position:fixed;inset:0;z-index:50;background:#000;align-items:center;justify-content:center;display:none}
+  #m-3d-overlay-close{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:51}
+  #m-3d-overlay-content{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+  #m-3d-overlay-content img,#m-3d-overlay-content video{max-width:100%;max-height:100vh;object-fit:contain}
 }
 @media(min-width:768px){#mob{display:none}}
 /* ── Food Map ── */
@@ -1305,8 +1314,17 @@ video:not([src]),video[preload="none"]{background:#111}
         <span class="m-card-label">Motion Design</span>
       </div>
       <div class="m-card-body">
-        <video src="assets/motion/01.mp4" autoplay muted loop playsinline></video>
-        <div class="m-card-ov"><div class="m-card-ov-name">Promo Video for Concept App &ldquo;Nudge&rdquo;</div></div>
+        <div class="story-bars">
+          <div class="sb"><div class="sb-fill"></div></div>
+          <div class="sb"><div class="sb-fill"></div></div>
+          <div class="sb"><div class="sb-fill"></div></div>
+          <div class="sb"><div class="sb-fill"></div></div>
+          <div class="sb"><div class="sb-fill"></div></div>
+        </div>
+        <video id="m-story-video" muted playsinline preload="metadata"></video>
+        <div class="m-story-tap m-story-tap-l"></div>
+        <div class="m-story-tap m-story-tap-r"></div>
+        <div class="m-card-ov"><div class="m-card-ov-name" id="m-story-title"></div></div>
       </div>
     </div>
 
@@ -1559,13 +1577,6 @@ video:not([src]),video[preload="none"]{background:#111}
         </div>
         <div class="absec-label">Connect</div>
         <div class="socials socials-lg" id="m-about-socials"></div>
-        <div class="absec-label" style="padding-top:28px;border-top:.5px solid rgba(255,255,255,.08);margin-top:28px">Food Map</div>
-        <div class="m-fm-toggle">
-          <button class="m-fm-btn active" data-city="london">London</button>
-          <button class="m-fm-btn" data-city="istanbul">Istanbul</button>
-        </div>
-        <div id="m-food-map"></div>
-        <p style="font-size:11px;color:rgba(255,255,255,.25);margin-top:10px;text-align:center" id="m-fm-note">19 spots &middot; more coming soon</p>
         <div class="absec-label" style="margin-top:28px">Get in touch</div>
         <form id="m-contact-form" class="cform" action="https://formspree.io/f/xqenkdqy" method="POST">
           <div class="cform-row row2">
@@ -1589,6 +1600,12 @@ video:not([src]),video[preload="none"]{background:#111}
       <img class="m-logo-img" src="assets/logo.png" alt="">
     </header>
     <div class="m-detail-body" id="m-detail-body"></div>
+  </div>
+
+  <!-- 3D fullscreen overlay -->
+  <div id="m-3d-overlay">
+    <button id="m-3d-overlay-close">&#215;</button>
+    <div id="m-3d-overlay-content"></div>
   </div>
 
   <!-- Lightbox -->
@@ -2575,25 +2592,32 @@ function close3DTab(idx){
   if(motionGrid){
     motionGrid.innerHTML = PROJECTS.motion.map((p,i) =>
       `<div class="m-mvcard" data-idx="${i}">` +
-        `<video src="${p.video}" poster="${p.img}" muted playsinline preload="none"></video>` +
+        `<video data-src="${p.video}" muted playsinline preload="none"></video>` +
         `<button class="m-mute-btn" aria-label="Mute">${SPKOFF}</button>` +
       `</div>`
     ).join('');
-    // Fix 5: lazy-play mobile motion cards via IntersectionObserver.
-    const mMotionObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        const v = entry.target;
-        if(entry.isIntersecting){ v.preload='auto'; v.load(); v.play().catch(()=>{}); }
-        else { v.pause(); v.preload='none'; }
+    // Lazy-load: each card video loads only when it scrolls into view.
+    const mMotionObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        const v = e.target;
+        if(e.isIntersecting){
+          if(!v.src || v.src === window.location.href){ v.src = v.dataset.src; }
+          v.preload = 'auto';
+          v.play().catch(()=>{});
+        } else {
+          v.pause();
+          v.preload = 'none';
+        }
       });
-    }, { threshold: 0.1 });
-    motionGrid.querySelectorAll('.m-mvcard').forEach(card => {
+    }, { threshold: 0.2 });
+    motionGrid.querySelectorAll('.m-mvcard').forEach((card, i) => {
       const vid = card.querySelector('video');
       const muteBtn = card.querySelector('.m-mute-btn');
-      mMotionObserver.observe(vid);
+      mMotionObs.observe(vid);
+      // Tap → open fullscreen detail page (reuses existing openDetail).
       card.addEventListener('click', e => {
         if(e.target.closest('.m-mute-btn')) return;
-        vid.paused ? vid.play().catch(()=>{}) : vid.pause();
+        openDetail('motion', i);
       });
       muteBtn.addEventListener('click', e => {
         e.stopPropagation();
@@ -2616,7 +2640,6 @@ function close3DTab(idx){
         `<div class="m-3d-info"><div class="m-3d-title">${p.title}</div></div>` +
       `</div>`;
     }).join('');
-    // Fix 5: lazy-play mobile 3D card videos via IntersectionObserver.
     const m3dObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         const v = entry.target;
@@ -2627,9 +2650,26 @@ function close3DTab(idx){
     list3d.querySelectorAll('.m-3d-card').forEach(card => {
       const vid = card.querySelector('video');
       if(vid) m3dObserver.observe(vid);
-      card.addEventListener('click', () => openDetail('3d', +card.dataset.idx));
+      const p = PROJECTS['3d'][+card.dataset.idx];
+      card.addEventListener('click', () => open3DOverlay(p));
     });
   }
+
+  // ── 3D fullscreen overlay ──
+  function open3DOverlay(p){
+    const content = document.getElementById('m-3d-overlay-content');
+    content.innerHTML = p.video
+      ? `<video src="${p.video}" autoplay muted loop playsinline></video>`
+      : `<img src="${p.img}" alt="">`;
+    document.getElementById('m-3d-overlay').style.display = 'flex';
+  }
+  document.getElementById('m-3d-overlay-close')?.addEventListener('click', () => {
+    const ov = document.getElementById('m-3d-overlay');
+    const vid = ov.querySelector('video');
+    if(vid){ vid.pause(); vid.src = ''; }
+    ov.style.display = 'none';
+    document.getElementById('m-3d-overlay-content').innerHTML = '';
+  });
 
   // ── Album Art section: 2-col grid ──
   const artGrid = document.getElementById('m-sec-artdir-grid');
@@ -2644,7 +2684,6 @@ function close3DTab(idx){
 
   // ── Navigation state ──
   let currentSec = null;
-  let mapInited  = false;
 
   function openSection(secId){
     if(currentSec === secId) return;
@@ -2656,7 +2695,6 @@ function close3DTab(idx){
     if(body) body.scrollTop = 0;
     currentSec = secId;
     setNavActive(secId.replace('m-sec-',''));
-    if(secId === 'm-sec-about' && !mapInited) initMobileMap();
     // Fix 2: lazy-load Brand Identity section videos on first open.
     if(secId === 'm-sec-uiux'){
       el.querySelectorAll('video[data-src]').forEach(v => {
@@ -2796,75 +2834,53 @@ function close3DTab(idx){
     });
   }
 
-  // ── Mobile food map (lazy — only when About section opens) ──
-  function initMobileMap(){
-    mapInited = true;
-    const mapEl  = document.getElementById('m-food-map');
-    const noteEl = document.getElementById('m-fm-note');
-    if(!mapEl || typeof L === 'undefined') return;
+  // ── Mobile motion card: Instagram-style story player ──
+  let mStoryIdx = 0;
+  let mStoryTimer = null;
 
-    const LONDON_SPOTS = [
-      [[51.4985,-0.1270],'Haanbaagasuteki'],
-      [[51.4122,-0.3063],'Poor Boys Kingston'],
-      [[51.4613,-0.3042],'Hollyhock Vegetarian Cafe Richmond'],
-      [[51.4608,-0.3167],'Napoli on the Road Richmond'],
-      [[51.4601,-0.3065],'Via Romana Deli Richmond'],
-      [[51.4597,-0.3055],'Danieli on the Green Richmond'],
-      [[51.5393,-0.1425],'Mestizo Mexican Restaurant Camden'],
-      [[51.5116,-0.2021],'Earl of Lonsdale Notting Hill'],
-      [[51.5129,-0.1333],'Heard Burger Soho'],
-      [[51.5131,-0.1340],'Breadstall Pizza Soho'],
-      [[51.5127,-0.1338],'Antico Vinaio Soho'],
-      [[51.5113,-0.1285],'YiQi Chinatown'],
-      [[51.5117,-0.1353],'Bar Termini'],
-      [[51.5120,-0.1264],'Rock and Sole Plaice'],
-      [[51.5155,-0.0613],'Tarim Uyghur Restaurant'],
-      [[51.5278,-0.0573],'E Pelicci'],
-      [[51.5008,-0.0199],'Dishoom Canary Wharf'],
-      [[51.4118,-0.3055],'Korea Hero Kingston'],
-      [[51.4115,-0.3049],'Al Forno Kingston'],
-    ];
-
-    const dotOpts = {radius:7,fillColor:'#ff5f57',color:'rgba(255,255,255,0.6)',weight:1.5,fillOpacity:1};
-    function popHtml(name, city){
-      const q = name.replace(/ /g,'+') + '+' + city;
-      return `<span class="fp-name">${name}</span>` +
-             `<a class="fp-link" href="https://www.google.com/maps/search/${q}" target="_blank" rel="noopener">Open in Google Maps</a>`;
-    }
-
-    const mmap = L.map(mapEl,{center:[51.505,-0.09],zoom:11,zoomControl:true,attributionControl:false});
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(mmap);
-
-    const londonLayer   = L.layerGroup();
-    const istanbulLayer = L.layerGroup();
-    LONDON_SPOTS.forEach(([latlng,name]) => {
-      const m = L.circleMarker(latlng, dotOpts);
-      m.bindPopup(popHtml(name,'London'),{className:'food-popup',closeButton:false,autoPan:false});
-      m.on('click', function(){ this.openPopup(); });
-      londonLayer.addLayer(m);
+  function mShowStory(i){
+    mStoryIdx = ((i % STORIES.length) + STORIES.length) % STORIES.length;
+    const s = STORIES[mStoryIdx];
+    const vid = document.getElementById('m-story-video');
+    if(!vid) return;
+    vid.src = s.video;
+    vid.muted = true;
+    vid.load();
+    const play = () => vid.play().catch(()=>{});
+    if(vid.readyState >= 3){ play(); }
+    else { vid.addEventListener('canplay', play, {once:true}); }
+    const title = document.getElementById('m-story-title');
+    if(title) title.textContent = s.title;
+    const bars = document.querySelectorAll('#m-card-motion .sb-fill');
+    bars.forEach((b, j) => {
+      b.style.transition = 'none';
+      b.style.width = j < mStoryIdx ? '100%' : '0%';
     });
-    londonLayer.addTo(mmap);
-
-    const CITIES = {
-      london:   {layer:londonLayer,  center:[51.505,-0.09],   zoom:11, note:'19 spots · more coming soon'},
-      istanbul: {layer:istanbulLayer,center:[41.0082,28.9784],zoom:12, note:'Coming soon'},
-    };
-
-    document.querySelectorAll('.m-fm-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.m-fm-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const cfg = CITIES[btn.dataset.city];
-        if(!cfg) return;
-        Object.values(CITIES).forEach(c => { if(mmap.hasLayer(c.layer)) mmap.removeLayer(c.layer); });
-        mmap.addLayer(cfg.layer);
-        mmap.flyTo(cfg.center, cfg.zoom, {duration:0.8});
-        if(noteEl) noteEl.textContent = cfg.note;
-      });
-    });
-
-    setTimeout(() => mmap.invalidateSize(), 200);
+    void bars[mStoryIdx]?.offsetWidth;
+    let mt = setTimeout(() => mStartBar(8000), 1000);
+    vid.addEventListener('loadedmetadata', () => {
+      clearTimeout(mt);
+      mStartBar(Math.max(vid.duration * 1000, 1000));
+    }, {once:true});
   }
+
+  function mStartBar(dur){
+    const b = document.querySelectorAll('#m-card-motion .sb-fill')[mStoryIdx];
+    if(!b) return;
+    b.style.transition = 'none'; b.style.width = '0%';
+    void b.offsetWidth;
+    b.style.transition = `width ${dur}ms linear`;
+    b.style.width = '100%';
+    clearTimeout(mStoryTimer);
+    mStoryTimer = setTimeout(() => mShowStory(mStoryIdx + 1), dur);
+  }
+
+  const mTapL = document.querySelector('#m-card-motion .m-story-tap-l');
+  const mTapR = document.querySelector('#m-card-motion .m-story-tap-r');
+  if(mTapL) mTapL.addEventListener('click', () => mShowStory(mStoryIdx - 1));
+  if(mTapR) mTapR.addEventListener('click', () => mShowStory(mStoryIdx + 1));
+
+  mShowStory(0);
 
 })();
 
