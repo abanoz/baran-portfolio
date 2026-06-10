@@ -888,6 +888,9 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 .food-popup .fp-name{font-family:'DM Serif Display',serif;font-size:14px;color:#fff;display:block;margin-bottom:4px}
 .food-popup .fp-link{font-size:10px;color:rgba(255,255,255,.45);text-decoration:none;display:block}
 .food-popup .fp-link:hover{text-decoration:underline}
+/* Loading placeholders — make unloaded video areas dark, not white/empty */
+video:not([src]),video[preload="none"]{background:#111}
+#story-card{background:#0d1829}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
@@ -938,7 +941,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   </div>
   <div class="win-body">
     <div class="motion-card" id="td3-card">
-      <video id="td3-video" src="assets/3d/teaser.mp4" muted loop playsinline preload="metadata"></video>
+      <video id="td3-video" poster="assets/3d/01.jpg" muted loop playsinline preload="none"></video>
       <div class="ov"><small>3D Design</small><h3>Ducks in Distress</h3></div>
       <div class="mute-btn" id="td3-mute" data-mute></div>
     </div>
@@ -954,7 +957,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   </div>
   <div class="win-body">
     <div class="motion-card" style="background:#081810">
-      <video id="bi-teaser-video" src="assets/uiux/cover.mp4" muted loop playsinline preload="metadata"></video>
+      <video id="bi-teaser-video" data-src="assets/uiux/cover.mp4" muted loop playsinline preload="none"></video>
       <div class="mute-btn" id="bi-teaser-mute" data-mute></div>
     </div>
   </div>
@@ -1061,7 +1064,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   <div class="win-body"><div class="bi-layout">
     <div class="bi-landscape">
       <div class="bi-slot">
-        <video src="assets/uiux/01.mp4" autoplay muted loop playsinline></video>
+        <video data-src="assets/uiux/01.mp4" muted loop playsinline></video>
         <div class="mute-btn" data-mute></div>
       </div>
       <div class="bi-slot"><img src="assets/uiux/02.png" alt=""></div>
@@ -1071,11 +1074,11 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
     </div>
     <div class="bi-verticals">
       <div class="bi-slot">
-        <video src="assets/uiux/06.mp4" autoplay muted loop playsinline></video>
+        <video data-src="assets/uiux/06.mp4" muted loop playsinline></video>
         <div class="mute-btn" data-mute></div>
       </div>
       <div class="bi-slot">
-        <video src="assets/uiux/07.mp4" autoplay muted loop playsinline></video>
+        <video data-src="assets/uiux/07.mp4" muted loop playsinline></video>
         <div class="mute-btn" data-mute></div>
       </div>
     </div>
@@ -1427,15 +1430,15 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
     <div class="m-sec-body">
       <div class="bi-layout">
         <div class="bi-landscape">
-          <div class="bi-slot"><video src="assets/uiux/01.mp4" autoplay muted loop playsinline></video></div>
+          <div class="bi-slot"><video data-src="assets/uiux/01.mp4" muted loop playsinline></video></div>
           <div class="bi-slot"><img src="assets/uiux/02.png" alt=""></div>
           <div class="bi-slot"><img src="assets/uiux/03.png" alt=""></div>
           <div class="bi-slot"><img src="assets/uiux/04.png" alt=""></div>
           <div class="bi-slot"><img src="assets/uiux/05.png" alt=""></div>
         </div>
         <div class="bi-verticals">
-          <div class="bi-slot"><video src="assets/uiux/06.mp4" autoplay muted loop playsinline></video></div>
-          <div class="bi-slot"><video src="assets/uiux/07.mp4" autoplay muted loop playsinline></video></div>
+          <div class="bi-slot"><video data-src="assets/uiux/06.mp4" muted loop playsinline></video></div>
+          <div class="bi-slot"><video data-src="assets/uiux/07.mp4" muted loop playsinline></video></div>
         </div>
       </div>
     </div>
@@ -1980,6 +1983,17 @@ function openSection(cat){
   sectionEls[cat]=sw;
   initSwDrag(sw);
   dimTeasers();  // Fix 3
+  // Fix 2: lazy-load Brand Identity section videos the first time the section opens.
+  if(cat === 'uiux'){
+    sw.querySelectorAll('video[data-src]').forEach(v => {
+      if(!v.src || v.src === window.location.href){
+        v.src = v.dataset.src;
+        v.muted = true;
+        v.load();
+        v.play().catch(()=>{});
+      }
+    });
+  }
 }
 
 function initSwDrag(sw){
@@ -2312,13 +2326,28 @@ document.querySelectorAll('.pcard').forEach(c=>{
 (function renderMotionGrid(){
   const grid = document.getElementById('motion-grid');
   if(!grid) return;
+  // Fix 3: only load motion card videos as they scroll into view.
+  const motionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const v = entry.target;
+      if(entry.isIntersecting){
+        v.preload = 'auto';
+        v.load();
+        v.play().catch(()=>{});
+      } else {
+        v.pause();
+        v.preload = 'none';
+      }
+    });
+  }, { threshold: 0.1, root: document.getElementById('motion-grid') });
+
   PROJECTS.motion.forEach((p, i) => {
     const n = String(i+1).padStart(2,'0');
     const card = document.createElement('div');
     card.className = 'mvcard';
     card.dataset.idx = i;
     card.innerHTML = `
-      <video autoplay muted loop playsinline preload="metadata">
+      <video muted loop playsinline preload="none">
         <source src="${p.video}" type="video/mp4">
       </video>
       <div class="phl">motion/${n}</div>
@@ -2328,10 +2357,7 @@ document.querySelectorAll('.pcard').forEach(c=>{
     const video = card.querySelector('video');
     const mute  = card.querySelector('[data-mute]');
     wireMute(mute, video);
-
-    // Some browsers block the first autoplay until a play() call fires post-load.
-    // Calling play() on loadedmetadata is harmless if autoplay already started.
-    video.addEventListener('loadedmetadata', () => { video.play().catch(()=>{}); });
+    motionObserver.observe(video);
 
     // Click → open the fullscreen vertical player (no project page).
     card.addEventListener('click', e => {
@@ -2549,13 +2575,22 @@ function close3DTab(idx){
   if(motionGrid){
     motionGrid.innerHTML = PROJECTS.motion.map((p,i) =>
       `<div class="m-mvcard" data-idx="${i}">` +
-        `<video src="${p.video}" poster="${p.img}" muted playsinline preload="metadata"></video>` +
+        `<video src="${p.video}" poster="${p.img}" muted playsinline preload="none"></video>` +
         `<button class="m-mute-btn" aria-label="Mute">${SPKOFF}</button>` +
       `</div>`
     ).join('');
+    // Fix 5: lazy-play mobile motion cards via IntersectionObserver.
+    const mMotionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const v = entry.target;
+        if(entry.isIntersecting){ v.preload='auto'; v.load(); v.play().catch(()=>{}); }
+        else { v.pause(); v.preload='none'; }
+      });
+    }, { threshold: 0.1 });
     motionGrid.querySelectorAll('.m-mvcard').forEach(card => {
       const vid = card.querySelector('video');
       const muteBtn = card.querySelector('.m-mute-btn');
+      mMotionObserver.observe(vid);
       card.addEventListener('click', e => {
         if(e.target.closest('.m-mute-btn')) return;
         vid.paused ? vid.play().catch(()=>{}) : vid.pause();
@@ -2574,14 +2609,24 @@ function close3DTab(idx){
     list3d.innerHTML = PROJECTS['3d'].map((p,i) => {
       const orient = p.orientation || 'landscape';
       const mediaHtml = p.video
-        ? `<video src="${p.video}" muted loop playsinline autoplay preload="metadata"></video>`
+        ? `<video src="${p.video}" muted loop playsinline preload="none"></video>`
         : `<img src="${p.img}" loading="lazy" alt="">`;
       return `<div class="m-3d-card" data-idx="${i}">` +
         `<div class="m-3d-media ${orient}">${mediaHtml}</div>` +
         `<div class="m-3d-info"><div class="m-3d-title">${p.title}</div></div>` +
       `</div>`;
     }).join('');
+    // Fix 5: lazy-play mobile 3D card videos via IntersectionObserver.
+    const m3dObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const v = entry.target;
+        if(entry.isIntersecting){ v.preload='auto'; v.load(); v.play().catch(()=>{}); }
+        else { v.pause(); v.preload='none'; }
+      });
+    }, { threshold: 0.1 });
     list3d.querySelectorAll('.m-3d-card').forEach(card => {
+      const vid = card.querySelector('video');
+      if(vid) m3dObserver.observe(vid);
       card.addEventListener('click', () => openDetail('3d', +card.dataset.idx));
     });
   }
@@ -2612,6 +2657,17 @@ function close3DTab(idx){
     currentSec = secId;
     setNavActive(secId.replace('m-sec-',''));
     if(secId === 'm-sec-about' && !mapInited) initMobileMap();
+    // Fix 2: lazy-load Brand Identity section videos on first open.
+    if(secId === 'm-sec-uiux'){
+      el.querySelectorAll('video[data-src]').forEach(v => {
+        if(!v.src || v.src === window.location.href){
+          v.src = v.dataset.src;
+          v.muted = true;
+          v.load();
+          v.play().catch(()=>{});
+        }
+      });
+    }
   }
 
   function closeSection(){
@@ -3014,6 +3070,18 @@ let storyTotal = STORY_DUR_FALLBACK; // duration of the *current* story in ms
 
 function _bars(){ return document.querySelectorAll('#story-card .sb-fill'); }
 
+// Fix 4: preload the next story in the background while the current one plays,
+// so the browser cache serves it instantly when showStory() switches to it.
+function preloadNextStory(){
+  const next = STORIES[(storyIdx + 1) % STORIES.length];
+  const pre = document.createElement('video');
+  pre.src = next.video;
+  pre.preload = 'auto';
+  pre.muted = true;
+  pre.load();
+  window._nextStoryPreload = pre; // hold a reference so GC doesn't collect it
+}
+
 // Read the current video's duration in ms, or fall back if metadata isn't ready.
 function _videoDurMs(){
   const vid = document.getElementById('story-video');
@@ -3079,6 +3147,8 @@ function showStory(i){
     if(STORIES[storyIdx] !== s) return; // user tapped through
     startBar(Math.max(vid.duration * 1000, 1000));
   }, { once: true });
+  // Fix 4: preload the next story so it's in the browser cache when needed.
+  preloadNextStory();
 }
 
 function startBar(remaining){
@@ -3201,26 +3271,37 @@ restoreWin = function(cat){
 // Kick off the first story.
 showStory(0);
 
-// ── Fix 7: lazy-play teaser videos via IntersectionObserver ──
-// td3-video and bi-teaser-video no longer have autoplay in HTML.
-// They play only when ≥10 % visible, and pause when scrolled out of view,
-// reducing simultaneous autoplay on page load and browser throttling.
+// ── Fixes 1 & 2: defer heavy teaser videos until first user interaction ──
+// td3-video (58 MB) and bi-teaser-video are not loaded at all until the user
+// first clicks anywhere. After that an IntersectionObserver plays/pauses them
+// based on visibility so they don't waste bandwidth when off-screen.
 (function(){
-  const lazyVideos = ['td3-video', 'bi-teaser-video'];
-  const vidObserver = new IntersectionObserver((entries)=>{
+  const teaserObserver = new IntersectionObserver((entries)=>{
     entries.forEach(entry=>{
       const v = entry.target;
-      if(entry.isIntersecting){
-        v.play().catch(()=>{});
-      } else {
-        v.pause();
-      }
+      if(entry.isIntersecting){ v.play().catch(()=>{}); }
+      else { v.pause(); }
     });
   }, { threshold: 0.1 });
-  lazyVideos.forEach(id=>{
-    const v = document.getElementById(id);
-    if(v) vidObserver.observe(v);
-  });
+
+  document.addEventListener('click', ()=>{
+    // td3-video: set src now (was omitted in HTML to skip the 58 MB download).
+    const td3 = document.getElementById('td3-video');
+    if(td3 && !td3.getAttribute('src')){
+      td3.src = 'assets/3d/teaser.mp4';
+      td3.preload = 'auto';
+      td3.load();
+      teaserObserver.observe(td3);
+    }
+    // bi-teaser-video: swap data-src → src.
+    const bi = document.getElementById('bi-teaser-video');
+    if(bi && bi.dataset.src && !bi.getAttribute('src')){
+      bi.src = bi.dataset.src;
+      bi.preload = 'auto';
+      bi.load();
+      teaserObserver.observe(bi);
+    }
+  }, { once: true });
 })();
 
 // ── DVD-style idle screensaver ──
