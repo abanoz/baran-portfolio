@@ -938,7 +938,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   </div>
   <div class="win-body">
     <div class="motion-card" id="td3-card">
-      <video id="td3-video" src="assets/3d/teaser.mp4" autoplay muted loop playsinline preload="metadata"></video>
+      <video id="td3-video" src="assets/3d/teaser.mp4" muted loop playsinline preload="metadata"></video>
       <div class="ov"><small>3D Design</small><h3>Ducks in Distress</h3></div>
       <div class="mute-btn" id="td3-mute" data-mute></div>
     </div>
@@ -954,7 +954,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   </div>
   <div class="win-body">
     <div class="motion-card" style="background:#081810">
-      <video id="bi-teaser-video" src="assets/uiux/cover.mp4" autoplay muted loop playsinline preload="metadata"></video>
+      <video id="bi-teaser-video" src="assets/uiux/cover.mp4" muted loop playsinline preload="metadata"></video>
       <div class="mute-btn" id="bi-teaser-mute" data-mute></div>
     </div>
   </div>
@@ -1872,7 +1872,23 @@ function addThumb(cat, isSW, swId){
     t.style.opacity='';
     t.style.transform='scale(1)';
   }));
-  t.addEventListener('click',()=>{ isSW ? restoreSW(cat,swId) : restoreWin(cat); });
+  // Fix 5: smart thumb click — context-aware restore.
+  t.addEventListener('click',()=>{
+    if(sectionEls[cat] && sectionEls[cat].classList.contains('open')){
+      // Section is already open — just raise it.
+      bringFront(sectionEls[cat]); removeThumb(cat);
+    } else if(MINNED[cat]){
+      // Section not open, teaser is minimised — restore the teaser.
+      restoreWin(cat); undimPillBtn(cat);
+    } else {
+      // Neither open nor minimised — open section, or restore teaser if it's
+      // still in the MINNED state (fixes issue 1 + 3: thumb click undims pill
+      // and never opens a section while teaser is awaiting restore).
+      removeThumb(cat); undimPillBtn(cat);
+      if(MINNED[cat]) restoreWin(cat);
+      else openSection(cat);
+    }
+  });
 }
 
 function restoreWin(cat){
@@ -1998,11 +2014,16 @@ document.querySelectorAll('.sw .dot[data-role]').forEach(dot=>{
     const role=dot.dataset.role, id=dot.dataset.id;
     const sw=document.getElementById(id);
     const cat=id.replace('sw-','');
-    // Red — minimise to pill (Fix 6: same as teaser minimise).
+    // Red — minimise to pill.
+    // Fix 1: force-remove any existing thumb synchronously before addThumb so the
+    // 260ms fade-out animation can't block the guard in addThumb.
     if(role==='sc'){
       sw.classList.remove('open'); SW_MAX[id]=false;
       sw.style.width='90vw'; sw.style.height='';
       sw.style.top='20px'; sw.style.left='50%'; sw.style.transform='translateX(-50%)'; sw.style.borderRadius='10px';
+      const _tb=document.getElementById('thumbs');
+      const _ex=_tb.querySelector(`[data-tcat="${cat}"]`);
+      if(_ex) _ex.remove();
       addThumb(cat, true, id); dimPillBtn(cat);
       delete sectionEls[cat]; checkRestoreTeasers();
     }
@@ -2018,12 +2039,15 @@ document.querySelectorAll('.sw .dot[data-role]').forEach(dot=>{
         SW_MAX[id]=true;
       }
     }
-    // Yellow — collapse back to teaser position (Fix 6: was minimise-to-pill).
+    // Yellow — collapse back to teaser / homepage view. No thumb, no dim.
+    // Fix 2: run checkRestoreTeasers first (while sectionEls update is fresh),
+    // then undimPillBtn so the pill is never left in a dim state after yellow-close,
+    // then restoreWin so the minimised-teaser animation doesn't conflict.
     else if(role==='sy'){
       sw.classList.remove('open'); SW_MAX[id]=false;
-      // If the teaser for this category was itself minimised, restore it now.
-      if(MINNED[cat]) restoreWin(cat);
       delete sectionEls[cat]; checkRestoreTeasers();
+      undimPillBtn(cat);
+      if(MINNED[cat]) restoreWin(cat);
     }
   });
 });
@@ -2156,7 +2180,7 @@ function openDetail(cat,idx){
 
   const [dr,dy,dg]=dw.querySelectorAll('.dot');
   dr.addEventListener('click',e=>{ e.stopPropagation(); dw.remove(); });
-  dy.addEventListener('click',e=>{ e.stopPropagation(); dw.style.display='none'; });
+  dy.addEventListener('click',e=>{ e.stopPropagation(); dw.remove(); });  // Fix 4: same as red dot
   dg.addEventListener('click',e=>{
     e.stopPropagation();
     if(dw._max){
@@ -2209,6 +2233,9 @@ document.querySelectorAll('.pbtn[data-sec]').forEach(btn=>{
     const cat=btn.dataset.sec;
     // If the pill is dim the section was minimised — clear the thumb too.
     if(btn.classList.contains('dim')){ removeThumb(cat); undimPillBtn(cat); }
+    // Fix 1: if the teaser is minimised, restore it first so section and dock
+    // don't both show at the same time (simultaneous dock + open bug).
+    if(MINNED[cat]) restoreWin(cat);
     openSection(cat);
   });
 });
@@ -2219,7 +2246,22 @@ document.getElementById('pill-home').addEventListener('click',()=>{
   document.querySelectorAll('.dw').forEach(d=>d.remove());
   Object.keys(sectionEls).forEach(k=>delete sectionEls[k]);
   document.querySelectorAll('.pbtn.dim').forEach(b=>b.classList.remove('dim'));
+  // Fix 3: clear all dock thumbs and restore all minimised teasers.
+  Object.keys(CAT_COLORS).forEach(cat=>{
+    if(MINNED[cat]) restoreWin(cat);  // restoreWin calls removeThumb internally
+    else removeThumb(cat);            // explicit clear for section-only thumbs
+  });
   checkRestoreTeasers();
+  // Fix 5: safety net — after all restore animations finish (≈470ms),
+  // force-show any teaser that is still display:none but no longer MINNED.
+  setTimeout(()=>{
+    document.querySelectorAll('.win[data-cat]').forEach(el=>{
+      if(el.style.display==='none' && !MINNED[el.dataset.cat]){
+        el.style.display='flex';
+        el.style.opacity='1';
+      }
+    });
+  }, 500);
 });
 
 // ── Project cards ──
@@ -2967,13 +3009,22 @@ function showStory(i){
   const s = STORIES[storyIdx];
   const vid = document.getElementById('story-video');
 
-  // Always set src + load + play — never skip even if src looks the same.
-  // load() resets Safari's buffer state; play() must follow load() directly.
+  // Always set src + load — load() resets Safari's buffer state.
+  // Fix 6: wait until the browser has buffered enough data (readyState >= 3)
+  // before calling play(), eliminating the black screen on story switches.
   vid.src = s.video;
-  vid.load();
   vid.muted = true;
+  vid.preload = 'auto';
+  vid.load();
   _hideStoryPlayBtn();
-  vid.play().catch(() => _showStoryPlayBtn());
+  const playAttempt = () => {
+    vid.play().then(()=> _hideStoryPlayBtn()).catch(()=> _showStoryPlayBtn());
+  };
+  if(vid.readyState >= 3){
+    playAttempt();
+  } else {
+    vid.addEventListener('canplay', playAttempt, { once: true });
+  }
 
   document.getElementById('story-title').textContent = s.title;
   document.getElementById('story-cat').textContent = s.cat;
@@ -3116,6 +3167,28 @@ restoreWin = function(cat){
 
 // Kick off the first story.
 showStory(0);
+
+// ── Fix 7: lazy-play teaser videos via IntersectionObserver ──
+// td3-video and bi-teaser-video no longer have autoplay in HTML.
+// They play only when ≥10 % visible, and pause when scrolled out of view,
+// reducing simultaneous autoplay on page load and browser throttling.
+(function(){
+  const lazyVideos = ['td3-video', 'bi-teaser-video'];
+  const vidObserver = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      const v = entry.target;
+      if(entry.isIntersecting){
+        v.play().catch(()=>{});
+      } else {
+        v.pause();
+      }
+    });
+  }, { threshold: 0.1 });
+  lazyVideos.forEach(id=>{
+    const v = document.getElementById(id);
+    if(v) vidObserver.observe(v);
+  });
+})();
 
 // ── DVD-style idle screensaver ──
 // After 1 minute with no input, drop a darkened overlay with the portfolio
