@@ -876,11 +876,12 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   .m-story-tap-l{left:0;width:40%}
   .m-story-tap-r{right:0;width:60%}
 
-  /* 3D fullscreen overlay */
-  #m-3d-overlay{position:fixed;inset:0;z-index:50;background:#000;align-items:center;justify-content:center;display:none}
-  #m-3d-overlay-close{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:51}
-  #m-3d-overlay-content{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
-  #m-3d-overlay-content img,#m-3d-overlay-content video{max-width:100%;max-height:100vh;object-fit:contain}
+  /* Media fullscreen overlay */
+  #m-media-overlay{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.96);align-items:center;justify-content:center;display:none}
+  #m-media-overlay-close{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:51;line-height:1}
+  #m-media-overlay-content{width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative}
+  /* Motion card "See all" pill */
+  .m-story-see-all{position:absolute;bottom:14px;right:14px;z-index:5;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border:.5px solid rgba(255,255,255,.3);border-radius:100px;color:rgba(255,255,255,.6);background:transparent;cursor:pointer}
 }
 @media(min-width:768px){#mob{display:none}}
 /* ── Food Map ── */
@@ -1321,10 +1322,11 @@ video:not([src]),video[preload="none"]{background:#111}
           <div class="sb"><div class="sb-fill"></div></div>
           <div class="sb"><div class="sb-fill"></div></div>
         </div>
-        <video id="m-story-video" muted playsinline preload="metadata"></video>
+        <video id="m-story-video" muted playsinline preload="auto"></video>
         <div class="m-story-tap m-story-tap-l"></div>
         <div class="m-story-tap m-story-tap-r"></div>
         <div class="m-card-ov"><div class="m-card-ov-name" id="m-story-title"></div></div>
+        <button class="m-story-see-all">See all →</button>
       </div>
     </div>
 
@@ -1335,7 +1337,7 @@ video:not([src]),video[preload="none"]{background:#111}
         <span class="m-card-label">3D Design</span>
       </div>
       <div class="m-card-body">
-        <video src="assets/3d/01.mp4" autoplay muted loop playsinline></video>
+        <video id="m-card-3d-video" data-src="assets/3d/01.mp4" muted loop playsinline preload="none"></video>
         <div class="m-card-ov"><div class="m-card-ov-name">Ducks in Distress</div></div>
       </div>
     </div>
@@ -1602,10 +1604,10 @@ video:not([src]),video[preload="none"]{background:#111}
     <div class="m-detail-body" id="m-detail-body"></div>
   </div>
 
-  <!-- 3D fullscreen overlay -->
-  <div id="m-3d-overlay">
-    <button id="m-3d-overlay-close">&#215;</button>
-    <div id="m-3d-overlay-content"></div>
+  <!-- Media fullscreen overlay (motion + 3D) -->
+  <div id="m-media-overlay">
+    <button id="m-media-overlay-close">&#215;</button>
+    <div id="m-media-overlay-content"></div>
   </div>
 
   <!-- Lightbox -->
@@ -2614,10 +2616,11 @@ function close3DTab(idx){
       const vid = card.querySelector('video');
       const muteBtn = card.querySelector('.m-mute-btn');
       mMotionObs.observe(vid);
-      // Tap → open fullscreen detail page (reuses existing openDetail).
+      // Tap → open fullscreen overlay.
       card.addEventListener('click', e => {
         if(e.target.closest('.m-mute-btn')) return;
-        openDetail('motion', i);
+        const p = PROJECTS.motion[i];
+        openMediaOverlay(p.video, 'video', 'vertical');
       });
       muteBtn.addEventListener('click', e => {
         e.stopPropagation();
@@ -2651,25 +2654,61 @@ function close3DTab(idx){
       const vid = card.querySelector('video');
       if(vid) m3dObserver.observe(vid);
       const p = PROJECTS['3d'][+card.dataset.idx];
-      card.addEventListener('click', () => open3DOverlay(p));
+      card.addEventListener('click', () => {
+        if(p.video) openMediaOverlay(p.video, 'video', p.orientation || 'landscape');
+        else openMediaOverlay(p.img, 'image');
+      });
     });
   }
 
-  // ── 3D fullscreen overlay ──
-  function open3DOverlay(p){
-    const content = document.getElementById('m-3d-overlay-content');
-    content.innerHTML = p.video
-      ? `<video src="${p.video}" autoplay muted loop playsinline></video>`
-      : `<img src="${p.img}" alt="">`;
-    document.getElementById('m-3d-overlay').style.display = 'flex';
+  // ── Unified media overlay (motion + 3D) ──
+  function openMediaOverlay(src, type, orientation){
+    const content = document.getElementById('m-media-overlay-content');
+    if(type === 'video'){
+      const ar = orientation === 'vertical' ? '9/16' : '16/9';
+      content.innerHTML =
+        `<video src="${src}" autoplay muted loop playsinline` +
+        ` style="max-width:100%;max-height:90vh;aspect-ratio:${ar};object-fit:contain;display:block;"></video>` +
+        `<button id="m-overlay-mute" style="position:absolute;bottom:20px;right:20px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.5);border:.5px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;">${SPKOFF}</button>`;
+      const vid = content.querySelector('video');
+      const muteBtn = content.querySelector('#m-overlay-mute');
+      if(muteBtn && vid){
+        muteBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          vid.muted = !vid.muted;
+          muteBtn.innerHTML = vid.muted ? SPKOFF : SPKON;
+        });
+      }
+    } else {
+      content.innerHTML = `<img src="${src}" style="max-width:100%;max-height:90vh;object-fit:contain;display:block;">`;
+    }
+    document.getElementById('m-media-overlay').style.display = 'flex';
   }
-  document.getElementById('m-3d-overlay-close')?.addEventListener('click', () => {
-    const ov = document.getElementById('m-3d-overlay');
+  document.getElementById('m-media-overlay-close')?.addEventListener('click', () => {
+    const ov = document.getElementById('m-media-overlay');
     const vid = ov.querySelector('video');
     if(vid){ vid.pause(); vid.src = ''; }
     ov.style.display = 'none';
-    document.getElementById('m-3d-overlay-content').innerHTML = '';
+    document.getElementById('m-media-overlay-content').innerHTML = '';
   });
+
+  // ── 3D home card: lazy-load teaser video ──
+  const td3CardVid = document.getElementById('m-card-3d-video');
+  if(td3CardVid){
+    const td3CardObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        const v = e.target;
+        if(e.isIntersecting){
+          if(!v.src || v.src === window.location.href){ v.src = v.dataset.src; }
+          v.preload = 'auto';
+          v.play().catch(()=>{});
+        } else {
+          v.pause();
+        }
+      });
+    }, { threshold: 0.3 });
+    td3CardObs.observe(td3CardVid);
+  }
 
   // ── Album Art section: 2-col grid ──
   const artGrid = document.getElementById('m-sec-artdir-grid');
@@ -2784,8 +2823,12 @@ function close3DTab(idx){
   }
 
   // ── Home card click → open section ──
-  ['motion','3d','uiux','artdir'].forEach(cat => {
+  ['3d','uiux','artdir'].forEach(cat => {
     document.getElementById(`m-card-${cat}`)?.addEventListener('click', () => openSection(`m-sec-${cat}`));
+  });
+  document.querySelector('#m-card-motion .m-story-see-all')?.addEventListener('click', e => {
+    e.stopPropagation();
+    openSection('m-sec-motion');
   });
 
   // ── Back buttons ──
@@ -2845,10 +2888,14 @@ function close3DTab(idx){
     if(!vid) return;
     vid.src = s.video;
     vid.muted = true;
+    vid.preload = 'auto';
     vid.load();
-    const play = () => vid.play().catch(()=>{});
-    if(vid.readyState >= 3){ play(); }
-    else { vid.addEventListener('canplay', play, {once:true}); }
+    const playAttempt = () => vid.play().catch(()=>{});
+    if(vid.readyState >= 2){ playAttempt(); }
+    else {
+      vid.addEventListener('canplay', playAttempt, {once:true});
+      setTimeout(playAttempt, 1500);
+    }
     const title = document.getElementById('m-story-title');
     if(title) title.textContent = s.title;
     const bars = document.querySelectorAll('#m-card-motion .sb-fill');
@@ -2877,8 +2924,8 @@ function close3DTab(idx){
 
   const mTapL = document.querySelector('#m-card-motion .m-story-tap-l');
   const mTapR = document.querySelector('#m-card-motion .m-story-tap-r');
-  if(mTapL) mTapL.addEventListener('click', () => mShowStory(mStoryIdx - 1));
-  if(mTapR) mTapR.addEventListener('click', () => mShowStory(mStoryIdx + 1));
+  if(mTapL) mTapL.addEventListener('click', e => { e.stopPropagation(); mShowStory(mStoryIdx - 1); });
+  if(mTapR) mTapR.addEventListener('click', e => { e.stopPropagation(); mShowStory(mStoryIdx + 1); });
 
   mShowStory(0);
 
