@@ -46,7 +46,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
    z-index 0 so every window (z ≥ 1) is in front of it. */
 #airplane{
   position:absolute;
-  top:12vh;
+  top:-8vh;
   left:0;
   width:100%;
   height:auto;
@@ -971,7 +971,7 @@ video:not([src]),video[preload="none"]{background:#111}
 </div>
 
 <!-- Teaser: UI/UX -->
-<div class="win" id="tw-uiux" data-cat="uiux" style="left:3.3vw;top:56.4vh;width:30.6vw;height:33.1vh;z-index:3">
+<div class="win" id="tw-uiux" data-cat="uiux" style="left:3.3vw;top:56.4vh;width:27.6vw;height:33.1vh;z-index:3">
   <div class="win-bar" style="background:#081810">
     <div class="dots"><div class="dot r" data-role="min"></div><div class="dot y" data-role="min"></div><div class="dot g" data-role="open"></div></div>
     <div class="win-label">Brand Identity</div>
@@ -3336,10 +3336,7 @@ restoreWin = function(cat){
 // Kick off the first story.
 showStory(0);
 
-// ── Fixes 1 & 2: defer heavy teaser videos until first user interaction ──
-// td3-video (58 MB) and bi-teaser-video are not loaded at all until the user
-// first clicks anywhere. After that an IntersectionObserver plays/pauses them
-// based on visibility so they don't waste bandwidth when off-screen.
+// ── Teaser videos: load on page ready with IntersectionObserver play/pause ──
 (function(){
   const teaserObserver = new IntersectionObserver((entries)=>{
     entries.forEach(entry=>{
@@ -3349,24 +3346,19 @@ showStory(0);
     });
   }, { threshold: 0.1 });
 
-  document.addEventListener('click', ()=>{
-    // td3-video: set src now (was omitted in HTML to skip the 58 MB download).
-    const td3 = document.getElementById('td3-video');
-    if(td3 && !td3.getAttribute('src')){
-      td3.src = 'assets/3d/teaser.mp4';
-      td3.preload = 'auto';
-      td3.load();
-      teaserObserver.observe(td3);
-    }
-    // bi-teaser-video: swap data-src → src.
-    const bi = document.getElementById('bi-teaser-video');
-    if(bi && bi.dataset.src && !bi.getAttribute('src')){
-      bi.src = bi.dataset.src;
-      bi.preload = 'auto';
-      bi.load();
-      teaserObserver.observe(bi);
-    }
-  }, { once: true });
+  function loadTeaser(v, src){
+    if(!v || v.getAttribute('src') || !src) return;
+    v.src = src;
+    v.preload = 'auto';
+    v.load();
+    teaserObserver.observe(v);
+  }
+
+  // td3-video: load immediately.
+  loadTeaser(document.getElementById('td3-video'), 'assets/3d/teaser.mp4');
+  // bi-teaser-video: swap data-src → src immediately.
+  const bi = document.getElementById('bi-teaser-video');
+  if(bi) loadTeaser(bi, bi.dataset.src);
 })();
 
 // ── DVD-style idle screensaver ──
@@ -3443,7 +3435,7 @@ showStory(0);
   });
 })();
 
-/* ── Brand Identity section: click vertical videos → fullscreen detail window ── */
+/* ── Brand Identity section: click vertical videos → fullscreen motion-style player ── */
 (function wireBrandIdentityVerticals(){
   document.querySelectorAll('#sw-uiux .bi-verticals .bi-slot').forEach(slot => {
     const vid = slot.querySelector('video');
@@ -3451,7 +3443,10 @@ showStory(0);
     slot.style.cursor = 'pointer';
     slot.addEventListener('click', e => {
       if(e.target.closest('[data-mute]')) return;
-      openVideoDetail(vid.src);
+      const src = (vid.getAttribute('src') && vid.src !== window.location.href)
+        ? vid.src
+        : vid.dataset.src;
+      if(src) openMotionPlayer(src);
     });
   });
 })();
