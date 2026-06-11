@@ -2403,12 +2403,16 @@ document.querySelectorAll('.pcard').forEach(c=>{
 // user-initiated click; if the browser still blocks unmuted autoplay we fall
 // back to muted so the video at least plays. Click the backdrop, the close
 // button, or press Esc to dismiss.
-function openMotionPlayer(videoSrc){
+function openMotionPlayer(videoSrc, orientation){
+  const isVertical = !orientation || orientation === 'vertical';
+  const vidStyle = isVertical
+    ? 'height:92vh;width:auto;max-width:92vw;aspect-ratio:9/16;object-fit:contain;position:relative;z-index:1;display:block;'
+    : 'width:85vw;height:auto;max-height:90vh;aspect-ratio:16/9;object-fit:contain;position:relative;z-index:1;display:block;';
   const player = document.createElement('div');
   player.className = 'video-player';
   player.innerHTML = `
     <div class="video-player-bg"></div>
-    <video src="${videoSrc}" autoplay loop playsinline controls></video>
+    <video src="${videoSrc}" autoplay loop playsinline controls style="${vidStyle}"></video>
     <button class="video-player-close" aria-label="Close">×</button>
   `;
   document.body.appendChild(player);
@@ -2472,7 +2476,7 @@ function openMotionPlayer(videoSrc){
     card.addEventListener('click', e => {
       if(e.target.closest('[data-mute]')) return;
       if(p.video){
-        openMotionPlayer(p.video);
+        openMotionPlayer(p.video, p.orientation);
       } else {
         openImagePlayer(p.img);
       }
