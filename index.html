@@ -6,6 +6,18 @@
 <link rel="apple-touch-icon" href="/assets/favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Baran — Portfolio</title>
+<meta name="description" content="Baran Abanoz — Designer & Creative Director based in London. Motion Graphics, Art Direction, 3D Design, UI/UX, Brand Identity.">
+<meta name="author" content="Baran Abanoz">
+<meta property="og:title" content="Baran Abanoz — Portfolio">
+<meta property="og:description" content="Designer & Creative Director based in London. Motion Graphics, Art Direction, 3D Design, UI/UX, Brand Identity.">
+<meta property="og:image" content="https://baranabanoz.com/assets/favicon.png">
+<meta property="og:url" content="https://baranabanoz.com">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Baran Abanoz — Portfolio">
+<meta name="twitter:description" content="Designer & Creative Director based in London.">
+<meta name="twitter:image" content="https://baranabanoz.com/assets/favicon.png">
+<meta name="theme-color" content="#0a0a0a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
@@ -22,7 +34,7 @@
 html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:var(--text);background:#0a0a0a}
 
 /* Background */
-#bg{position:fixed;inset:0;z-index:0;background:url('assets/background.png') center/cover no-repeat}
+#bg{position:fixed;inset:0;z-index:0;background:url('assets/background.jpeg') center/cover no-repeat}
 #bg::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,.42)}
 
 #desktop{position:fixed;inset:0;z-index:1}
@@ -34,7 +46,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
    z-index 0 so every window (z ≥ 1) is in front of it. */
 #airplane{
   position:absolute;
-  top:-30vh;                          /* lifted high above the viewport — plane reads as a distant flyover */
+  top:12vh;
   left:0;
   width:100%;
   height:auto;
@@ -141,7 +153,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 .music-cover{width:100%;aspect-ratio:1/1;flex:0 1 auto;min-height:0;
   border-radius:6px;overflow:hidden;background:rgba(255,255,255,.05);position:relative}
 .music-cover img{width:100%;height:100%;object-fit:cover;display:block}
-.music-cover .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,.18);letter-spacing:.05em}
 .music-name{font-family:var(--serif);font-size:18px;line-height:1.1;flex:0 0 auto}
 .music-tag{font-size:10px;color:rgba(255,255,255,.5);line-height:1.45;flex:0 0 auto}
 .mtracks h3{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-bottom:12px;font-weight:500}
@@ -165,7 +176,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 .mshow{display:grid;grid-template-columns:1fr 1.2fr;gap:32px;align-items:start;margin-bottom:36px}
 .mshow-cover{aspect-ratio:1/1;border-radius:10px;overflow:hidden;background:rgba(255,255,255,.04);position:relative}
 .mshow-cover img{width:100%;height:100%;object-fit:cover;display:block}
-.mshow-cover .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:rgba(255,255,255,.18)}
 .mshow-info h1{font-family:var(--serif);font-size:48px;line-height:1.05;margin-bottom:8px}
 .mshow-info .tag{font-size:13px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.12em;margin-bottom:18px}
 .mshow-info p{font-size:14px;line-height:1.75;color:rgba(255,255,255,.55);margin-bottom:24px}
@@ -182,7 +192,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 .mgallery{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:36px}
 .mgallery-item{aspect-ratio:4/3;border-radius:6px;overflow:hidden;position:relative;background:rgba(255,255,255,.04)}
 .mgallery-item img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.mgallery-item .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,.18)}
 
 .mtracks{border-top:.5px solid rgba(255,255,255,.08);padding-top:20px}
 
@@ -322,7 +331,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   .uiux-grid{grid-template-columns:repeat(2,1fr)}
   .uiux-grid .pcard.vertical{grid-row:span 2}
 }
-.pcard-img .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,.15);letter-spacing:.05em}
 .pcard-info{padding:10px 12px}
 .pcard-info .pc{font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em}
 .pcard-info .pt{font-family:var(--serif);font-size:15px;color:rgba(255,255,255,.9);margin-top:2px}
@@ -356,7 +364,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   font-size:10px;color:rgba(255,255,255,.85);letter-spacing:.08em;font-weight:500;
   text-shadow:0 1px 2px rgba(0,0,0,.6);
 }
-.mvcard .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,.18);letter-spacing:.05em}
 
 /* Mute button (small, on hover, on grid cards) */
 .mute-btn{
@@ -394,7 +401,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 .threed-card.landscape{aspect-ratio:16/10}
 .threed-card.vertical{aspect-ratio:9/14}
 .threed-card video, .threed-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.threed-card .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:rgba(255,255,255,.18);letter-spacing:.05em}
 .threed-card .info{
   position:absolute;bottom:0;left:0;right:0;z-index:2;padding:14px 16px;pointer-events:none;
   background:linear-gradient(to top,rgba(0,0,0,.78) 0%,transparent 100%);
@@ -617,7 +623,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 .dw .win-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
 .d-hero{width:100%;padding-bottom:calc(9/16*100%);position:relative;background:rgba(255,255,255,.04)}
 .d-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.d-hero .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:rgba(255,255,255,.12)}
 .d-info{padding:24px}
 .d-cat{font-size:10px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px}
 .d-client{font-family:var(--serif);font-size:34px;color:rgba(255,255,255,.95);line-height:1.1}
@@ -671,11 +676,10 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 .uiux-embed-label{flex-shrink:0;padding:5px 10px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.28);background:rgba(0,0,0,.35);text-align:center}
 .d-slot{border-radius:6px;overflow:hidden;padding-bottom:62%;position:relative;background:rgba(255,255,255,.04)}
 .d-slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.d-slot .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,.12)}
 
 /* ── Mobile — macOS-card layout, rebuilt from scratch ── */
 @media(max-width:767px){
-  html,body{overflow:hidden;background:#0c0c0c;height:100%}
+  html,body{background:#0c0c0c;height:100%}
   #bg{display:none}
   #desktop,#pill,#airplane{display:none !important}
   #mob{display:block}
@@ -691,25 +695,26 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 
   /* ── Page containers ── */
   #m-home{
-    position:fixed;top:52px;bottom:60px;left:0;right:0;
+    position:fixed;top:52px;bottom:0;left:0;right:0;
     overflow-y:auto;-webkit-overflow-scrolling:touch;
     background:#0c0c0c;z-index:1;
-    padding:12px 12px 20px;display:flex;flex-direction:column;gap:8px;
+    padding:12px 12px 0;display:flex;flex-direction:column;gap:8px;
+    padding-bottom:calc(60px + env(safe-area-inset-bottom,20px));
   }
   .m-sec-page{
     position:fixed;inset:0;background:#0c0c0c;
-    opacity:0;pointer-events:none;
-    transition:opacity .2s ease;
+    opacity:0;pointer-events:none;visibility:hidden;
+    transition:opacity .2s ease,visibility .2s ease;
     z-index:10;display:flex;flex-direction:column;
   }
-  .m-sec-page.open{opacity:1;pointer-events:auto}
+  .m-sec-page.open{opacity:1;pointer-events:auto;visibility:visible}
   #m-detail{
     position:fixed;inset:0;background:#000;
-    opacity:0;pointer-events:none;
-    transition:opacity .2s ease;
+    opacity:0;pointer-events:none;visibility:hidden;
+    transition:opacity .2s ease,visibility .2s ease;
     z-index:20;display:flex;flex-direction:column;
   }
-  #m-detail.open{opacity:1;pointer-events:auto}
+  #m-detail.open{opacity:1;pointer-events:auto;visibility:visible}
 
   /* ── Section page header ── */
   .m-sec-hdr{
@@ -807,9 +812,16 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   .m-3d-info{padding:10px 12px 12px}
   .m-3d-title{font-family:var(--serif);font-size:16px;color:rgba(255,255,255,.9)}
 
-  /* ── Brand Identity: reuse bi-layout, override height ── */
+  /* ── Brand Identity: mobile layout ── */
   #m-sec-uiux .m-sec-body{padding:0 0 80px}
-  #m-sec-uiux .bi-layout{height:auto;overflow-y:visible;padding:12px}
+  #m-sec-uiux .bi-layout{display:flex;flex-direction:column;gap:8px;padding:12px;height:auto;overflow-y:visible}
+  #m-sec-uiux .bi-slot{border-radius:6px;overflow:hidden;width:100%}
+  #m-sec-uiux .bi-landscape .bi-slot{aspect-ratio:16/9}
+  #m-sec-uiux .bi-landscape .bi-slot video,
+  #m-sec-uiux .bi-landscape .bi-slot img{width:100%;height:100%;object-fit:cover;display:block}
+  #m-sec-uiux .bi-verticals{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  #m-sec-uiux .bi-verticals .bi-slot{aspect-ratio:9/16}
+  #m-sec-uiux .bi-verticals .bi-slot video{width:100%;height:100%;object-fit:cover;display:block}
 
   /* ── Album Art: 2-col square grid ── */
   .m-art-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
@@ -832,14 +844,14 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   #m-sec-about .absec h1{font-size:40px}
 
   /* ── Lightbox ── */
-  #m-lightbox{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.95);
+  #m-lightbox{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.95);
     display:none;align-items:center;justify-content:center}
   #m-lightbox.open{display:flex}
   #m-lb-img{max-width:96%;max-height:90vh;object-fit:contain;display:block}
   .m-lb-close{position:absolute;top:16px;right:16px;width:36px;height:36px;
     border-radius:50%;background:rgba(255,255,255,.1);border:none;
     color:#fff;font-size:20px;cursor:pointer;
-    display:flex;align-items:center;justify-content:center}
+    display:flex;align-items:center;justify-content:center;z-index:201}
 
   /* ── Detail page ── */
   #m-detail .m-sec-hdr{background:rgba(0,0,0,.95)}
@@ -859,9 +871,9 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   .m-detail-title{font-family:var(--serif);font-size:26px;color:#fff;line-height:1.2}
 
   /* ── Bottom nav ── */
-  #m-nav{position:fixed;bottom:0;left:0;right:0;height:60px;z-index:100;
+  #m-nav{position:fixed;bottom:0;left:0;right:0;height:calc(60px + env(safe-area-inset-bottom,0px));z-index:100;
     background:rgba(10,10,10,.97);border-top:.5px solid rgba(255,255,255,.08);
-    display:flex;align-items:center}
+    display:flex;align-items:center;padding-bottom:env(safe-area-inset-bottom,0px)}
   .m-nav-btn{flex:1;height:100%;border:none;background:none;padding:0;cursor:pointer;
     display:flex;align-items:center;justify-content:center;position:relative}
   .m-nav-btn svg{width:22px;height:22px;stroke:rgba(255,255,255,.55);fill:none;
@@ -877,8 +889,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   .m-story-tap-r{right:0;width:60%}
 
   /* Media fullscreen overlay */
-  #m-media-overlay{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.96);align-items:center;justify-content:center;display:none}
-  #m-media-overlay-close{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:51;line-height:1}
+  #m-media-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.96);align-items:center;justify-content:center;display:none}
+  #m-media-overlay-close{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:201;line-height:1}
   #m-media-overlay-content{width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative}
   /* Motion card "See all" pill */
   .m-story-see-all{position:absolute;bottom:14px;right:14px;z-index:5;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border:.5px solid rgba(255,255,255,.3);border-radius:100px;color:rgba(255,255,255,.6);background:transparent;cursor:pointer}
@@ -902,7 +914,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 video:not([src]),video[preload="none"]{background:#111}
 #story-card{background:#0d1829}
 </style>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body>
 
@@ -1077,10 +1088,10 @@ video:not([src]),video[preload="none"]{background:#111}
         <video data-src="assets/uiux/01.mp4" muted loop playsinline></video>
         <div class="mute-btn" data-mute></div>
       </div>
-      <div class="bi-slot"><img src="assets/uiux/02.png" alt=""></div>
-      <div class="bi-slot"><img src="assets/uiux/03.png" alt=""></div>
-      <div class="bi-slot"><img src="assets/uiux/04.png" alt=""></div>
-      <div class="bi-slot"><img src="assets/uiux/05.png" alt=""></div>
+      <div class="bi-slot"><img src="assets/uiux/02.jpeg" alt="" loading="lazy"></div>
+      <div class="bi-slot"><img src="assets/uiux/03.jpeg" alt="" loading="lazy"></div>
+      <div class="bi-slot"><img src="assets/uiux/04.jpeg" alt="" loading="lazy"></div>
+      <div class="bi-slot"><img src="assets/uiux/05.jpeg" alt="" loading="lazy"></div>
     </div>
     <div class="bi-verticals">
       <div class="bi-slot">
@@ -1164,7 +1175,7 @@ video:not([src]),video[preload="none"]{background:#111}
     <div class="absec-label">Experience</div>
     <div class="exp-list">
       <div class="exp-row">
-        <div class="exp-logo"><img src="assets/logos/september.png" alt="September"></div>
+        <div class="exp-logo"><img src="assets/logos/september.png" alt="September" loading="lazy"></div>
         <div>
           <div class="exp-role">Motion Designer</div>
           <div class="exp-company">September Content Management</div>
@@ -1172,7 +1183,7 @@ video:not([src]),video[preload="none"]{background:#111}
         <div class="exp-date">2024 — 2025</div>
       </div>
       <div class="exp-row">
-        <div class="exp-logo"><img src="assets/logos/jaff.png" alt="Jaff Digital"></div>
+        <div class="exp-logo"><img src="assets/logos/jaff.png" alt="Jaff Digital" loading="lazy"></div>
         <div>
           <div class="exp-role">Jr. Art Director</div>
           <div class="exp-company">Jaff Digital</div>
@@ -1180,7 +1191,7 @@ video:not([src]),video[preload="none"]{background:#111}
         <div class="exp-date">2024</div>
       </div>
       <div class="exp-row">
-        <div class="exp-logo"><img src="assets/logos/shopigo.png" alt="Shopigo"></div>
+        <div class="exp-logo"><img src="assets/logos/shopigo.png" alt="Shopigo" loading="lazy"></div>
         <div>
           <div class="exp-role">Creative Intern</div>
           <div class="exp-company">shopi go 買物</div>
@@ -1188,7 +1199,7 @@ video:not([src]),video[preload="none"]{background:#111}
         <div class="exp-date">2023</div>
       </div>
       <div class="exp-row">
-        <div class="exp-logo"><img src="assets/logos/dknd.png" alt="DKND Law Firm"></div>
+        <div class="exp-logo"><img src="assets/logos/dknd.png" alt="DKND Law Firm" loading="lazy"></div>
         <div>
           <div class="exp-role">UI/UX Freelancer</div>
           <div class="exp-company">DKND Law Firm</div>
@@ -1196,7 +1207,7 @@ video:not([src]),video[preload="none"]{background:#111}
         <div class="exp-date">2023</div>
       </div>
       <div class="exp-row">
-        <div class="exp-logo"><img src="assets/logos/mopp.png" alt="Mopp Agency"></div>
+        <div class="exp-logo"><img src="assets/logos/mopp.png" alt="Mopp Agency" loading="lazy"></div>
         <div>
           <div class="exp-role">Graphic Design Intern</div>
           <div class="exp-company">Mopp Agency</div>
@@ -1204,7 +1215,7 @@ video:not([src]),video[preload="none"]{background:#111}
         <div class="exp-date">2022</div>
       </div>
       <div class="exp-row">
-        <div class="exp-logo"><img src="assets/logos/e365.png" alt="E365 Digital Technologies"></div>
+        <div class="exp-logo"><img src="assets/logos/e365.png" alt="E365 Digital Technologies" loading="lazy"></div>
         <div>
           <div class="exp-role">Project Manager</div>
           <div class="exp-company">E365 Digital Technologies</div>
@@ -1217,7 +1228,7 @@ video:not([src]),video[preload="none"]{background:#111}
     <div class="absec-label">Education</div>
     <div class="exp-list">
       <div class="exp-row">
-        <div class="exp-logo"><img src="assets/logos/kingston.png" alt="Kingston University"></div>
+        <div class="exp-logo"><img src="assets/logos/kingston.png" alt="Kingston University" loading="lazy"></div>
         <div>
           <div class="exp-role">MA Media &amp; Communications</div>
           <div class="exp-company">Kingston University London</div>
@@ -1225,7 +1236,7 @@ video:not([src]),video[preload="none"]{background:#111}
         <div class="exp-date">2025 — 2026</div>
       </div>
       <div class="exp-row">
-        <div class="exp-logo"><img src="assets/logos/ozyegin.png" alt="Özyeğin University"></div>
+        <div class="exp-logo"><img src="assets/logos/ozyegin.png" alt="Özyeğin University" loading="lazy"></div>
         <div>
           <div class="exp-role">BA Communication Design</div>
           <div class="exp-company">Özyeğin University</div>
@@ -1350,10 +1361,10 @@ video:not([src]),video[preload="none"]{background:#111}
       </div>
       <div class="m-card-body">
         <div class="m-card-grid2">
-          <div class="m-cell"><img src="assets/uiux/02.png" alt=""></div>
-          <div class="m-cell"><img src="assets/uiux/03.png" alt=""></div>
-          <div class="m-cell"><img src="assets/uiux/04.png" alt=""></div>
-          <div class="m-cell"><img src="assets/uiux/05.png" alt=""></div>
+          <div class="m-cell"><img src="assets/uiux/02.jpeg" alt="" loading="lazy"></div>
+          <div class="m-cell"><img src="assets/uiux/03.jpeg" alt="" loading="lazy"></div>
+          <div class="m-cell"><img src="assets/uiux/04.jpeg" alt="" loading="lazy"></div>
+          <div class="m-cell"><img src="assets/uiux/05.jpeg" alt="" loading="lazy"></div>
         </div>
       </div>
     </div>
@@ -1366,10 +1377,10 @@ video:not([src]),video[preload="none"]{background:#111}
       </div>
       <div class="m-card-body">
         <div class="m-card-grid2">
-          <div class="m-cell"><img src="assets/artdir/01.jpg" alt=""></div>
-          <div class="m-cell"><img src="assets/artdir/02.jpg" alt=""></div>
-          <div class="m-cell"><img src="assets/artdir/03.jpg" alt=""></div>
-          <div class="m-cell"><img src="assets/artdir/04.jpg" alt=""></div>
+          <div class="m-cell"><img src="assets/artdir/01.jpg" alt="" loading="lazy"></div>
+          <div class="m-cell"><img src="assets/artdir/02.jpg" alt="" loading="lazy"></div>
+          <div class="m-cell"><img src="assets/artdir/03.jpg" alt="" loading="lazy"></div>
+          <div class="m-cell"><img src="assets/artdir/04.jpg" alt="" loading="lazy"></div>
         </div>
       </div>
     </div>
@@ -1381,7 +1392,7 @@ video:not([src]),video[preload="none"]{background:#111}
         <span class="m-card-label">Music</span>
       </div>
       <div class="m-card-body">
-        <div class="m-card-cover"><img src="assets/music/cover.jpg" alt="Dekolte"></div>
+        <div class="m-card-cover"><img src="assets/music/cover.jpg" alt="Dekolte" loading="lazy"></div>
         <div class="m-card-info">
           <div class="m-card-music-name">Dekolte</div>
           <div class="m-card-music-tag">D&eacute;collet&eacute; for Turkish</div>
@@ -1451,10 +1462,10 @@ video:not([src]),video[preload="none"]{background:#111}
       <div class="bi-layout">
         <div class="bi-landscape">
           <div class="bi-slot"><video data-src="assets/uiux/01.mp4" muted loop playsinline></video></div>
-          <div class="bi-slot"><img src="assets/uiux/02.png" alt=""></div>
-          <div class="bi-slot"><img src="assets/uiux/03.png" alt=""></div>
-          <div class="bi-slot"><img src="assets/uiux/04.png" alt=""></div>
-          <div class="bi-slot"><img src="assets/uiux/05.png" alt=""></div>
+          <div class="bi-slot"><img src="assets/uiux/02.jpeg" alt="" loading="lazy"></div>
+          <div class="bi-slot"><img src="assets/uiux/03.jpeg" alt="" loading="lazy"></div>
+          <div class="bi-slot"><img src="assets/uiux/04.jpeg" alt="" loading="lazy"></div>
+          <div class="bi-slot"><img src="assets/uiux/05.jpeg" alt="" loading="lazy"></div>
         </div>
         <div class="bi-verticals">
           <div class="bi-slot"><video data-src="assets/uiux/06.mp4" muted loop playsinline></video></div>
@@ -1482,7 +1493,7 @@ video:not([src]),video[preload="none"]{background:#111}
       <img class="m-logo-img" src="assets/logo.png" alt="">
     </header>
     <div class="m-sec-body">
-      <div class="m-music-full-cover"><img src="assets/music/cover.jpg" alt="Dekolte"></div>
+      <div class="m-music-full-cover"><img src="assets/music/cover.jpg" alt="Dekolte" loading="lazy"></div>
       <div class="m-music-sec-info">
         <h2 id="m-music-sec-name">Dekolte</h2>
         <div class="m-music-sec-tag" id="m-music-sec-tag">D&eacute;collet&eacute; for Turkish</div>
@@ -1493,12 +1504,12 @@ video:not([src]),video[preload="none"]{background:#111}
         </a>
       </div>
       <div class="m-photo-grid">
-        <div class="m-photo"><img src="assets/music/01.jpg" alt=""></div>
-        <div class="m-photo"><img src="assets/music/02.jpg" alt=""></div>
-        <div class="m-photo"><img src="assets/music/03.jpg" alt=""></div>
-        <div class="m-photo"><img src="assets/music/04.jpg" alt=""></div>
-        <div class="m-photo"><img src="assets/music/05.jpg" alt=""></div>
-        <div class="m-photo"><img src="assets/music/06.jpg" alt=""></div>
+        <div class="m-photo"><img src="assets/music/01.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
+        <div class="m-photo"><img src="assets/music/02.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
+        <div class="m-photo"><img src="assets/music/03.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
+        <div class="m-photo"><img src="assets/music/04.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
+        <div class="m-photo"><img src="assets/music/05.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
+        <div class="m-photo"><img src="assets/music/06.jpg" alt="" onerror="this.parentElement.style.display='none'"></div>
       </div>
       <div class="mtracks">
         <h3>Tracks</h3>
@@ -1534,32 +1545,32 @@ video:not([src]),video[preload="none"]{background:#111}
         <div class="absec-label">Experience</div>
         <div class="exp-list">
           <div class="exp-row">
-            <div class="exp-logo"><img src="assets/logos/september.png" alt="September"></div>
+            <div class="exp-logo"><img src="assets/logos/september.png" alt="September" loading="lazy"></div>
             <div><div class="exp-role">Motion Designer</div><div class="exp-company">September Content Management</div></div>
             <div class="exp-date">2024 — 2025</div>
           </div>
           <div class="exp-row">
-            <div class="exp-logo"><img src="assets/logos/jaff.png" alt="Jaff Digital"></div>
+            <div class="exp-logo"><img src="assets/logos/jaff.png" alt="Jaff Digital" loading="lazy"></div>
             <div><div class="exp-role">Jr. Art Director</div><div class="exp-company">Jaff Digital</div></div>
             <div class="exp-date">2024</div>
           </div>
           <div class="exp-row">
-            <div class="exp-logo"><img src="assets/logos/shopigo.png" alt="Shopigo"></div>
+            <div class="exp-logo"><img src="assets/logos/shopigo.png" alt="Shopigo" loading="lazy"></div>
             <div><div class="exp-role">Creative Intern</div><div class="exp-company">shopi go 買物</div></div>
             <div class="exp-date">2023</div>
           </div>
           <div class="exp-row">
-            <div class="exp-logo"><img src="assets/logos/dknd.png" alt="DKND Law Firm"></div>
+            <div class="exp-logo"><img src="assets/logos/dknd.png" alt="DKND Law Firm" loading="lazy"></div>
             <div><div class="exp-role">UI/UX Freelancer</div><div class="exp-company">DKND Law Firm</div></div>
             <div class="exp-date">2023</div>
           </div>
           <div class="exp-row">
-            <div class="exp-logo"><img src="assets/logos/mopp.png" alt="Mopp Agency"></div>
+            <div class="exp-logo"><img src="assets/logos/mopp.png" alt="Mopp Agency" loading="lazy"></div>
             <div><div class="exp-role">Graphic Design Intern</div><div class="exp-company">Mopp Agency</div></div>
             <div class="exp-date">2022</div>
           </div>
           <div class="exp-row">
-            <div class="exp-logo"><img src="assets/logos/e365.png" alt="E365 Digital Technologies"></div>
+            <div class="exp-logo"><img src="assets/logos/e365.png" alt="E365 Digital Technologies" loading="lazy"></div>
             <div><div class="exp-role">Project Manager</div><div class="exp-company">E365 Digital Technologies</div></div>
             <div class="exp-date">2021</div>
           </div>
@@ -1567,12 +1578,12 @@ video:not([src]),video[preload="none"]{background:#111}
         <div class="absec-label">Education</div>
         <div class="exp-list">
           <div class="exp-row">
-            <div class="exp-logo"><img src="assets/logos/kingston.png" alt="Kingston University"></div>
+            <div class="exp-logo"><img src="assets/logos/kingston.png" alt="Kingston University" loading="lazy"></div>
             <div><div class="exp-role">MA Media &amp; Communications</div><div class="exp-company">Kingston University London</div></div>
             <div class="exp-date">2025 — 2026</div>
           </div>
           <div class="exp-row">
-            <div class="exp-logo"><img src="assets/logos/ozyegin.png" alt="Özyeğin University"></div>
+            <div class="exp-logo"><img src="assets/logos/ozyegin.png" alt="Özyeğin University" loading="lazy"></div>
             <div><div class="exp-role">BA Communication Design</div><div class="exp-company">Özyeğin University</div></div>
             <div class="exp-date">2019 — 2024</div>
           </div>
@@ -1643,7 +1654,6 @@ video:not([src]),video[preload="none"]{background:#111}
 
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 // ── Easy-edit constants ──
 // Replace these with your own URLs.
@@ -2411,6 +2421,8 @@ function openMotionPlayer(videoSrc){
   });
   const close = () => {
     document.removeEventListener('keydown', onKey);
+    video.pause();
+    video.src = '';
     player.remove();
   };
   const onKey = e => { if(e.key === 'Escape') close(); };
@@ -2536,18 +2548,20 @@ function close3DTab(idx){
   if(wasActive) setActive3DTab(i>0?td3State.tabs[i-1].idx:'all');
 }
 
-// ── Wire the 3D teaser's mute button ──
-(function wireBITeaserMute(){
-  const btn   = document.getElementById('bi-teaser-mute');
-  const video = document.getElementById('bi-teaser-video');
-  if(btn && video) wireMute(btn, video);
-})();
+// ── Wire the teaser mute buttons (desktop only) ──
+if(window.innerWidth > 767){
+  (function wireBITeaserMute(){
+    const btn   = document.getElementById('bi-teaser-mute');
+    const video = document.getElementById('bi-teaser-video');
+    if(btn && video) wireMute(btn, video);
+  })();
 
-(function wire3DTeaserMute(){
-  const btn   = document.getElementById('td3-mute');
-  const video = document.getElementById('td3-video');
-  if(btn && video) wireMute(btn, video);
-})();
+  (function wire3DTeaserMute(){
+    const btn   = document.getElementById('td3-mute');
+    const video = document.getElementById('td3-video');
+    if(btn && video) wireMute(btn, video);
+  })();
+}
 
 // ── Mobile UI — macOS-card nav layer ──
 (function initMobile(){
@@ -2636,7 +2650,7 @@ function close3DTab(idx){
     list3d.innerHTML = PROJECTS['3d'].map((p,i) => {
       const orient = p.orientation || 'landscape';
       const mediaHtml = p.video
-        ? `<video src="${p.video}" muted loop playsinline preload="none"></video>`
+        ? `<video data-src="${p.video}" muted loop playsinline preload="none"></video>`
         : `<img src="${p.img}" loading="lazy" alt="">`;
       return `<div class="m-3d-card" data-idx="${i}">` +
         `<div class="m-3d-media ${orient}">${mediaHtml}</div>` +
@@ -2646,8 +2660,10 @@ function close3DTab(idx){
     const m3dObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         const v = entry.target;
-        if(entry.isIntersecting){ v.preload='auto'; v.load(); v.play().catch(()=>{}); }
-        else { v.pause(); v.preload='none'; }
+        if(entry.isIntersecting){
+          if(!v.src || v.src === window.location.href){ v.src = v.dataset.src; }
+          v.preload='auto'; v.load(); v.play().catch(()=>{});
+        } else { v.pause(); v.preload='none'; }
       });
     }, { threshold: 0.1 });
     list3d.querySelectorAll('.m-3d-card').forEach(card => {
@@ -2734,8 +2750,8 @@ function close3DTab(idx){
     if(body) body.scrollTop = 0;
     currentSec = secId;
     setNavActive(secId.replace('m-sec-',''));
-    // Fix 2: lazy-load Brand Identity section videos on first open.
-    if(secId === 'm-sec-uiux'){
+    // Lazy-load videos on section open.
+    if(secId === 'm-sec-uiux' || secId === 'm-sec-3d'){
       el.querySelectorAll('video[data-src]').forEach(v => {
         if(!v.src || v.src === window.location.href){
           v.src = v.dataset.src;
@@ -2876,58 +2892,6 @@ function close3DTab(idx){
       }
     });
   }
-
-  // ── Mobile motion card: Instagram-style story player ──
-  let mStoryIdx = 0;
-  let mStoryTimer = null;
-
-  function mShowStory(i){
-    mStoryIdx = ((i % STORIES.length) + STORIES.length) % STORIES.length;
-    const s = STORIES[mStoryIdx];
-    const vid = document.getElementById('m-story-video');
-    if(!vid) return;
-    vid.src = s.video;
-    vid.muted = true;
-    vid.preload = 'auto';
-    vid.load();
-    const playAttempt = () => vid.play().catch(()=>{});
-    if(vid.readyState >= 2){ playAttempt(); }
-    else {
-      vid.addEventListener('canplay', playAttempt, {once:true});
-      setTimeout(playAttempt, 1500);
-    }
-    const title = document.getElementById('m-story-title');
-    if(title) title.textContent = s.title;
-    const bars = document.querySelectorAll('#m-card-motion .sb-fill');
-    bars.forEach((b, j) => {
-      b.style.transition = 'none';
-      b.style.width = j < mStoryIdx ? '100%' : '0%';
-    });
-    void bars[mStoryIdx]?.offsetWidth;
-    let mt = setTimeout(() => mStartBar(8000), 1000);
-    vid.addEventListener('loadedmetadata', () => {
-      clearTimeout(mt);
-      mStartBar(Math.max(vid.duration * 1000, 1000));
-    }, {once:true});
-  }
-
-  function mStartBar(dur){
-    const b = document.querySelectorAll('#m-card-motion .sb-fill')[mStoryIdx];
-    if(!b) return;
-    b.style.transition = 'none'; b.style.width = '0%';
-    void b.offsetWidth;
-    b.style.transition = `width ${dur}ms linear`;
-    b.style.width = '100%';
-    clearTimeout(mStoryTimer);
-    mStoryTimer = setTimeout(() => mShowStory(mStoryIdx + 1), dur);
-  }
-
-  const mTapL = document.querySelector('#m-card-motion .m-story-tap-l');
-  const mTapR = document.querySelector('#m-card-motion .m-story-tap-r');
-  if(mTapL) mTapL.addEventListener('click', e => { e.stopPropagation(); mShowStory(mStoryIdx - 1); });
-  if(mTapR) mTapR.addEventListener('click', e => { e.stopPropagation(); mShowStory(mStoryIdx + 1); });
-
-  mShowStory(0);
 
 })();
 
@@ -3124,6 +3088,44 @@ const STORY_COUNT = 5;
 const STORIES = PROJECTS.motion.slice(0, STORY_COUNT).map((p,i)=>({
   video: p.video, title: p.title, cat: `Motion Design — ${i+1} / ${STORY_COUNT}`
 }));
+
+// ── Mobile story player — runs AFTER STORIES is defined ──
+(function initMobileStory(){
+  if(window.innerWidth > 767) return;
+  if(!window.STORIES || !STORIES.length) return;
+  let mStoryIdx = 0, mStoryTimer = null;
+  function mShowStory(i){
+    mStoryIdx = ((i % STORIES.length) + STORIES.length) % STORIES.length;
+    const s = STORIES[mStoryIdx];
+    const vid = document.getElementById('m-story-video');
+    if(!vid) return;
+    vid.src = s.video; vid.muted = true; vid.preload = 'auto'; vid.load();
+    const play = () => vid.play().catch(()=>{});
+    if(vid.readyState >= 2){ play(); }
+    else { vid.addEventListener('canplay', play, {once:true}); setTimeout(play, 1500); }
+    const title = document.getElementById('m-story-title');
+    if(title) title.textContent = s.title;
+    const bars = document.querySelectorAll('#m-card-motion .sb-fill');
+    bars.forEach((b,j)=>{ b.style.transition='none'; b.style.width=j<mStoryIdx?'100%':'0%'; });
+    void bars[mStoryIdx]?.offsetWidth;
+    let mt = setTimeout(()=>mStartBar(8000), 1000);
+    vid.addEventListener('loadedmetadata',()=>{ clearTimeout(mt); mStartBar(Math.max(vid.duration*1000,1000)); },{once:true});
+  }
+  function mStartBar(dur){
+    const b = document.querySelectorAll('#m-card-motion .sb-fill')[mStoryIdx];
+    if(!b) return;
+    b.style.transition='none'; b.style.width='0%'; void b.offsetWidth;
+    b.style.transition=`width ${dur}ms linear`; b.style.width='100%';
+    clearTimeout(mStoryTimer);
+    mStoryTimer = setTimeout(()=>mShowStory(mStoryIdx+1), dur);
+  }
+  const mTapL = document.querySelector('#m-card-motion .m-story-tap-l');
+  const mTapR = document.querySelector('#m-card-motion .m-story-tap-r');
+  if(mTapL) mTapL.addEventListener('click', e=>{ e.stopPropagation(); mShowStory(mStoryIdx-1); });
+  if(mTapR) mTapR.addEventListener('click', e=>{ e.stopPropagation(); mShowStory(mStoryIdx+1); });
+  mShowStory(0);
+})();
+
 const STORY_DUR_FALLBACK = 5000;   // used if the video duration isn't known yet
 let storyIdx = 0;
 let storyTimer = null;
@@ -3455,7 +3457,7 @@ showStory(0);
 })();
 
 /* ── Food Map (Leaflet + CartoDB dark) ── */
-(function wireFoodMap(){
+function wireFoodMap(){
   const btns   = document.querySelectorAll('.food-map-btn');
   const mapEl  = document.getElementById('food-map');
   const noteEl = document.getElementById('food-map-note');
@@ -3552,7 +3554,19 @@ showStory(0);
       }
     }).observe(aboutSW, { attributes: true, attributeFilter: ['class'] });
   }
-})();
+}
+
+(function loadLeaflet(cb){
+  if(window.innerWidth <= 767){ return; }
+  const link = document.createElement('link');
+  link.rel='stylesheet';
+  link.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+  document.head.appendChild(link);
+  const s = document.createElement('script');
+  s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  s.onload = cb;
+  document.head.appendChild(s);
+})(wireFoodMap);
 
 </script>
 </body>
