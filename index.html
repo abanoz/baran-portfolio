@@ -947,6 +947,7 @@ video:not([src]),video[preload="none"]{background:#111}
       <div class="story-tap left" data-dir="-1"></div>
       <div class="story-tap right" data-dir="1"></div>
       <button id="story-play-btn" aria-label="Play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></button>
+      <button id="story-see-all" style="position:absolute;bottom:14px;right:14px;z-index:5;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border:.5px solid rgba(255,255,255,.3);border-radius:100px;color:rgba(255,255,255,.6);background:transparent;cursor:pointer;font-family:var(--sans)">See all →</button>
     </div>
   </div>
   <div class="grip"></div>
@@ -971,7 +972,7 @@ video:not([src]),video[preload="none"]{background:#111}
 </div>
 
 <!-- Teaser: UI/UX -->
-<div class="win" id="tw-uiux" data-cat="uiux" style="left:3.3vw;top:56.4vh;width:27.6vw;height:33.1vh;z-index:3">
+<div class="win" id="tw-uiux" data-cat="uiux" style="left:2.3vw;top:56.4vh;width:27.6vw;height:33.1vh;z-index:3">
   <div class="win-bar" style="background:#081810">
     <div class="dots"><div class="dot r" data-role="min"></div><div class="dot y" data-role="min"></div><div class="dot g" data-role="open"></div></div>
     <div class="win-label">Brand Identity</div>
@@ -3318,6 +3319,10 @@ document.querySelectorAll('#story-card .story-tap').forEach(el=>{
     e.stopPropagation();
     showStory(storyIdx + parseInt(el.dataset.dir));
   });
+});
+document.getElementById('story-see-all')?.addEventListener('click', e=>{
+  e.stopPropagation();
+  openSection('motion');
 });
 
 // Hook minimise/restore so the timer pauses while the window is hidden,
