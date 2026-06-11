@@ -46,7 +46,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
    z-index 0 so every window (z ≥ 1) is in front of it. */
 #airplane{
   position:absolute;
-  top:-8vh;
+  top:-10vh;
   left:0;
   width:100%;
   height:auto;
@@ -949,7 +949,7 @@ video:not([src]),video[preload="none"]{background:#111}
       <div class="story-tap left" data-dir="-1"></div>
       <div class="story-tap right" data-dir="1"></div>
       <button id="story-play-btn" aria-label="Play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></button>
-      <button id="story-see-all" style="position:absolute;top:48px;right:10px;z-index:5;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border:.5px solid rgba(255,255,255,.5);border-radius:100px;color:rgba(255,255,255,.85);background:rgba(0,0,0,.3);cursor:pointer;font-family:var(--sans)">See all →</button>
+      <button id="story-see-all" style="position:absolute;top:12px;right:10px;z-index:5;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border:.5px solid rgba(255,255,255,.5);border-radius:100px;color:rgba(255,255,255,.85);background:rgba(0,0,0,.3);cursor:pointer;font-family:var(--sans)">See all →</button>
     </div>
   </div>
   <div class="grip"></div>
@@ -1070,9 +1070,6 @@ video:not([src]),video[preload="none"]{background:#111}
 <!-- 3D section -->
 <div class="sw" id="sw-3d">
   <div class="win-bar"><div class="dots"><div class="dot r" data-role="sc" data-id="sw-3d"></div><div class="dot y" data-role="sy" data-id="sw-3d"></div><div class="dot g" data-role="sg" data-id="sw-3d"></div></div><div class="win-label">3D Design</div></div>
-  <div class="sw-tabs" id="td3-tabs">
-    <div class="sw-tab active" data-tab="all">All Projects</div>
-  </div>
   <div class="win-body" id="td3-body" style="padding:0;overflow-y:auto">
     <div id="td3-grid-wrap" style="padding:24px">
       <!-- Mixed-orientation video grid rendered by JS from PROJECTS['3d'] -->
@@ -2474,11 +2471,10 @@ function openMotionPlayer(videoSrc){
 
     card.addEventListener('click', e => {
       if(e.target.closest('[data-mute]')) return;
-      // Vertical videos → fullscreen player. Everything else → tab in section window.
-      if(p.orientation === 'vertical' && p.video){
+      if(p.video){
         openMotionPlayer(p.video);
       } else {
-        open3DTab(i);
+        openImagePlayer(p.img);
       }
     });
 
@@ -2486,69 +2482,22 @@ function openMotionPlayer(videoSrc){
   });
 })();
 
-// ── 3D section: browser-style tab management ──
-const td3State={tabs:[],active:'all'};
-
-document.getElementById('td3-tabs').querySelector('[data-tab="all"]')
-  .addEventListener('click',()=>setActive3DTab('all'));
-
-function open3DTab(idx){
-  // If tab already open, just activate it.
-  const existing=td3State.tabs.find(t=>t.idx===idx);
-  if(existing){ setActive3DTab(idx); return; }
-  // Make sure the 3D section window is open first.
-  openSection('3d');
-  const p=PROJECTS['3d'][idx];
-  const tabBar=document.getElementById('td3-tabs');
-  const body=document.getElementById('td3-body');
-  // Tab button
-  const tabEl=document.createElement('div');
-  tabEl.className='sw-tab';
-  tabEl.dataset.tabIdx=String(idx);
-  tabEl.innerHTML=`<span class="sw-tab-name">${p.title}</span><button class="sw-tab-x" aria-label="Close">&#215;</button>`;
-  tabBar.appendChild(tabEl);
-  // Content area
-  const contentEl=document.createElement('div');
-  contentEl.style.display='none';
-  const mediaHtml=p.video
-    ?`<div class="td3-hero-wrap"><video src="${p.video}" autoplay muted loop playsinline preload="metadata"></video></div>`
-    :`<div class="td3-hero-wrap"><img src="${p.img}" alt=""></div>`;
-  contentEl.innerHTML=mediaHtml+
-    `<div class="td3-tab-info"><div class="td3-tab-title">${p.title}</div>`+
-    (p.client?`<div class="td3-tab-client">${p.client}</div>`:'')+`</div>`;
-  body.appendChild(contentEl);
-  tabEl.querySelector('.sw-tab-name').addEventListener('click',()=>setActive3DTab(idx));
-  tabEl.querySelector('.sw-tab-x').addEventListener('click',e=>{e.stopPropagation();close3DTab(idx);});
-  td3State.tabs.push({idx,el:tabEl,contentEl});
-  setActive3DTab(idx);
-}
-
-function setActive3DTab(idx){
-  td3State.active=idx;
-  const tabBar=document.getElementById('td3-tabs');
-  const gridWrap=document.getElementById('td3-grid-wrap');
-  tabBar.querySelectorAll('.sw-tab').forEach(t=>t.classList.remove('active'));
-  if(idx==='all'){
-    tabBar.querySelector('[data-tab="all"]').classList.add('active');
-    gridWrap.style.display='';
-    td3State.tabs.forEach(t=>{t.contentEl.style.display='none';});
-  } else {
-    const d=td3State.tabs.find(t=>t.idx===idx);
-    if(!d) return;
-    d.el.classList.add('active');
-    gridWrap.style.display='none';
-    td3State.tabs.forEach(t=>{t.contentEl.style.display=(t.idx===idx)?'':'none';});
-  }
-}
-
-function close3DTab(idx){
-  const i=td3State.tabs.findIndex(t=>t.idx===idx);
-  if(i===-1) return;
-  const d=td3State.tabs[i];
-  const wasActive=(td3State.active===idx);
-  d.el.remove(); d.contentEl.remove();
-  td3State.tabs.splice(i,1);
-  if(wasActive) setActive3DTab(i>0?td3State.tabs[i-1].idx:'all');
+function openImagePlayer(imgSrc){
+  const player = document.createElement('div');
+  player.className = 'video-player';
+  player.innerHTML =
+    `<div class="video-player-bg"></div>` +
+    `<img src="${imgSrc}" style="max-width:90vw;max-height:90vh;object-fit:contain;position:relative;z-index:1;display:block;" alt="">` +
+    `<button class="video-player-close" aria-label="Close">×</button>`;
+  document.body.appendChild(player);
+  const close = () => {
+    document.removeEventListener('keydown', onKey);
+    player.remove();
+  };
+  const onKey = e => { if(e.key === 'Escape') close(); };
+  player.querySelector('.video-player-bg').addEventListener('click', close);
+  player.querySelector('.video-player-close').addEventListener('click', close);
+  document.addEventListener('keydown', onKey);
 }
 
 // ── Wire the teaser mute buttons (desktop only) ──
