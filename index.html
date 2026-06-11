@@ -892,7 +892,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 
   /* Media fullscreen overlay */
   #m-media-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.96);align-items:center;justify-content:center;display:none;padding-top:env(safe-area-inset-top,0px)}
-  #m-media-overlay-close{position:absolute;top:max(16px,env(safe-area-inset-top,16px));right:16px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:201;line-height:1}
+  #m-media-overlay-close{position:absolute;top:max(16px,env(safe-area-inset-top,16px));right:16px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.15);border:.5px solid rgba(255,255,255,.3);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:203;line-height:1}
   #m-media-overlay-content{width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative}
   /* Motion card "See all" pill */
   .m-story-see-all{position:absolute;bottom:14px;right:14px;z-index:5;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border:.5px solid rgba(255,255,255,.3);border-radius:100px;color:rgba(255,255,255,.6);background:transparent;cursor:pointer}
@@ -949,7 +949,7 @@ video:not([src]),video[preload="none"]{background:#111}
       <div class="story-tap left" data-dir="-1"></div>
       <div class="story-tap right" data-dir="1"></div>
       <button id="story-play-btn" aria-label="Play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></button>
-      <button id="story-see-all" style="position:absolute;top:12px;right:10px;z-index:5;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border:.5px solid rgba(255,255,255,.5);border-radius:100px;color:rgba(255,255,255,.85);background:rgba(0,0,0,.3);cursor:pointer;font-family:var(--sans)">See all →</button>
+      <button id="story-see-all" style="position:absolute;top:20px;right:10px;z-index:5;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border:.5px solid rgba(255,255,255,.5);border-radius:100px;color:rgba(255,255,255,.85);background:rgba(0,0,0,.3);cursor:pointer;font-family:var(--sans)">See all →</button>
     </div>
   </div>
   <div class="grip"></div>
@@ -2637,31 +2637,44 @@ if(window.innerWidth > 767){
 
   // ── Unified media overlay (motion + 3D) ──
   function openMediaOverlay(src, type, orientation){
+    const ov = document.getElementById('m-media-overlay');
     const content = document.getElementById('m-media-overlay-content');
+    content.innerHTML = '';
     if(type === 'video'){
-      const ar = orientation === 'vertical' ? '9/16' : '16/9';
-      content.innerHTML =
-        `<video src="${src}" autoplay muted loop playsinline` +
-        ` style="max-width:100%;max-height:90vh;aspect-ratio:${ar};object-fit:contain;display:block;"></video>` +
-        `<button id="m-overlay-mute" style="position:absolute;bottom:20px;right:20px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.5);border:.5px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;">${SPKOFF}</button>`;
-      const vid = content.querySelector('video');
-      const muteBtn = content.querySelector('#m-overlay-mute');
-      if(muteBtn && vid){
-        muteBtn.addEventListener('click', e => {
-          e.stopPropagation();
-          vid.muted = !vid.muted;
-          muteBtn.innerHTML = vid.muted ? SPKOFF : SPKON;
-        });
-      }
+      const vid = document.createElement('video');
+      vid.src = src;
+      vid.autoplay = true;
+      vid.muted = true;
+      vid.loop = true;
+      vid.setAttribute('playsinline', '');
+      vid.style.cssText = orientation === 'vertical'
+        ? 'height:85vh;width:auto;max-width:95vw;object-fit:contain;display:block;border-radius:8px;'
+        : 'width:95vw;height:auto;max-height:85vh;object-fit:contain;display:block;border-radius:8px;';
+      content.appendChild(vid);
+      vid.play().catch(()=>{});
+      const muteBtn = document.createElement('button');
+      muteBtn.style.cssText = 'position:absolute;bottom:24px;right:20px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.6);border:.5px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:202;';
+      muteBtn.innerHTML = SPKOFF;
+      ov.appendChild(muteBtn);
+      muteBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        vid.muted = !vid.muted;
+        muteBtn.innerHTML = vid.muted ? SPKOFF : SPKON;
+      });
     } else {
-      content.innerHTML = `<img src="${src}" style="max-width:100%;max-height:90vh;object-fit:contain;display:block;">`;
+      const img = document.createElement('img');
+      img.src = src;
+      img.style.cssText = 'max-width:95vw;max-height:85vh;object-fit:contain;display:block;border-radius:8px;';
+      content.appendChild(img);
     }
-    document.getElementById('m-media-overlay').style.display = 'flex';
+    ov.style.display = 'flex';
   }
   document.getElementById('m-media-overlay-close')?.addEventListener('click', () => {
     const ov = document.getElementById('m-media-overlay');
     const vid = ov.querySelector('video');
     if(vid){ vid.pause(); vid.src = ''; }
+    const muteBtn = ov.querySelector('button:not(#m-media-overlay-close)');
+    if(muteBtn) muteBtn.remove();
     ov.style.display = 'none';
     document.getElementById('m-media-overlay-content').innerHTML = '';
   });
@@ -2733,6 +2746,7 @@ if(window.innerWidth > 767){
     setNavActive('home');
     const home = document.getElementById('m-home');
     if(home){
+      home.scrollTop = 0;
       home.style.overflow = 'hidden';
       requestAnimationFrame(() => { home.style.overflow = 'auto'; });
     }
@@ -2840,8 +2854,11 @@ if(window.innerWidth > 767){
       }
       // Then handle nav
       const nav = btn.dataset.nav;
-      if(nav === 'home') closeSection();
-      else if(secMap[nav]) openSection(secMap[nav]);
+      if(nav === 'home'){
+        closeSection();
+        const home = document.getElementById('m-home');
+        if(home) home.scrollTop = 0;
+      } else if(secMap[nav]) openSection(secMap[nav]);
     });
   });
 
@@ -3074,7 +3091,7 @@ const STORIES = PROJECTS.motion.slice(0, STORY_COUNT).map((p,i)=>({
 // ── Mobile story player — runs AFTER STORIES is defined ──
 (function initMobileStory(){
   if(window.innerWidth > 767) return;
-  if(!window.STORIES || !STORIES.length) return;
+  if(typeof STORIES === 'undefined' || !STORIES.length) return;
   let mStoryIdx = 0, mStoryTimer = null;
   function mShowStory(i){
     mStoryIdx = ((i % STORIES.length) + STORIES.length) % STORIES.length;
