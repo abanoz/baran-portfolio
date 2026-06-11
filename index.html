@@ -686,7 +686,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 
   /* ── Fixed header ── */
   #m-header{
-    position:fixed;top:0;left:0;right:0;height:52px;z-index:100;
+    position:fixed;top:0;left:0;right:0;height:52px;z-index:300;
     background:rgba(10,10,10,.97);
     border-bottom:.5px solid rgba(255,255,255,.08);
     display:flex;align-items:center;justify-content:center;
@@ -700,6 +700,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
     background:#0c0c0c;z-index:1;
     padding:12px 12px 0;display:flex;flex-direction:column;gap:8px;
     padding-bottom:calc(60px + env(safe-area-inset-bottom,20px));
+    overscroll-behavior:contain;
   }
   .m-sec-page{
     position:fixed;inset:0;background:#0c0c0c;
@@ -732,7 +733,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   }
   .m-sec-body{
     flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
-    padding:16px 12px 80px;
+    padding:16px 12px 80px;overscroll-behavior:contain;
   }
 
   /* ── Home category cards ── */
@@ -845,10 +846,11 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 
   /* ── Lightbox ── */
   #m-lightbox{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.95);
-    display:none;align-items:center;justify-content:center}
+    display:none;align-items:center;justify-content:center;
+    padding-top:env(safe-area-inset-top,0px)}
   #m-lightbox.open{display:flex}
   #m-lb-img{max-width:96%;max-height:90vh;object-fit:contain;display:block}
-  .m-lb-close{position:absolute;top:16px;right:16px;width:36px;height:36px;
+  .m-lb-close{position:absolute;top:max(16px,env(safe-area-inset-top,16px));right:16px;width:36px;height:36px;
     border-radius:50%;background:rgba(255,255,255,.1);border:none;
     color:#fff;font-size:20px;cursor:pointer;
     display:flex;align-items:center;justify-content:center;z-index:201}
@@ -871,7 +873,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   .m-detail-title{font-family:var(--serif);font-size:26px;color:#fff;line-height:1.2}
 
   /* ── Bottom nav ── */
-  #m-nav{position:fixed;bottom:0;left:0;right:0;height:calc(60px + env(safe-area-inset-bottom,0px));z-index:100;
+  #m-nav{position:fixed;bottom:0;left:0;right:0;height:calc(60px + env(safe-area-inset-bottom,0px));z-index:300;
     background:rgba(10,10,10,.97);border-top:.5px solid rgba(255,255,255,.08);
     display:flex;align-items:center;padding-bottom:env(safe-area-inset-bottom,0px)}
   .m-nav-btn{flex:1;height:100%;border:none;background:none;padding:0;cursor:pointer;
@@ -889,8 +891,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   .m-story-tap-r{right:0;width:60%}
 
   /* Media fullscreen overlay */
-  #m-media-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.96);align-items:center;justify-content:center;display:none}
-  #m-media-overlay-close{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:201;line-height:1}
+  #m-media-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.96);align-items:center;justify-content:center;display:none;padding-top:env(safe-area-inset-top,0px)}
+  #m-media-overlay-close{position:absolute;top:max(16px,env(safe-area-inset-top,16px));right:16px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:201;line-height:1}
   #m-media-overlay-content{width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative}
   /* Motion card "See all" pill */
   .m-story-see-all{position:absolute;bottom:14px;right:14px;z-index:5;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border:.5px solid rgba(255,255,255,.3);border-radius:100px;color:rgba(255,255,255,.6);background:transparent;cursor:pointer}
@@ -947,7 +949,7 @@ video:not([src]),video[preload="none"]{background:#111}
       <div class="story-tap left" data-dir="-1"></div>
       <div class="story-tap right" data-dir="1"></div>
       <button id="story-play-btn" aria-label="Play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></button>
-      <button id="story-see-all" style="position:absolute;bottom:14px;right:14px;z-index:5;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border:.5px solid rgba(255,255,255,.3);border-radius:100px;color:rgba(255,255,255,.6);background:transparent;cursor:pointer;font-family:var(--sans)">See all →</button>
+      <button id="story-see-all" style="position:absolute;top:48px;right:10px;z-index:5;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border:.5px solid rgba(255,255,255,.5);border-radius:100px;color:rgba(255,255,255,.85);background:rgba(0,0,0,.3);cursor:pointer;font-family:var(--sans)">See all →</button>
     </div>
   </div>
   <div class="grip"></div>
@@ -2571,6 +2573,12 @@ if(window.innerWidth > 767){
   const SPKOFF = '<svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
   const SPKON  = '<svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
   const liSVG  = '<svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>';
+
+  // Pre-warm the first story video so it's ready when initMobileStory fires.
+  if(window.PROJECTS && PROJECTS.motion && PROJECTS.motion[0]){
+    const preWarm = document.getElementById('m-story-video');
+    if(preWarm){ preWarm.src = PROJECTS.motion[0].video; preWarm.load(); }
+  }
   const igSVG  = '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
 
   // ── Social links ──
@@ -2723,7 +2731,7 @@ if(window.innerWidth > 767){
           v.pause();
         }
       });
-    }, { threshold: 0.3 });
+    }, { threshold: 0, rootMargin: '200px' });
     td3CardObs.observe(td3CardVid);
   }
 
@@ -2748,7 +2756,11 @@ if(window.innerWidth > 767){
     if(!el) return;
     el.classList.add('open');
     const body = el.querySelector('.m-sec-body');
-    if(body) body.scrollTop = 0;
+    if(body){
+      body.scrollTop = 0;
+      body.style.overflow = 'hidden';
+      requestAnimationFrame(() => { body.style.overflow = ''; });
+    }
     currentSec = secId;
     setNavActive(secId.replace('m-sec-',''));
     // Lazy-load videos on section open.
@@ -2770,6 +2782,11 @@ if(window.innerWidth > 767){
     currentSec = null;
     closeDetail();
     setNavActive('home');
+    const home = document.getElementById('m-home');
+    if(home){
+      home.style.overflow = 'hidden';
+      requestAnimationFrame(() => { home.style.overflow = 'auto'; });
+    }
   }
 
   function openDetail(cat, idx){
@@ -2858,6 +2875,21 @@ if(window.innerWidth > 767){
   const secMap = {motion:'m-sec-motion','3d':'m-sec-3d',uiux:'m-sec-uiux',artdir:'m-sec-artdir',music:'m-sec-music',about:'m-sec-about'};
   document.querySelectorAll('.m-nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
+      // Always close any open overlays first
+      const ov = document.getElementById('m-media-overlay');
+      if(ov && ov.style.display === 'flex'){
+        const vid = ov.querySelector('video');
+        if(vid){ vid.pause(); vid.src = ''; }
+        ov.style.display = 'none';
+        document.getElementById('m-media-overlay-content').innerHTML = '';
+      }
+      const lb = document.getElementById('m-lightbox');
+      if(lb && lb.classList.contains('open')){
+        lb.classList.remove('open');
+        const lbImg = document.getElementById('m-lb-img');
+        if(lbImg) lbImg.src = '';
+      }
+      // Then handle nav
       const nav = btn.dataset.nav;
       if(nav === 'home') closeSection();
       else if(secMap[nav]) openSection(secMap[nav]);
