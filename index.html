@@ -866,15 +866,16 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   #m-sec-about .absec h1{font-size:40px}
 
   /* ── Lightbox ── */
-  #m-lightbox{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.95);
+  #m-lightbox{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.95);
     display:none;align-items:center;justify-content:center;
-    padding-top:env(safe-area-inset-top,0px)}
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:calc(60px + env(safe-area-inset-bottom,0px))}
   #m-lightbox.open{display:flex}
-  #m-lb-img{max-width:96%;max-height:90vh;object-fit:contain;display:block}
+  #m-lb-img{max-width:95%;max-height:calc(100vh - 120px);object-fit:contain;display:block}
   .m-lb-close{position:absolute;top:max(16px,env(safe-area-inset-top,16px));right:16px;width:36px;height:36px;
     border-radius:50%;background:rgba(255,255,255,.1);border:none;
     color:#fff;font-size:20px;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;z-index:201}
+    display:flex;align-items:center;justify-content:center;z-index:9001}
 
   /* ── Detail page ── */
   #m-detail .m-sec-hdr{background:rgba(0,0,0,.95)}
@@ -912,8 +913,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   .m-story-tap-r{right:0;width:60%}
 
   /* Media fullscreen overlay */
-  #m-media-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.96);align-items:center;justify-content:center;display:none;padding-top:env(safe-area-inset-top,0px)}
-  #m-media-overlay-close{position:absolute;top:max(16px,env(safe-area-inset-top,16px));right:16px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.15);border:.5px solid rgba(255,255,255,.3);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:203;line-height:1}
+  #m-media-overlay{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.97);display:none;align-items:center;justify-content:center;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(60px + env(safe-area-inset-bottom,0px))}
+  #m-media-overlay-close{position:absolute;top:max(16px,env(safe-area-inset-top,16px));right:16px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.15);border:.5px solid rgba(255,255,255,.3);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:9002;line-height:1}
   #m-media-overlay-content{width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative}
   /* Motion card "See all" pill */
   .m-story-see-all{position:absolute;bottom:14px;right:14px;z-index:5;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border:.5px solid rgba(255,255,255,.3);border-radius:100px;color:rgba(255,255,255,.6);background:transparent;cursor:pointer}
@@ -2678,17 +2679,15 @@ if(window.innerWidth > 767){
     if(type === 'video'){
       const vid = document.createElement('video');
       vid.src = src;
-      vid.autoplay = true;
       vid.muted = true;
       vid.loop = true;
       vid.setAttribute('playsinline', '');
       vid.style.cssText = orientation === 'vertical'
-        ? 'height:85vh;width:auto;max-width:95vw;object-fit:contain;display:block;border-radius:8px;'
-        : 'width:95vw;height:auto;max-height:85vh;object-fit:contain;display:block;border-radius:8px;';
+        ? 'max-height:calc(100vh - 120px);width:auto;max-width:95vw;object-fit:contain;display:block;border-radius:8px;'
+        : 'width:95vw;max-height:calc(100vh - 120px);height:auto;object-fit:contain;display:block;border-radius:8px;';
       content.appendChild(vid);
-      vid.play().catch(()=>{});
       const muteBtn = document.createElement('button');
-      muteBtn.style.cssText = 'position:absolute;bottom:24px;right:20px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.6);border:.5px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:202;';
+      muteBtn.style.cssText = 'position:absolute;bottom:calc(70px + env(safe-area-inset-bottom,0px));right:20px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.6);border:.5px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:9003;';
       muteBtn.innerHTML = SPKOFF;
       ov.appendChild(muteBtn);
       muteBtn.addEventListener('click', e => {
@@ -2696,13 +2695,20 @@ if(window.innerWidth > 767){
         vid.muted = !vid.muted;
         muteBtn.innerHTML = vid.muted ? SPKOFF : SPKON;
       });
+      // Show overlay first, then play — required for iOS autoplay
+      ov.style.display = 'flex';
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          vid.play().catch(() => {});
+        });
+      });
     } else {
       const img = document.createElement('img');
       img.src = src;
-      img.style.cssText = 'max-width:95vw;max-height:85vh;object-fit:contain;display:block;border-radius:8px;';
+      img.style.cssText = 'max-width:95vw;max-height:calc(100vh - 120px);object-fit:contain;display:block;border-radius:8px;';
       content.appendChild(img);
+      ov.style.display = 'flex';
     }
-    ov.style.display = 'flex';
   }
   document.getElementById('m-media-overlay-close')?.addEventListener('click', () => {
     const ov = document.getElementById('m-media-overlay');
