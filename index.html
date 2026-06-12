@@ -3073,13 +3073,24 @@ const AIRPLANE_SRC = 'https://pub-f259d1de70d2425c8e3c5bb95ecd6aa2.r2.dev/assets
 
         const link = item.link || SOCIAL_LINKS.letterboxd;
 
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'ab-film-title';
+        titleDiv.textContent = title;
+
         const card = document.createElement('div');
         card.className = 'ab-film-card';
         card.style.cursor = 'pointer';
         card.innerHTML =
-          `<img class="ab-film-poster" src="${poster}" alt="${title.replace(/"/g,'&quot;')}" loading="lazy" onerror="this.closest('.ab-film-card').style.display='none'">` +
-          `<div class="ab-film-title">${title}</div>`;
-        card.addEventListener('click', () => window.open(link, '_blank'));
+          `<img class="ab-film-poster" src="${poster}" alt="" loading="lazy" onerror="this.closest('.ab-film-card').style.display='none'">`;
+        card.appendChild(titleDiv);
+        card.addEventListener('click', () => {
+          try {
+            const url = new URL(link);
+            if(url.protocol === 'https:' || url.protocol === 'http:'){
+              window.open(link, '_blank', 'noopener,noreferrer');
+            }
+          } catch(e) {}
+        });
         row.appendChild(card);
       });
 
