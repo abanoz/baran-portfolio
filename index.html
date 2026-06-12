@@ -192,6 +192,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 .mgallery{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:36px}
 .mgallery-item{aspect-ratio:4/3;border-radius:6px;overflow:hidden;position:relative;background:rgba(255,255,255,.04)}
 .mgallery-item img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.mgallery-item:empty,.mgallery-item img[src=""]{display:none}
 
 .mtracks{border-top:.5px solid rgba(255,255,255,.08);padding-top:20px}
 
@@ -563,6 +564,16 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 .socials-lg{gap:10px;margin-bottom:36px}
 .socials-lg .social-link svg{width:22px;height:22px}
 
+/* ── Favourites / Letterboxd film cards ── */
+#ab-favourites{margin-bottom:28px}
+#ab-films-row{display:flex;gap:8px;flex-wrap:nowrap;margin-bottom:10px}
+.ab-film-card{flex:0 0 calc(25% - 6px);width:calc(25% - 6px);min-width:0}
+.ab-film-poster{width:100%;aspect-ratio:2/3;border-radius:6px;object-fit:cover;background:#1a1a1a;display:block}
+.ab-film-title{font-size:11px;color:rgba(255,255,255,.7);margin-top:6px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-family:var(--sans)}
+.ab-film-stars{font-size:10px;color:rgba(255,255,255,.4);margin-top:2px}
+#ab-lb-viewall{font-size:11px;color:rgba(255,255,255,.35);text-decoration:none;letter-spacing:.02em}
+#ab-lb-viewall:hover{color:rgba(255,255,255,.6)}
+
 /* ── Contact form ── */
 .cform{display:flex;flex-direction:column;gap:18px;margin-top:8px}
 .cform-row{display:flex;flex-direction:column;gap:6px}
@@ -683,6 +694,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   #bg{display:none}
   #desktop,#pill,#airplane{display:none !important}
   #mob{display:block}
+  #ab-favourites{display:none}
 
   /* ── Fixed header ── */
   #m-header{
@@ -974,7 +986,7 @@ video:not([src]),video[preload="none"]{background:#111}
 </div>
 
 <!-- Teaser: UI/UX -->
-<div class="win" id="tw-uiux" data-cat="uiux" style="left:2.3vw;top:56.4vh;width:27.6vw;height:33.1vh;z-index:3">
+<div class="win" id="tw-uiux" data-cat="uiux" style="left:1.3vw;top:56.4vh;width:27.6vw;height:33.1vh;z-index:3">
   <div class="win-bar" style="background:#081810">
     <div class="dots"><div class="dot r" data-role="min"></div><div class="dot y" data-role="min"></div><div class="dot g" data-role="open"></div></div>
     <div class="win-label">Brand Identity</div>
@@ -1135,12 +1147,12 @@ video:not([src]),video[preload="none"]{background:#111}
       <div class="mshow-info" id="mshow-info"><!-- rendered from MUSIC by JS --></div>
     </div>
     <div class="mgallery">
-      <div class="mgallery-item"><img src="assets/music/01.jpg" onerror="this.style.display='none'" alt=""><div class="phl">music/01</div></div>
-      <div class="mgallery-item"><img src="assets/music/02.jpg" onerror="this.style.display='none'" alt=""><div class="phl">music/02</div></div>
-      <div class="mgallery-item"><img src="assets/music/03.jpg" onerror="this.style.display='none'" alt=""><div class="phl">music/03</div></div>
-      <div class="mgallery-item"><img src="assets/music/04.jpg" onerror="this.style.display='none'" alt=""><div class="phl">music/04</div></div>
-      <div class="mgallery-item"><img src="assets/music/05.jpg" onerror="this.style.display='none'" alt=""><div class="phl">music/05</div></div>
-      <div class="mgallery-item"><img src="assets/music/06.jpg" onerror="this.style.display='none'" alt=""><div class="phl">music/06</div></div>
+      <div class="mgallery-item"><img src="assets/music/01.jpg" onerror="this.closest('.mgallery-item').style.display='none'" alt=""><div class="phl">music/01</div></div>
+      <div class="mgallery-item"><img src="assets/music/02.jpg" onerror="this.closest('.mgallery-item').style.display='none'" alt=""><div class="phl">music/02</div></div>
+      <div class="mgallery-item"><img src="assets/music/03.jpg" onerror="this.closest('.mgallery-item').style.display='none'" alt=""><div class="phl">music/03</div></div>
+      <div class="mgallery-item"><img src="assets/music/04.jpg" onerror="this.closest('.mgallery-item').style.display='none'" alt=""><div class="phl">music/04</div></div>
+      <div class="mgallery-item"><img src="assets/music/05.jpg" onerror="this.closest('.mgallery-item').style.display='none'" alt=""><div class="phl">music/05</div></div>
+      <div class="mgallery-item"><img src="assets/music/06.jpg" onerror="this.closest('.mgallery-item').style.display='none'" alt=""><div class="phl">music/06</div></div>
     </div>
     <div class="mtracks">
       <h3>Tracks</h3>
@@ -1248,7 +1260,14 @@ video:not([src]),video[preload="none"]{background:#111}
     <div class="absec-label">Connect</div>
     <div class="socials socials-lg" id="ab-section-socials"><!-- injected by JS --></div>
 
-    <div class="absec-label">Get in touch</div>
+    <!-- ── Favourites ── -->
+    <div id="ab-favourites">
+      <div class="absec-label">Favourites</div>
+      <div id="ab-films-row"></div>
+      <a id="ab-lb-viewall" href="" target="_blank" rel="noopener">View all on Letterboxd →</a>
+    </div>
+
+    <div class="absec-label" style="margin-top:28px">Get in touch</div>
     <!--
       ── Contact form via Formspree ──
       Setup steps:
@@ -1658,8 +1677,9 @@ video:not([src]),video[preload="none"]{background:#111}
 // ── Easy-edit constants ──
 // Replace these with your own URLs.
 const SOCIAL_LINKS = {
-  linkedin:  'https://www.linkedin.com/in/baran-abanoz-779b62153/',
-  instagram: 'https://www.instagram.com/baranabanoz/',
+  linkedin:    'https://www.linkedin.com/in/baran-abanoz-779b62153/',
+  instagram:   'https://www.instagram.com/baranabanoz/',
+  letterboxd:  'https://letterboxd.com/abanoz/',
 };
 
 // ── Data ──
@@ -2526,21 +2546,23 @@ if(window.innerWidth > 767){
   const SPKOFF = '<svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
   const SPKON  = '<svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
   const liSVG  = '<svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>';
+  const igSVG  = '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
+  const lbSVG  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg>';
 
   // Pre-warm the first story video so it's ready when initMobileStory fires.
   if(window.PROJECTS && PROJECTS.motion && PROJECTS.motion[0]){
     const preWarm = document.getElementById('m-story-video');
     if(preWarm){ preWarm.src = PROJECTS.motion[0].video; preWarm.load(); }
   }
-  const igSVG  = '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
 
   // ── Social links ──
   ['m-card-socials','m-about-socials'].forEach(id => {
     const el = document.getElementById(id);
     if(!el) return;
     el.innerHTML =
-      `<a class="social-link" href="${SOCIAL_LINKS.linkedin}" target="_blank" rel="noopener" aria-label="LinkedIn">${liSVG}</a>` +
-      `<a class="social-link" href="${SOCIAL_LINKS.instagram}" target="_blank" rel="noopener" aria-label="Instagram">${igSVG}</a>`;
+      `<a class="social-link" href="${SOCIAL_LINKS.linkedin}"   target="_blank" rel="noopener" aria-label="LinkedIn">${liSVG}</a>` +
+      `<a class="social-link" href="${SOCIAL_LINKS.instagram}"  target="_blank" rel="noopener" aria-label="Instagram">${igSVG}</a>` +
+      `<a class="social-link" href="${SOCIAL_LINKS.letterboxd}" target="_blank" rel="noopener" aria-label="Letterboxd">${lbSVG}</a>`;
   });
 
   // ── Music section data ──
@@ -2998,15 +3020,53 @@ const AIRPLANE_SRC = 'assets/airplane.gif';
 
 // ── Inject social icons into the About teaser + section ──
 (function renderSocials(){
-  const linkedinSVG  = '<svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>';
-  const instagramSVG = '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
+  const linkedinSVG    = '<svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>';
+  const instagramSVG   = '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
+  const letterboxdSVG  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg>';
   const html =
-    `<a class="social-link" href="${SOCIAL_LINKS.linkedin}"  target="_blank" rel="noopener" aria-label="LinkedIn">${linkedinSVG}</a>` +
-    `<a class="social-link" href="${SOCIAL_LINKS.instagram}" target="_blank" rel="noopener" aria-label="Instagram">${instagramSVG}</a>`;
+    `<a class="social-link" href="${SOCIAL_LINKS.linkedin}"   target="_blank" rel="noopener" aria-label="LinkedIn">${linkedinSVG}</a>` +
+    `<a class="social-link" href="${SOCIAL_LINKS.instagram}"  target="_blank" rel="noopener" aria-label="Instagram">${instagramSVG}</a>` +
+    `<a class="social-link" href="${SOCIAL_LINKS.letterboxd}" target="_blank" rel="noopener" aria-label="Letterboxd">${letterboxdSVG}</a>`;
   const teaser  = document.getElementById('ab-teaser-socials');
   const section = document.getElementById('ab-section-socials');
   if(teaser)  teaser.innerHTML  = html;
   if(section) section.innerHTML = html;
+})();
+
+// ── Letterboxd Favourites ──
+// Fetches the 4 most-recent logged films from the RSS feed via rss2json
+// (handles CORS). Hides the section on any failure or empty response.
+(function loadLetterboxdFaves(){
+  if(window.innerWidth <= 767) return;
+  const container = document.getElementById('ab-favourites');
+  const row       = document.getElementById('ab-films-row');
+  const viewAll   = document.getElementById('ab-lb-viewall');
+  if(!container || !row) return;
+  // Derive RSS URL from SOCIAL_LINKS so username stays a single source of truth
+  const base   = SOCIAL_LINKS.letterboxd.replace(/\/?$/, '/');
+  const rssUrl = encodeURIComponent(base + 'rss/');
+  if(viewAll) viewAll.href = SOCIAL_LINKS.letterboxd;
+  fetch('https://api.rss2json.com/v1/api.json?rss_url=' + rssUrl)
+    .then(r => r.json())
+    .then(data => {
+      const items = (data.items || []).slice(0, 4);
+      if(!items.length){ container.style.display = 'none'; return; }
+      items.forEach(item => {
+        // Letterboxd puts "Film Title, YYYY - ★★★½" in the title field
+        const raw   = (item.title || '');
+        const stars = raw.match(/[★½]+/)?.[0] || '';
+        const title = raw.replace(/[★½].*$/, '').replace(/,?\s*\d{4}\s*[-–]?\s*$/, '').trim();
+        const img   = item.thumbnail || (item.enclosure && item.enclosure.link) || '';
+        const card  = document.createElement('div');
+        card.className = 'ab-film-card';
+        card.innerHTML =
+          `<img class="ab-film-poster" src="${img}" alt="${title.replace(/"/g,'&quot;')}" loading="lazy" onerror="this.style.visibility='hidden'">` +
+          `<div class="ab-film-title">${title}</div>` +
+          (stars ? `<div class="ab-film-stars">${stars}</div>` : '');
+        row.appendChild(card);
+      });
+    })
+    .catch(() => { container.style.display = 'none'; });
 })();
 
 // ── Render the music section from MUSIC data ──
