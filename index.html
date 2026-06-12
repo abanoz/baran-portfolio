@@ -560,18 +560,25 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 }
 .social-link:hover{color:#fff;transform:translateY(-1px)}
 .social-link svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.social-link svg,.social-link circle{transition:fill .2s,stroke .2s}
+.social-link[aria-label="LinkedIn"]:hover svg{stroke:#0A66C2}
+.social-link[aria-label="Instagram"]:hover svg{stroke:url(#ig-gradient)}
+.social-link[aria-label="Letterboxd"]:hover svg circle:nth-child(1){fill:#EF7B2A}
+.social-link[aria-label="Letterboxd"]:hover svg circle:nth-child(2){fill:#3DB845}
+.social-link[aria-label="Letterboxd"]:hover svg circle:nth-child(3){fill:#40BCF4}
 /* Larger variant in About section */
 .socials-lg{gap:10px;margin-bottom:36px}
 .socials-lg .social-link svg{width:22px;height:22px}
 
-/* ── Favourites / Letterboxd film cards ── */
-#ab-favourites{margin-bottom:28px}
-#ab-films-row{display:flex;gap:8px;flex-wrap:nowrap;margin-bottom:10px}
-.ab-film-card{flex:0 0 calc(25% - 6px);width:calc(25% - 6px);min-width:0}
-.ab-film-poster{width:100%;aspect-ratio:2/3;border-radius:6px;object-fit:cover;background:#1a1a1a;display:block}
-.ab-film-title{font-size:11px;color:rgba(255,255,255,.7);margin-top:6px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-family:var(--sans)}
-.ab-film-stars{font-size:10px;color:rgba(255,255,255,.4);margin-top:2px}
-#ab-lb-viewall{font-size:11px;color:rgba(255,255,255,.35);text-decoration:none;letter-spacing:.02em}
+/* ── Recent Activity / Letterboxd film cards ── */
+#ab-favourites{margin-top:32px;padding-top:32px;border-top:.5px solid rgba(255,255,255,.08)}
+#ab-favourites .absec-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:16px}
+#ab-films-row{display:flex;gap:12px;flex-wrap:nowrap}
+.ab-film-card{flex:1;min-width:0;cursor:pointer}
+.ab-film-poster{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:6px;background:#1a1a1a;display:block;transition:opacity .2s}
+.ab-film-card:hover .ab-film-poster{opacity:.8}
+.ab-film-title{font-size:11px;color:rgba(255,255,255,.6);margin-top:6px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-family:var(--sans)}
+#ab-lb-viewall{display:block;margin-top:12px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.28);text-decoration:none;transition:color .15s}
 #ab-lb-viewall:hover{color:rgba(255,255,255,.6)}
 
 /* ── Contact form ── */
@@ -3643,5 +3650,18 @@ function wireFoodMap(){
 })(wireFoodMap);
 
 </script>
+
+<!-- Instagram gradient definition for social icon hover -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="ig-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%"   style="stop-color:#f09433"/>
+      <stop offset="25%"  style="stop-color:#e6683c"/>
+      <stop offset="50%"  style="stop-color:#dc2743"/>
+      <stop offset="75%"  style="stop-color:#cc2366"/>
+      <stop offset="100%" style="stop-color:#bc1888"/>
+    </linearGradient>
+  </defs>
+</svg>
 </body>
 </html>
