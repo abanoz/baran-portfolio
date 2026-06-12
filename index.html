@@ -1262,7 +1262,7 @@ video:not([src]),video[preload="none"]{background:#111}
 
     <!-- ── Favourites ── -->
     <div id="ab-favourites">
-      <div class="absec-label">Favourites</div>
+      <div class="absec-label">Recent Activity</div>
       <div id="ab-films-row"></div>
       <a id="ab-lb-viewall" href="" target="_blank" rel="noopener">View all on Letterboxd →</a>
     </div>
@@ -2547,7 +2547,7 @@ if(window.innerWidth > 767){
   const SPKON  = '<svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
   const liSVG  = '<svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>';
   const igSVG  = '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
-  const lbSVG  = '<span style="font-size:9px;font-weight:700;letter-spacing:0.04em;font-family:var(--sans);color:inherit;line-height:1;">LB</span>';
+  const lbSVG  = '<svg viewBox="0 0 36 16" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:auto;display:inline-block;vertical-align:middle;"><circle cx="8" cy="8" r="8" fill="rgba(255,255,255,0.7)"/><circle cx="18" cy="8" r="8" fill="rgba(255,255,255,0.85)"/><circle cx="28" cy="8" r="8" fill="rgba(255,255,255,0.7)"/></svg>';
 
   // Pre-warm the first story video so it's ready when initMobileStory fires.
   if(window.PROJECTS && PROJECTS.motion && PROJECTS.motion[0]){
@@ -3022,7 +3022,7 @@ const AIRPLANE_SRC = 'assets/airplane.gif';
 (function renderSocials(){
   const linkedinSVG    = '<svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>';
   const instagramSVG   = '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
-  const letterboxdSVG  = '<span style="font-size:9px;font-weight:700;letter-spacing:0.04em;font-family:var(--sans);color:inherit;line-height:1;">LB</span>';
+  const letterboxdSVG  = '<svg viewBox="0 0 36 16" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:auto;display:inline-block;vertical-align:middle;"><circle cx="8" cy="8" r="8" fill="rgba(255,255,255,0.7)"/><circle cx="18" cy="8" r="8" fill="rgba(255,255,255,0.85)"/><circle cx="28" cy="8" r="8" fill="rgba(255,255,255,0.7)"/></svg>';
   const html =
     `<a class="social-link" href="${SOCIAL_LINKS.linkedin}"   target="_blank" rel="noopener" aria-label="LinkedIn">${linkedinSVG}</a>` +
     `<a class="social-link" href="${SOCIAL_LINKS.instagram}"  target="_blank" rel="noopener" aria-label="Instagram">${instagramSVG}</a>` +
@@ -3033,43 +3033,50 @@ const AIRPLANE_SRC = 'assets/airplane.gif';
   if(section) section.innerHTML = html;
 })();
 
-// ── Letterboxd Favourites ──
-// Fetches the 4 most-recent logged films from the RSS feed via rss2json
-// (handles CORS). Hides the section on any failure or empty response.
+// ── Letterboxd Recent Activity ──
+// Fetches 4 most-recently logged films via rss2json (handles CORS).
+// Hides the section on any failure or empty response.
 (function loadLetterboxdFaves(){
   if(window.innerWidth <= 767) return;
   const container = document.getElementById('ab-favourites');
   const row       = document.getElementById('ab-films-row');
   const viewAll   = document.getElementById('ab-lb-viewall');
   if(!container || !row) return;
-  // Derive profile URL from SOCIAL_LINKS — single source of truth for username
-  const profileUrl = SOCIAL_LINKS.letterboxd.replace(/\/?$/, '/');
   if(viewAll) viewAll.href = SOCIAL_LINKS.letterboxd;
-  fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(profileUrl))
+
+  // Use RSS feed — reliable film data with poster images
+  const rssUrl = SOCIAL_LINKS.letterboxd.replace(/\/?$/, '/rss/');
+  fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rssUrl))
     .then(r => r.json())
     .then(data => {
-      const parser = new DOMParser();
-      const doc    = parser.parseFromString(data.contents, 'text/html');
-      // Favourites live in section.favourites (or #favourites) as .film-poster items
-      const favs = doc.querySelectorAll('section.favourites .film-poster, #favourites .film-poster');
-      if(!favs.length){ container.style.display = 'none'; return; }
+      if(!data.items || !data.items.length){
+        container.style.display = 'none'; return;
+      }
       row.innerHTML = '';
-      Array.from(favs).slice(0, 4).forEach(fp => {
-        const img      = fp.querySelector('img');
-        const filmSlug = fp.dataset.filmSlug || '';
-        const title    = img?.alt || filmSlug.replace(/-/g, ' ');
-        const poster   = img?.src || img?.dataset.src || '';
-        const card     = document.createElement('div');
+      data.items.slice(0, 4).forEach(item => {
+        // Extract poster from description HTML
+        const tmp = document.createElement('div');
+        tmp.innerHTML = item.description || '';
+        const img    = tmp.querySelector('img');
+        const poster = img ? img.src : '';
+
+        // RSS title includes rating like "Film Name, ★★★"
+        const title = (item.title || '').replace(/,\s*★.*/, '').trim();
+
+        const link = item.link || SOCIAL_LINKS.letterboxd;
+
+        const card = document.createElement('div');
         card.className = 'ab-film-card';
         card.style.cursor = 'pointer';
         card.innerHTML =
-          `<img class="ab-film-poster" src="${poster}" alt="${title.replace(/"/g,'&quot;')}" loading="lazy" onerror="this.style.visibility='hidden'">` +
+          `<img class="ab-film-poster" src="${poster}" alt="${title.replace(/"/g,'&quot;')}" loading="lazy" onerror="this.closest('.ab-film-card').style.display='none'">` +
           `<div class="ab-film-title">${title}</div>`;
-        card.addEventListener('click', () => {
-          window.open('https://letterboxd.com/film/' + filmSlug, '_blank');
-        });
+        card.addEventListener('click', () => window.open(link, '_blank'));
         row.appendChild(card);
       });
+
+      // If every card was hidden by onerror, hide the section
+      if(!row.children.length) container.style.display = 'none';
     })
     .catch(() => { container.style.display = 'none'; });
 })();
