@@ -491,6 +491,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 .absec p{font-size:16px;line-height:1.75;color:rgba(255,255,255,.58);margin-bottom:28px}
 
 .absec-label{font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.14em;margin-bottom:12px}
+.absec-top{margin-top:32px}
+.absec-ruled{padding-top:32px;border-top:.5px solid rgba(255,255,255,.08)}
 
 .skills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:32px}
 .skill{display:inline-block;font-size:11px;color:rgba(255,255,255,.7);background:rgba(255,255,255,.05);border:.5px solid rgba(255,255,255,.12);border-radius:100px;padding:5px 12px;letter-spacing:.02em}
@@ -566,13 +568,13 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 .social-link[aria-label="Letterboxd"]:hover svg circle:nth-child(1){fill:#EF7B2A}
 .social-link[aria-label="Letterboxd"]:hover svg circle:nth-child(2){fill:#3DB845}
 .social-link[aria-label="Letterboxd"]:hover svg circle:nth-child(3){fill:#40BCF4}
+.social-link[aria-label="Letterboxd"] circle{fill:rgba(255,255,255,.65)}
 /* Larger variant in About section */
-.socials-lg{gap:10px;margin-bottom:36px}
+.socials-lg{gap:10px;margin-bottom:0}
 .socials-lg .social-link svg{width:22px;height:22px}
 
 /* ── Recent Activity / Letterboxd film cards ── */
-#ab-favourites{margin-top:32px;padding-top:32px;border-top:.5px solid rgba(255,255,255,.08)}
-#ab-favourites .absec-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:16px}
+#ab-favourites{margin-top:0;padding-top:28px;border-top:.5px solid rgba(255,255,255,.08);margin-bottom:0}
 #ab-films-row{display:flex;gap:12px;flex-wrap:nowrap}
 .ab-film-card{flex:1;min-width:0;cursor:pointer}
 .ab-film-poster{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:6px;background:#1a1a1a;display:block;transition:opacity .2s}
@@ -1274,7 +1276,7 @@ video:not([src]),video[preload="none"]{background:#111}
       <a id="ab-lb-viewall" href="" target="_blank" rel="noopener">View all on Letterboxd →</a>
     </div>
 
-    <div class="absec-label" style="margin-top:28px">Get in touch</div>
+    <div class="absec-label absec-top">Get in touch</div>
     <!--
       ── Contact form via Formspree ──
       Setup steps:
@@ -1306,7 +1308,7 @@ video:not([src]),video[preload="none"]{background:#111}
     </form>
     <div class="cform-success" id="cf-success" hidden>Message sent — I'll be in touch soon.</div>
 
-    <div class="absec-label" style="padding-top:32px;border-top:.5px solid rgba(255,255,255,.08);margin-top:32px">Food Map</div>
+    <div class="absec-label absec-top absec-ruled">Food Map</div>
     <div class="food-map-toggle">
       <button class="food-map-btn active" data-city="london">London</button>
       <button class="food-map-btn" data-city="istanbul">Istanbul</button>
@@ -2554,7 +2556,7 @@ if(window.innerWidth > 767){
   const SPKON  = '<svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
   const liSVG  = '<svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>';
   const igSVG  = '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
-  const lbSVG  = '<svg viewBox="0 0 36 16" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:auto;display:inline-block;vertical-align:middle;"><circle cx="8" cy="8" r="8" fill="rgba(255,255,255,0.7)"/><circle cx="18" cy="8" r="8" fill="rgba(255,255,255,0.85)"/><circle cx="28" cy="8" r="8" fill="rgba(255,255,255,0.7)"/></svg>';
+  const lbSVG  = '<svg viewBox="0 0 36 16" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:auto;display:inline-block;vertical-align:middle;"><circle cx="8" cy="8" r="8" fill="rgba(255,255,255,0.6)"/><circle cx="18" cy="8" r="8" fill="rgba(255,255,255,0.8)"/><circle cx="28" cy="8" r="8" fill="rgba(255,255,255,0.6)"/></svg>';
 
   // Pre-warm the first story video so it's ready when initMobileStory fires.
   if(window.PROJECTS && PROJECTS.motion && PROJECTS.motion[0]){
@@ -3029,7 +3031,7 @@ const AIRPLANE_SRC = 'assets/airplane.gif';
 (function renderSocials(){
   const linkedinSVG    = '<svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>';
   const instagramSVG   = '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
-  const letterboxdSVG  = '<svg viewBox="0 0 36 16" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:auto;display:inline-block;vertical-align:middle;"><circle cx="8" cy="8" r="8" fill="rgba(255,255,255,0.7)"/><circle cx="18" cy="8" r="8" fill="rgba(255,255,255,0.85)"/><circle cx="28" cy="8" r="8" fill="rgba(255,255,255,0.7)"/></svg>';
+  const letterboxdSVG  = '<svg viewBox="0 0 36 16" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:auto;display:inline-block;vertical-align:middle;"><circle cx="8" cy="8" r="8" fill="rgba(255,255,255,0.6)"/><circle cx="18" cy="8" r="8" fill="rgba(255,255,255,0.8)"/><circle cx="28" cy="8" r="8" fill="rgba(255,255,255,0.6)"/></svg>';
   const html =
     `<a class="social-link" href="${SOCIAL_LINKS.linkedin}"   target="_blank" rel="noopener" aria-label="LinkedIn">${linkedinSVG}</a>` +
     `<a class="social-link" href="${SOCIAL_LINKS.instagram}"  target="_blank" rel="noopener" aria-label="Instagram">${instagramSVG}</a>` +
