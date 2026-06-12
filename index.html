@@ -2676,43 +2676,19 @@ if(window.innerWidth > 767){
     const ov = document.getElementById('m-media-overlay');
     const content = document.getElementById('m-media-overlay-content');
 
-    // Remove any previously added mute buttons
-    ov.querySelectorAll('.m-ov-mute').forEach(b => b.remove());
     content.innerHTML = '';
 
     if(type === 'video'){
-      const wrapper = document.createElement('div');
-      wrapper.style.cssText =
-        'position:relative;display:inline-flex;align-items:center;justify-content:center;';
-
       const vid = document.createElement('video');
       vid.muted = true;
       vid.loop = true;
+      vid.controls = true;
       vid.setAttribute('playsinline','');
       vid.style.cssText = orientation === 'vertical'
         ? 'width:72vw;height:auto;max-height:70vh;border-radius:10px;display:block;object-fit:contain;'
         : 'width:86vw;height:auto;max-height:55vh;border-radius:10px;display:block;object-fit:contain;';
 
-      const muteBtn = document.createElement('button');
-      muteBtn.className = 'm-ov-mute';
-      muteBtn.style.cssText =
-        'position:absolute;bottom:10px;right:10px;' +
-        'width:32px;height:32px;border-radius:50%;' +
-        'background:rgba(0,0,0,0.65);' +
-        'border:0.5px solid rgba(255,255,255,0.25);' +
-        'display:flex;align-items:center;justify-content:center;' +
-        'cursor:pointer;z-index:2;padding:0;';
-      muteBtn.innerHTML = SPKOFF;
-      muteBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        vid.muted = !vid.muted;
-        muteBtn.innerHTML = vid.muted ? SPKOFF : SPKON;
-      });
-
-      wrapper.appendChild(vid);
-      wrapper.appendChild(muteBtn);
-      content.appendChild(wrapper);
-
+      content.appendChild(vid);
       ov.style.display = 'flex';
       vid.src = src;
       requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -2735,7 +2711,6 @@ if(window.innerWidth > 767){
     if(vid){ vid.pause(); vid.src = ''; }
     ov.style.display = 'none';
     document.getElementById('m-media-overlay-content').innerHTML = '';
-    ov.querySelectorAll('.m-ov-mute').forEach(b => b.remove());
   });
 
   // ── 3D home card: lazy-load teaser video ──
