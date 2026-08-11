@@ -920,17 +920,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   .m-story-see-all{position:absolute;top:20px;right:10px;z-index:5;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border:.5px solid rgba(255,255,255,.5);border-radius:100px;color:rgba(255,255,255,.9);background:rgba(0,0,0,.3);cursor:pointer}
 }
 @media(min-width:768px){#mob{display:none}}
-/* ── Food Map ── */
-.food-map-toggle{display:flex;gap:8px;margin:12px 0 14px}
-.food-map-btn{padding:5px 16px;border-radius:100px;font-family:var(--sans);font-size:11px;cursor:pointer;transition:all .18s;line-height:1.4}
-.food-map-btn.active{background:#fff;color:#000;border:none}
-.food-map-btn:not(.active){background:transparent;color:#fff;border:.5px solid rgba(255,255,255,.2)}
-#food-map{width:100%;height:380px;border-radius:8px;overflow:hidden;filter:contrast(1.05) saturate(.9)}
-.food-map-note{font-size:11px;color:rgba(255,255,255,.25);margin-top:10px;text-align:center}
-.food-popup .leaflet-popup-content-wrapper{background:rgba(12,12,12,.97);color:#fff;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;box-shadow:0 8px 32px rgba(0,0,0,.7);border:.5px solid rgba(255,255,255,.12);padding:4px 2px;min-width:160px;max-width:220px}
-.food-popup .leaflet-popup-content{margin:10px 14px;line-height:1.5}
-.food-popup .leaflet-popup-tip-container{display:none}
-.food-popup .leaflet-popup-close-button{display:none}
 .food-popup .fp-name{font-family:'DM Serif Display',serif;font-size:14px;color:#fff;display:block;margin-bottom:4px}
 .food-popup .fp-link{font-size:10px;color:rgba(255,255,255,.45);text-decoration:none;display:block}
 .food-popup .fp-link:hover{text-decoration:underline}
@@ -1178,7 +1167,7 @@ video:not([src]),video[preload="none"]{background:#111}
   <div class="win-body"><div class="absec">
     <div class="loc">London, United Kingdom</div>
     <h1>Baran</h1>
-    <p>Based in London. Kingston University London, MA Media &amp; Communications student. Özyeğin University, Communication Design graduate. Skilled in Motion Graphics, Art Direction, Creative Direction, 3D Design, UI/UX Design, Visual Design and Social Media Marketing. Various work in design, fashion and music industries. Last role: Motion Designer at 365 creative agency, September Content Management.</p>
+    <p>Based in London. Kingston University London, MA Media &amp; Communications student. Özyeğin University, Communication Design graduate. Skilled in Motion Graphics, Art Direction, Creative Direction, 3D Design, UI/UX Design, Visual Design and Social Media Marketing. Various work in design, fashion and music industries. Current role: Jr. Motion Designer at Entroxy, London.</p>
 
     <div class="absec-label">Skills</div>
     <div class="skills">
@@ -1196,6 +1185,14 @@ video:not([src]),video[preload="none"]{background:#111}
     <!-- ── Experience ── -->
     <div class="absec-label">Experience</div>
     <div class="exp-list">
+      <div class="exp-row">
+        <div class="exp-logo"><img src="https://assets.baranabanoz.com/assets/logos/entroxy.png" alt="Entroxy" loading="lazy"></div>
+        <div>
+          <div class="exp-role">Jr. Motion Designer</div>
+          <div class="exp-company">Entroxy</div>
+        </div>
+        <div class="exp-date">2025 — Present</div>
+      </div>
       <div class="exp-row">
         <div class="exp-logo"><img src="https://assets.baranabanoz.com/assets/logos/september.png" alt="September" loading="lazy"></div>
         <div>
@@ -1308,13 +1305,6 @@ video:not([src]),video[preload="none"]{background:#111}
     </form>
     <div class="cform-success" id="cf-success" hidden>Message sent — I'll be in touch soon.</div>
 
-    <div class="absec-label absec-top absec-ruled">Food Map</div>
-    <div class="food-map-toggle">
-      <button class="food-map-btn active" data-city="london">London</button>
-      <button class="food-map-btn" data-city="istanbul">Istanbul</button>
-    </div>
-    <div id="food-map"></div>
-    <div class="food-map-note" id="food-map-note">19 spots · more coming soon</div>
   </div></div>
 </div>
 
@@ -2555,7 +2545,6 @@ if(window.innerWidth > 767){
   const SPKOFF = '<svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
   const SPKON  = '<svg viewBox="0 0 24 24"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
   const liSVG  = '<svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>';
-  const igSVG  = '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
   const lbSVG  = '<svg viewBox="0 0 36 16" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:auto;display:inline-block;vertical-align:middle;"><circle cx="8" cy="8" r="8" fill="rgba(255,255,255,0.6)"/><circle cx="18" cy="8" r="8" fill="rgba(255,255,255,0.8)"/><circle cx="28" cy="8" r="8" fill="rgba(255,255,255,0.6)"/></svg>';
 
   // Pre-warm the first story video so it's ready when initMobileStory fires.
@@ -2570,7 +2559,6 @@ if(window.innerWidth > 767){
     if(!el) return;
     el.innerHTML =
       `<a class="social-link" href="${SOCIAL_LINKS.linkedin}"   target="_blank" rel="noopener" aria-label="LinkedIn">${liSVG}</a>` +
-      `<a class="social-link" href="${SOCIAL_LINKS.instagram}"  target="_blank" rel="noopener" aria-label="Instagram">${igSVG}</a>` +
       `<a class="social-link" href="${SOCIAL_LINKS.letterboxd}" target="_blank" rel="noopener" aria-label="Letterboxd">${lbSVG}</a>`;
   });
 
@@ -3028,11 +3016,9 @@ const AIRPLANE_SRC = 'https://assets.baranabanoz.com/assets/airplane.gif';
 // ── Inject social icons into the About teaser + section ──
 (function renderSocials(){
   const linkedinSVG    = '<svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>';
-  const instagramSVG   = '<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
   const letterboxdSVG  = '<svg viewBox="0 0 36 16" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:auto;display:inline-block;vertical-align:middle;"><circle cx="8" cy="8" r="8" fill="rgba(255,255,255,0.6)"/><circle cx="18" cy="8" r="8" fill="rgba(255,255,255,0.8)"/><circle cx="28" cy="8" r="8" fill="rgba(255,255,255,0.6)"/></svg>';
   const html =
     `<a class="social-link" href="${SOCIAL_LINKS.linkedin}"   target="_blank" rel="noopener" aria-label="LinkedIn">${linkedinSVG}</a>` +
-    `<a class="social-link" href="${SOCIAL_LINKS.instagram}"  target="_blank" rel="noopener" aria-label="Instagram">${instagramSVG}</a>` +
     `<a class="social-link" href="${SOCIAL_LINKS.letterboxd}" target="_blank" rel="noopener" aria-label="Letterboxd">${letterboxdSVG}</a>`;
   const teaser  = document.getElementById('ab-teaser-socials');
   const section = document.getElementById('ab-section-socials');
@@ -3548,117 +3534,6 @@ showStory(0);
   });
 })();
 
-/* ── Food Map (Leaflet + CartoDB dark) ── */
-function wireFoodMap(){
-  const btns   = document.querySelectorAll('.food-map-btn');
-  const mapEl  = document.getElementById('food-map');
-  const noteEl = document.getElementById('food-map-note');
-  if(!mapEl || typeof L === 'undefined') return;
-
-  const LONDON_SPOTS = [
-    [[51.4985, -0.1270], 'Haanbaagasuteki'],
-    [[51.4122, -0.3063], 'Poor Boys Kingston'],
-    [[51.4613, -0.3042], 'Hollyhock Vegetarian Cafe Richmond'],
-    [[51.4608, -0.3167], 'Napoli on the Road Richmond'],
-    [[51.4601, -0.3065], 'Via Romana Deli Richmond'],
-    [[51.4597, -0.3055], 'Danieli on the Green Richmond'],
-    [[51.5393, -0.1425], 'Mestizo Mexican Restaurant Camden'],
-    [[51.5116, -0.2021], 'Earl of Lonsdale Notting Hill'],
-    [[51.5129, -0.1333], 'Heard Burger Soho'],
-    [[51.5131, -0.1340], 'Breadstall Pizza Soho'],
-    [[51.5127, -0.1338], 'Antico Vinaio Soho'],
-    [[51.5113, -0.1285], 'YiQi Chinatown'],
-    [[51.5117, -0.1353], 'Bar Termini'],
-    [[51.5120, -0.1264], 'Rock and Sole Plaice'],
-    [[51.5155, -0.0613], 'Tarim Uyghur Restaurant'],
-    [[51.5278, -0.0573], 'E Pelicci'],
-    [[51.5008, -0.0199], 'Dishoom Canary Wharf'],
-    [[51.4118, -0.3055], 'Korea Hero Kingston'],
-    [[51.4115, -0.3049], 'Al Forno Kingston'],
-  ];
-  // Istanbul spots coming soon
-
-  // Circle marker style
-  const dotOpts = { radius:8, fillColor:'#ff5f57', color:'rgba(255,255,255,0.6)', weight:1.5, fillOpacity:1 };
-
-  // Rich popup HTML — name in DM Serif Display + Google Maps link
-  function makePopupHTML(name, city){
-    const q = name.replace(/ /g,'+') + '+' + city;
-    return `<span class="fp-name">${name}</span>` +
-           `<a class="fp-link" href="https://www.google.com/maps/search/${q}" target="_blank" rel="noopener">Open in Google Maps</a>`;
-  }
-
-  const map = L.map(mapEl, {
-    center: [51.505, -0.09],
-    zoom: 12,
-    zoomControl: true,
-    attributionControl: false,
-  });
-
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
-    maxZoom: 19,
-  }).addTo(map);
-
-  // London markers
-  const londonLayer = L.layerGroup();
-  LONDON_SPOTS.forEach(([latlng, name]) => {
-    const m = L.circleMarker(latlng, dotOpts);
-    m.bindPopup(makePopupHTML(name, 'London'), { className:'food-popup', closeButton:false, autoPan:false });
-    m.on('mouseover', function(){ this.openPopup(); });
-    m.on('mouseout',  function(){ this.closePopup(); });
-    londonLayer.addLayer(m);
-  });
-
-  // Istanbul layer — empty for now
-  const istanbulLayer = L.layerGroup();
-  // Istanbul spots coming soon
-
-  const CITIES = {
-    london:   { layer: londonLayer,   center: [51.505,  -0.09  ], zoom: 12, note: '19 spots · more coming soon' },
-    istanbul: { layer: istanbulLayer, center: [41.0082, 28.9784], zoom: 12, note: 'Coming soon' },
-  };
-
-  londonLayer.addTo(map);
-
-  function switchCity(city) {
-    const cfg = CITIES[city]; if(!cfg) return;
-    Object.values(CITIES).forEach(c => { if(map.hasLayer(c.layer)) map.removeLayer(c.layer); });
-    map.addLayer(cfg.layer);
-    map.flyTo(cfg.center, cfg.zoom, { duration: 0.8 });
-    if(noteEl) noteEl.textContent = cfg.note;
-  }
-
-  btns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      btns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      switchCity(btn.dataset.city);
-    });
-  });
-
-  // Invalidate size when About section is opened (sw-about gets class 'open')
-  const aboutSW = document.getElementById('sw-about');
-  if(aboutSW) {
-    new MutationObserver(() => {
-      if(aboutSW.classList.contains('open')) {
-        setTimeout(() => { map.invalidateSize(); }, 80);
-      }
-    }).observe(aboutSW, { attributes: true, attributeFilter: ['class'] });
-  }
-}
-
-(function loadLeaflet(cb){
-  if(window.innerWidth <= 767){ return; }
-  const link = document.createElement('link');
-  link.rel='stylesheet';
-  link.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-  document.head.appendChild(link);
-  const s = document.createElement('script');
-  s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-  s.onload = cb;
-  document.head.appendChild(s);
-})(wireFoodMap);
 
 </script>
 
