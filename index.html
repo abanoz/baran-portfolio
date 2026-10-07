@@ -1073,7 +1073,7 @@ video:not([src]),video[preload="none"]{background:#111}
   <div class="win-bar"><div class="dots"><div class="dot r" data-role="sc" data-id="sw-motion"></div><div class="dot y" data-role="sy" data-id="sw-motion"></div><div class="dot g" data-role="sg" data-id="sw-motion"></div></div><div class="win-label">Motion Design</div></div>
   <div class="sw-sub">Motion Design</div>
   <div class="win-body">
-    <!-- 19 vertical-video cards rendered by JS from PROJECTS.motion -->
+    <!-- 21 vertical-video cards rendered by JS from PROJECTS.motion -->
     <div class="motion-grid" id="motion-grid"></div>
   </div>
 </div>
@@ -1687,7 +1687,7 @@ const SOCIAL_LINKS = {
 };
 
 // ── Data ──
-// Motion: 17 vertical-video projects. Each card looks for https://assets.baranabanoz.com/assets/motion/NN.mp4
+// Motion: 21 vertical-video projects. Each card looks for https://assets.baranabanoz.com/assets/motion/NN.mp4
 // (with https://assets.baranabanoz.com/assets/motion/NN.jpg as a poster/fallback when the video is missing).
 const PROJECTS = {
   // First five motion projects have explicit titles (these drive the teaser
@@ -1700,7 +1700,7 @@ const PROJECTS = {
       'September Wrapped 2024',
       'Koton Paper Launch Video',
     ];
-    return Array.from({length:19}, (_, i) => {
+    return Array.from({length:21}, (_, i) => {
       const n = String(i+1).padStart(2,'0');
       return {
         title: titles[i] || `Project ${n}`,
@@ -1737,6 +1737,18 @@ const PROJECTS = {
     {title:'Tape Animation for Dekolte',   client:'', cat:'3D Design',
      video:'https://assets.baranabanoz.com/assets/3d/06.mp4',
      orientation:'vertical', extraImgs:[]},
+    {title:'',                             client:'', cat:'3D Design',
+     video:'https://assets.baranabanoz.com/assets/3d/07.mp4',
+     orientation:'landscape', extraImgs:[]},
+    {title:'',                             client:'', cat:'3D Design',
+     video:'https://assets.baranabanoz.com/assets/3d/08.mp4',
+     orientation:'landscape', extraImgs:[]},
+    {title:'',                             client:'', cat:'3D Design',
+     img:'https://assets.baranabanoz.com/assets/3d/07.jpg',
+     orientation:'landscape', extraImgs:[]},
+    {title:'',                             client:'', cat:'3D Design',
+     img:'https://assets.baranabanoz.com/assets/3d/08.jpg',
+     orientation:'landscape', extraImgs:[]},
   ],
   // UI/UX projects.
   //   • Project 01 ("App Design") is vertical (9:16) — its grid card spans
