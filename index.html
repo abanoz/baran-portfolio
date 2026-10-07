@@ -564,7 +564,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
 .social-link svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .social-link svg,.social-link circle{transition:fill .2s,stroke .2s}
 .social-link[aria-label="LinkedIn"]:hover svg{stroke:#0A66C2}
-.social-link[aria-label="Instagram"]:hover svg{stroke:url(#ig-gradient)}
 .social-link[aria-label="Letterboxd"]:hover svg circle:nth-child(1){fill:#EF7B2A}
 .social-link[aria-label="Letterboxd"]:hover svg circle:nth-child(2){fill:#3DB845}
 .social-link[aria-label="Letterboxd"]:hover svg circle:nth-child(3){fill:#40BCF4}
@@ -920,9 +919,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   .m-story-see-all{position:absolute;top:20px;right:10px;z-index:5;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border:.5px solid rgba(255,255,255,.5);border-radius:100px;color:rgba(255,255,255,.9);background:rgba(0,0,0,.3);cursor:pointer}
 }
 @media(min-width:768px){#mob{display:none}}
-.food-popup .fp-name{font-family:'DM Serif Display',serif;font-size:14px;color:#fff;display:block;margin-bottom:4px}
-.food-popup .fp-link{font-size:10px;color:rgba(255,255,255,.45);text-decoration:none;display:block}
-.food-popup .fp-link:hover{text-decoration:underline}
 /* Loading placeholders — make unloaded video areas dark, not white/empty */
 video:not([src]),video[preload="none"]{background:#111}
 #story-card{background:#0d1829}
@@ -1719,21 +1715,17 @@ const PROJECTS = {
   // `extraImgs` lists secondary images shown below the hero in the detail
   // window — explicit `[]` means "no extras", absence means "default placeholders".
   '3d':[
+    // landscape videos
     {title:'Ducks in Distress',           client:'', cat:'3D Design',
      video:'https://assets.baranabanoz.com/assets/3d/01.mp4', img:'https://assets.baranabanoz.com/assets/3d/01.jpg',
      orientation:'landscape', extraImgs:['https://assets.baranabanoz.com/assets/3d/01b.png']},
-    {title:'Tape Animation for Dekolte',   client:'', cat:'3D Design',
-     video:'https://assets.baranabanoz.com/assets/3d/05.mp4',
-     orientation:'vertical', extraImgs:[]},
-    {title:'Tape Animation for Dekolte',   client:'', cat:'3D Design',
-     video:'https://assets.baranabanoz.com/assets/3d/06.mp4',
-     orientation:'vertical', extraImgs:[]},
     {title:'',                             client:'', cat:'3D Design',
      video:'https://assets.baranabanoz.com/assets/3d/07.mp4',
      orientation:'landscape', extraImgs:[]},
     {title:'',                             client:'', cat:'3D Design',
      video:'https://assets.baranabanoz.com/assets/3d/08.mp4',
      orientation:'landscape', extraImgs:[]},
+    // landscape photos
     {title:'The Doughnuts',                client:'', cat:'3D Design',
      img:'https://assets.baranabanoz.com/assets/3d/02.jpg',
      orientation:'landscape', extraImgs:[]},
@@ -1749,6 +1741,13 @@ const PROJECTS = {
     {title:'',                             client:'', cat:'3D Design',
      img:'https://assets.baranabanoz.com/assets/3d/08.jpg',
      orientation:'landscape', extraImgs:[]},
+    // vertical videos
+    {title:'Tape Animation for Dekolte',   client:'', cat:'3D Design',
+     video:'https://assets.baranabanoz.com/assets/3d/05.mp4',
+     orientation:'vertical', extraImgs:[]},
+    {title:'Tape Animation for Dekolte',   client:'', cat:'3D Design',
+     video:'https://assets.baranabanoz.com/assets/3d/06.mp4',
+     orientation:'vertical', extraImgs:[]},
   ],
   // UI/UX projects.
   //   • Project 01 ("App Design") is vertical (9:16) — its grid card spans
@@ -3082,8 +3081,13 @@ const AIRPLANE_SRC = 'https://assets.baranabanoz.com/assets/airplane.gif';
         const card = document.createElement('div');
         card.className = 'ab-film-card';
         card.style.cursor = 'pointer';
-        card.innerHTML =
-          `<img class="ab-film-poster" src="${poster}" alt="" loading="lazy" onerror="this.closest('.ab-film-card').style.display='none'">`;
+        const posterImg = document.createElement('img');
+        posterImg.className = 'ab-film-poster';
+        posterImg.src = poster;
+        posterImg.alt = '';
+        posterImg.loading = 'lazy';
+        posterImg.onerror = function(){ this.closest('.ab-film-card').style.display='none'; };
+        card.appendChild(posterImg);
         card.appendChild(titleDiv);
         card.addEventListener('click', () => {
           try {
@@ -3554,17 +3558,5 @@ showStory(0);
 
 </script>
 
-<!-- Instagram gradient definition for social icon hover -->
-<svg width="0" height="0" style="position:absolute">
-  <defs>
-    <linearGradient id="ig-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
-      <stop offset="0%"   style="stop-color:#f09433"/>
-      <stop offset="25%"  style="stop-color:#e6683c"/>
-      <stop offset="50%"  style="stop-color:#dc2743"/>
-      <stop offset="75%"  style="stop-color:#cc2366"/>
-      <stop offset="100%" style="stop-color:#bc1888"/>
-    </linearGradient>
-  </defs>
-</svg>
 </body>
 </html>
