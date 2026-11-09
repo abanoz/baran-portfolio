@@ -358,6 +358,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--sans);color:v
   background:#000;border:.5px solid rgba(255,255,255,.07);
   transition:transform .2s,box-shadow .2s;
 }
+.mvcard.square{aspect-ratio:1/1}
+.mvcard.landscape{aspect-ratio:16/9;grid-column:span 2}
 .mvcard:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(0,0,0,.5)}
 .mvcard video, .mvcard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .mvcard .num{
@@ -1696,7 +1698,9 @@ const PROJECTS = {
       'September Wrapped 2024',
       'Koton Paper Launch Video',
     ];
-    return Array.from({length:21}, (_, i) => {
+    // orientation: 'vertical' (default 9/16), 'square' (1/1), 'landscape' (16/9)
+    const orientations = { 22: 'square', 23: 'square', 24: 'landscape' };
+    return Array.from({length:24}, (_, i) => {
       const n = String(i+1).padStart(2,'0');
       return {
         title: titles[i] || `Project ${n}`,
@@ -1704,6 +1708,7 @@ const PROJECTS = {
         cat: 'Motion Design',
         video: `https://assets.baranabanoz.com/assets/motion/${n}.mp4`,
         img:   `https://assets.baranabanoz.com/assets/motion/${n}.jpg`,
+        orientation: orientations[i+1] || 'vertical',
       };
     });
   })(),
@@ -2414,7 +2419,8 @@ document.querySelectorAll('.pcard').forEach(c=>{
   PROJECTS.motion.forEach((p, i) => {
     const n = String(i+1).padStart(2,'0');
     const card = document.createElement('div');
-    card.className = 'mvcard';
+    const ori = p.orientation || 'vertical';
+    card.className = 'mvcard' + (ori !== 'vertical' ? ' ' + ori : '');
     card.dataset.idx = i;
     card.innerHTML = `
       <video muted loop playsinline preload="none">
