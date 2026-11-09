@@ -1698,14 +1698,13 @@ const PROJECTS = {
       'September Wrapped 2024',
       'Koton Paper Launch Video',
     ];
-    // Order: 01, 02, 22(square), 23(square), 24(landscape), 03-21
-    const order = [1,2,22,23,24,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21];
+    // orientation: 'vertical' (default 9/16), 'square' (1/1), 'landscape' (16/9)
     const orientations = { 22: 'square', 23: 'square', 24: 'landscape' };
-    return order.map((num, i) => {
-      const n = String(num).padStart(2,'0');
-      const titleIdx = [1,2,3,4,5].indexOf(num); // original titles for 01-05
+    const nums = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,22,23,24];
+    return nums.map((num, i) => {
+      const n = String(num).padStart(2,'00');
       return {
-        title: titleIdx >= 0 ? (titles[titleIdx] || `Project ${n}`) : `Project ${n}`,
+        title: titles[num-1] || `Project ${n}`,
         client: '',
         cat: 'Motion Design',
         video: `https://assets.baranabanoz.com/assets/motion/${n}.mp4`,
